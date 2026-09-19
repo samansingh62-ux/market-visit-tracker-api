@@ -44,7 +44,7 @@ def _unb64(value: str) -> bytes:
     return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
 
 
-ddef create_token(user: dict, ttl_seconds: int = 12 * 3600) -> str:
+def create_token(user: dict, ttl_seconds: int = 12 * 3600) -> str:
     if not AUTH_SECRET:
         raise RuntimeError("AUTH_SECRET environment variable is not set")
 
