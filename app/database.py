@@ -1,32 +1,22 @@
-"""
-SQLite database layer for the Market Visit Tracker API.
-
-Uses the standard library's sqlite3 module directly (no ORM) to keep
-dependencies minimal. The database file path is configurable via the
-DB_PATH environment variable and defaults to ./data/market_visits.db.
-"""
-
 import json
 import os
-import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
+import psycopg
+from psycopg.rows import dict_row
+
 APP_DIR = Path(__file__).resolve().parent
-DB_PATH = os.environ.get("DB_PATH", str(APP_DIR.parent / "data" / "market_visits.db"))
+DATABASE_URL = os.environ.get("DATABASE_URL")
 RETAILERS_SEED_PATH = APP_DIR / "retailers_seed.json"
 
-
-def _ensure_data_dir():
-    Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is not set")
 
 
 @contextmanager
 def get_conn():
-    _ensure_data_dir()
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
         conn.commit()
@@ -38,10 +28,8 @@ def get_conn():
 
 
 def init_db():
-    """Create tables if they don't exist, and seed retailers on first run."""
     with get_conn() as conn:
-        conn.execute(
-            """
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS retailers (
                 code TEXT PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
@@ -52,12 +40,10 @@ def init_db():
                 club TEXT,
                 status TEXT
             )
-            """
-        )
-        conn.execute(
-            """
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS visits (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id BIGSERIAL PRIMARY KEY,
                 retailer TEXT NOT NULL,
                 market TEXT,
                 visit_date TEXT NOT NULL,
@@ -69,22 +55,22 @@ def init_db():
                 rds TEXT,
                 created_at TEXT NOT NULL
             )
-            """
-        )
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_visits_retailer ON visits(retailer)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_visits_tl ON visits(tl)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_visits_ss ON visits(ss)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_visits_rds ON visits(rds)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_visits_date ON visits(visit_date)")
+        """)
+        for col in ("retailer", "tl", "ss", "rds", "date"):
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_visits_{col} "
+                f"ON visits({ 'visit_date' if col == 'date' else col })"
+            )
 
         count = conn.execute("SELECT COUNT(*) AS c FROM retailers").fetchone()["c"]
         if count == 0 and RETAILERS_SEED_PATH.exists():
             with open(RETAILERS_SEED_PATH, "r", encoding="utf-8") as f:
                 seed = json.load(f)
-            conn.executemany(
-                """
-                INSERT OR IGNORE INTO retailers (code, name, tl, ss, rds, zone, club, status)
-                VALUES (:code, :name, :tl, :ss, :rds, :zone, :club, :status)
-                """,
-                seed,
-            )
+            conn.executemany("""
+                INSERT INTO retailers
+                    (code, name, tl, ss, rds, zone, club, status)
+                VALUES
+                    (%(code)s, %(name)s, %(tl)s, %(ss)s, %(rds)s,
+                     %(zone)s, %(club)s, %(status)s)
+                ON CONFLICT (code) DO NOTHING
+            """, seed)
