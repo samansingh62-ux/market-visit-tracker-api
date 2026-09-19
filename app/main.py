@@ -157,14 +157,21 @@ def get_stats(user: dict = Depends(get_current_user)):
 
 
 @app.get("/coverage", response_model=List[CoverageRow])
-def get_coverage(group_by: str = Query("tl", pattern="^(tl|ss|rds)$"), user: dict = Depends(get_current_user)):
+def get_coverage(
+    group_by: str = Query("tl", pattern="^(tl|ss|rds)$"),
+    user: dict = Depends(get_current_user)
+):
     role = user.get("role")
+
     if role in ("TL", "SS", "RDS"):
         group_by = role.lower()
+
     rows = crud.get_coverage(group_by)
+
     if role in ("TL", "SS", "RDS"):
-    name = user.get("name")
-    rows = [r for r in rows if r["name"] == name]
+        name = user.get("name")
+        rows = [r for r in rows if r["name"] == name]
+
     return rows
 
 
