@@ -57,11 +57,16 @@ def me(user: dict = Depends(get_current_user)):
 
 def _scope(user: dict) -> dict:
     role = user.get("role")
-    if role == "TL": return {"tl": user.get("sub")}
-    if role == "SS": return {"ss": user.get("sub")}
-    if role == "RDS": return {"rds": user.get("sub")}
-    return {}
+    name = user.get("name")
 
+    if role == "TL":
+        return {"tl": name}
+    if role == "SS":
+        return {"ss": name}
+    if role == "RDS":
+        return {"rds": name}
+
+    return {}
 
 @app.post("/visits", response_model=VisitOut)
 def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
