@@ -47,14 +47,15 @@ def _unb64(value: str) -> bytes:
 def create_token(user: dict, ttl_seconds: int = 12 * 3600) -> str:
     if not AUTH_SECRET:
         raise RuntimeError("AUTH_SECRET environment variable is not set")
-    payload = {
-        "sub": user["name"],
-        "role": user["role"],
-        "tl": user.get("tl"),
-        "ss": user.get("ss"),
-        "rds": user.get("rds"),
-        "exp": int(time.time()) + ttl_seconds,
-    }
+payload = {
+    "sub": user["username"],
+    "name": user["name"],
+    "role": user["role"],
+    "tl": user.get("tl"),
+    "ss": user.get("ss"),
+    "rds": user.get("rds"),
+    "exp": int(time.time()) + ttl_seconds,
+}
     body = _b64(json.dumps(payload, separators=(",", ":")).encode())
     sig = _b64(hmac.new(AUTH_SECRET.encode(), body.encode(), hashlib.sha256).digest())
     return body + "." + sig
