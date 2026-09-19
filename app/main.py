@@ -1,4 +1,5 @@
-"""
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles"""
 Market Visit Tracker API
 
 A small FastAPI service for logging retailer visits and reporting
@@ -159,3 +160,5 @@ def get_coverage(group_by: str = Query(..., pattern="^(tl|ss|rds)$", description
     resulting coverage percentage, and the total number of visits logged.
     """
     return crud.get_coverage(group_by)
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="frontend")
