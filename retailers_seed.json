@@ -1,0 +1,6412 @@
+[
+  {
+    "code": "NER00212314",
+    "name": "Tahmina Electicals & Electronics (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00212317",
+    "name": "Maa Electronic & Mobile Point (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00245678",
+    "name": "Tech City (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00291208",
+    "name": "E K Traders (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00307770",
+    "name": "Muthasir Electronics (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176644",
+    "name": "Western Point (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176966",
+    "name": "J H Electronic And Mobile Point-Main (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177028",
+    "name": "Eastern Electro Vision(Mirza) (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177845",
+    "name": "J K S Store (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178022",
+    "name": "Zoom Electronics ( Chaygaon ) (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178346",
+    "name": "J A Electronics(Goroimari) (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER207537",
+    "name": "JM Mobiles Goroimari (Retailer)",
+    "tl": "Bichitra Saharia",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00211228",
+    "name": "Raja Steel Furniture (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00229048",
+    "name": "A2 Electronics (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00245343",
+    "name": "Croma(Retailer) - NE",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Xaple Technology Pvt Ltd - NE",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00284812",
+    "name": "Oye Mobile (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER00320565",
+    "name": "JD Zone (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176485",
+    "name": "Akansha Enterprise (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176784",
+    "name": "New Sneha-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176894",
+    "name": "Connecting People-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER177760",
+    "name": "Mobile Junction-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178410",
+    "name": "AK Mobile Point-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178428",
+    "name": "R N Enterprises-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179145",
+    "name": "Cellocity Zone-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179252",
+    "name": "Galaxy Hub-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179292",
+    "name": "Taru N Sons-Main (Retailer)",
+    "tl": "Gobindo Mandal",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176360",
+    "name": "Nitu Brothers-Main (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER176574",
+    "name": "Maitri Traders-Main (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176723",
+    "name": "Brahmaputra Enterprise (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177087",
+    "name": "Alibaba-Main (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER177159",
+    "name": "SN Planet (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177686",
+    "name": "Great Eastern Trading Co-Main (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177828",
+    "name": "Reliance(Retailer) - NE",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "NexG - NE",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179139",
+    "name": "K R Communication-Main (Retailer)",
+    "tl": "Krishna Bhowmick",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00284766",
+    "name": "Tanveer Mobile City (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00286263",
+    "name": "Triansh Electronics (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177392",
+    "name": "Sudip Time n Sound Centre-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178153",
+    "name": "Shri Bhawani Enterprise-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178385",
+    "name": "Bharali Brothers (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178472",
+    "name": "Bela Watch Co-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178716",
+    "name": "New Bela Watch-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178784",
+    "name": "Web Net-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178844",
+    "name": "Music Den-Main (Retailer)",
+    "tl": "Saurav Dey",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER00263144",
+    "name": "Emmanuel Electronics (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176257",
+    "name": "Ritesh Mobile Shop-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177420",
+    "name": "J M Electronic-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER177736",
+    "name": "New Digitek India (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177798",
+    "name": "Datamation Service-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER177895",
+    "name": "Infinity World-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178298",
+    "name": "Anushree-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178496",
+    "name": "Sunita Electronics (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178830",
+    "name": "Spectrum Trade Comm Centre-Main (Retailer)",
+    "tl": "Subhashish Dasgupta",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00209560",
+    "name": "Sky Vision (Ulubari) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00209563",
+    "name": "Brand Rush (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00210755",
+    "name": "Areca (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00223378",
+    "name": "Mazo Hub Private Limited (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00223382",
+    "name": "Digital Arena-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00228658",
+    "name": "Electro Hub (Hatigaon) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00229046",
+    "name": "Electro Park (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00247339",
+    "name": "Jayshree Electronics & Electricals (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00253659",
+    "name": "Techno Solution (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00263140",
+    "name": "Prafulla Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00263584",
+    "name": "Beauty Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00264786",
+    "name": "Mobile World (Goroimari) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00275291",
+    "name": "National Electrical House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00277008",
+    "name": "Rozi Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00280094",
+    "name": "Welcome Mart (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00289534",
+    "name": "M/S PS Solution (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00299331",
+    "name": "Mobile House (Kalapahar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00303326",
+    "name": "M K Cell (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00312552",
+    "name": "T K Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00314889",
+    "name": "Tina Mobile Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00323050",
+    "name": "Bhai Bhai Enterprise (Kalatoli) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00324317",
+    "name": "Rahman Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00325571",
+    "name": "Galaxy (Dharapur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00329133",
+    "name": "MS Shaw Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176303",
+    "name": "Nehru Communication(Ghy) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176330",
+    "name": "Das Communication(Jorabat) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176332",
+    "name": "The Unique (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176334",
+    "name": "Chinaki Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176405",
+    "name": "Arup Electrical & elctronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176407",
+    "name": "Maa Kamakhya Travels (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176419",
+    "name": "S S Mobile Solution(Ghy) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176421",
+    "name": "Digital Foto Studio And Mobil Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176446",
+    "name": "T N Computer And Mobile Works (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176543",
+    "name": "Network Zone(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176632",
+    "name": "Choudhury Trader (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176638",
+    "name": "Basistha Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176721",
+    "name": "Munu Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176756",
+    "name": "Gaurav Electronics -Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176770",
+    "name": "Ratul Store-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176828",
+    "name": "Jilmil(Mirza) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176860",
+    "name": "A to Z Mobile Zone(Ghy)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176884",
+    "name": "Apol Digital (Guw) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176906",
+    "name": "Sir Ji (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176946",
+    "name": "Ring One (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176976",
+    "name": "Astha (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177043",
+    "name": "Prime Electronics (Bijaynagar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177091",
+    "name": "GF Radio (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177137",
+    "name": "Goon Collection (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177167",
+    "name": "Uniflame Equipment (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177210",
+    "name": "S S Enterprise(Ghy)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177246",
+    "name": "Classic(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177353",
+    "name": "Jyoti Watch (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177369",
+    "name": "Rishika (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177373",
+    "name": "Ayush Electronics (Jatia) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177394",
+    "name": "New Chaya Watch Co-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177418",
+    "name": "Kaziranga Infotech-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177422",
+    "name": "Next Digital Home (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177426",
+    "name": "Surya Communication-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177436",
+    "name": "Mirza Electronics(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177440",
+    "name": "Melody Mobile Store(Ghy) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177632",
+    "name": "Shree Shyam Gadgets(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177650",
+    "name": "K M Marketing(Ghy)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177786",
+    "name": "CGM Mobile Centre-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177812",
+    "name": "Cell Point (Bhangagarh) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177836",
+    "name": "Bhogeswari Traders (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177855",
+    "name": "Republic Watch-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177891",
+    "name": "Mobile Ghar (Barbari Chariali) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178042",
+    "name": "Galaxy Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178074",
+    "name": "Om Electronics(Ghy) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178108",
+    "name": "Bambino (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178163",
+    "name": "Jitu Electronics And Mobiles (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178230",
+    "name": "Roy Enterprise (Ghy)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178284",
+    "name": "Ms Anjali Enterprises-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178344",
+    "name": "Gauhati Stores (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178460",
+    "name": "Saklin Mobile-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178498",
+    "name": "Lucky Mobile Centre-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178582",
+    "name": "Aastha Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178610",
+    "name": "Multi Corner-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178650",
+    "name": "Jitu Mobile Store-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178722",
+    "name": "Assam Investment and Construction Co-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178796",
+    "name": "Ms Minakshi Electornics and Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178872",
+    "name": "Shree Ganga Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178964",
+    "name": "Cell Point (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178986",
+    "name": "Electronic Juntion (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179075",
+    "name": "Mobile Care(Hatigaon) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179109",
+    "name": "Jindal electronics-Silpukhuri (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179212",
+    "name": "Friends Communication(Lokrah)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179236",
+    "name": "Tanmoy Mobilecity & Computer-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179268",
+    "name": "Shree Balaji Electricals (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179288",
+    "name": "Star PCO-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179407",
+    "name": "Dev Enterprises(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179435",
+    "name": "Ms Mobile Point(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER185028",
+    "name": "In Tuch (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER185304",
+    "name": "Papo Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER185566",
+    "name": "MB Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER199788",
+    "name": "Mobile store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Naba Jyoti Bora",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER204705",
+    "name": "Mamta Electronics And Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Subir Kumar Sinha",
+    "rds": "Channel Infomatic",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176683",
+    "name": "S.H Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176874",
+    "name": "Sisi Infosys-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER177889",
+    "name": "SR Enterprise-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER178752",
+    "name": "M/S Mobile Centre (NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER178930",
+    "name": "U S Enterprise-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178966",
+    "name": "RS Enterprise-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER179437",
+    "name": "Jay Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178147",
+    "name": "Cell Vision (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178792",
+    "name": "Gungli Traders (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER179033",
+    "name": "DB Corner (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00251895",
+    "name": "G.D Mobile (Diyun) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00264961",
+    "name": "Nokia Cell Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00302683",
+    "name": "C.K Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176387",
+    "name": "Babu Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176709",
+    "name": "Chaya Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176786",
+    "name": "Sunita Mobile(Namsai) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177566",
+    "name": "Ms Mari Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177602",
+    "name": "M/s K.B Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177873",
+    "name": "Ms Matbing Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178392",
+    "name": "Sah Computer (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178988",
+    "name": "J K Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER184794",
+    "name": "Rajen Watch And Electronics-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER197525",
+    "name": "Khushi Steel (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00218525",
+    "name": "M/S Ardh Sainik Canteen (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00218937",
+    "name": "M/S Sony Mobile Accessories (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00245294",
+    "name": "M/S B.B Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00255104",
+    "name": "M/S Kabak Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00263147",
+    "name": "R B Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00265606",
+    "name": "M/S U K Jha Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00265657",
+    "name": "M/S Digital World (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00305659",
+    "name": "Dipti Mobile Point-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00306319",
+    "name": "Ansh Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00307002",
+    "name": "TC Mobile Shop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00308518",
+    "name": "Jeewan Electronis (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00313472",
+    "name": "Dhyinkho Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00321044",
+    "name": "Digital Centre (Namsai) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176245",
+    "name": "Mobile Zone(Ziro) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176255",
+    "name": "Jai Ganesh Mobile Point (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176373",
+    "name": "Bruwu Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176541",
+    "name": "Superfone Cafe (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176600",
+    "name": "Alisha Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176671",
+    "name": "JMD Enterprises(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176732",
+    "name": "Star Mobile Centre(AP) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176818",
+    "name": "JBK Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176888",
+    "name": "Electrojunction (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176978",
+    "name": "LTM Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176988",
+    "name": "M/S M & J Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177097",
+    "name": "Classic Collection (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177234",
+    "name": "G R Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177618",
+    "name": "TDR Mobile Shop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177658",
+    "name": "Shangri La Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177716",
+    "name": "Sanju Enterprise(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177756",
+    "name": "Yadav Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178010",
+    "name": "Baby Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178258",
+    "name": "Ms T L Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178402",
+    "name": "Ms Electronic Solution (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178664",
+    "name": "Ete Hi-Choice (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178702",
+    "name": "IT Solution (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178940",
+    "name": "Nokia House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178976",
+    "name": "M/s Jini Smart Tech (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179012",
+    "name": "M/S B.M. Electrical And Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179027",
+    "name": "Balaji Electronics(West Kameng) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Star Telecom(West Kameng)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179272",
+    "name": "RBT Mobile Centre (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179341",
+    "name": "Bruwu Watch n Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179453",
+    "name": "Jaiswal Electronics(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER184792",
+    "name": "Hoda Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Jyoti Cycle Stores and Agency (Zone A)",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER187805",
+    "name": "Minam Mobile Shop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "K M Enterprise (NHIN)",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00243942",
+    "name": "Mobi Flash (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00310895",
+    "name": "Mobile Ghar (Silchar) (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176243",
+    "name": "Moni Mobile Rep Centre-Main (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER176665",
+    "name": "Smart Mobile-Main (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177670",
+    "name": "Mobile Wale-Main (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177720",
+    "name": "RTCube (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178212",
+    "name": "Rahul Mobile Center (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER187405",
+    "name": "M/S. Masum Communication (Retailer)",
+    "tl": "A K Mehbub A Laskar",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177434",
+    "name": "Boyz Mobile-Main (Retailer)",
+    "tl": "Ajay Rai",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177990",
+    "name": "Shiwang Electronics-Main (Retailer)",
+    "tl": "Ajay Rai",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00281905",
+    "name": "Galaxy Mobile (Silchar) (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176576",
+    "name": "MMC-Main (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176808",
+    "name": "Time Sound Center-Main (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER177195",
+    "name": "Mamon Mobile And Electronic (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177452",
+    "name": "Moon Light-Main (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178559",
+    "name": "Ijaj Mobile And Electronics (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178658",
+    "name": "HiFi Telecom (Retailer)",
+    "tl": "Bappan Das",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00216051",
+    "name": "Techno Park (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00299970",
+    "name": "Foto Zone (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00301351",
+    "name": "Visionary Mobile (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176375",
+    "name": "King Mobile (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177696",
+    "name": "Smart Phone Hub (Kxj) (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178676",
+    "name": "Mobile World (Karimganj) (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178846",
+    "name": "Computer & Mobile Mart (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER179049",
+    "name": "Mobile Hub(Karimganj) (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER201808",
+    "name": "Star Mobile Centre (Retailer)",
+    "tl": "Bishnu Suklabaidya",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00268986",
+    "name": "S S Mobile Service (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177604",
+    "name": "Moulana Mobile Store (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178114",
+    "name": "Pulok Roy (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178218",
+    "name": "Lily Mobile (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178250",
+    "name": "RK Mobile(Karimganj) (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER180101",
+    "name": "Smart Mobile(Pkt) (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER187391",
+    "name": "Mobile Place (Karimganj) (Retailer)",
+    "tl": "Debabrata Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176515",
+    "name": "Rainbow-Main (Retailer)",
+    "tl": "Lalthuammawia",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER177680",
+    "name": "Cell Care (Aiz) (Retailer)",
+    "tl": "Lalthuammawia",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER177838",
+    "name": "Dk Mobile Care (Retailer)",
+    "tl": "Lalthuammawia",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178363",
+    "name": "Thanchhingi N Sons-Main (Retailer)",
+    "tl": "Lalthuammawia",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178530",
+    "name": "Hnamte Agencies (Retailer)",
+    "tl": "Lalthuammawia",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00227604",
+    "name": "Choudhury Electronics (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176880",
+    "name": "Afsana Mobile Store (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Imperial",
+    "status": "Active"
+  },
+  {
+    "code": "NER177390",
+    "name": "Rainbow Infotech-Main (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER177927",
+    "name": "Abhins Corner-Main (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178774",
+    "name": "Cell Phone Hub-Main (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178918",
+    "name": "Das Communication (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179409",
+    "name": "Mobile Plus(NE) (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER200756",
+    "name": "Palash Das (Retailer)",
+    "tl": "Monojit Rudra Paul",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00246255",
+    "name": "Enosa Enterprise (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176295",
+    "name": "Lunglei Mobile Repairing Center-Main (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER176890",
+    "name": "Universal Cells (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177584",
+    "name": "Lawmi Mobile Shop-Main (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER177970",
+    "name": "Angie Mobile House-Main (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178282",
+    "name": "Puii Infotech(Lunglei)-Main (Retailer)",
+    "tl": "R.Zodinthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176697",
+    "name": "Basanti Mobile System (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176734",
+    "name": "Mobile India(Hailakandi) (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176956",
+    "name": "Happy Mobile Zone (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177085",
+    "name": "Laskar Mobile Repairing (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER177612",
+    "name": "G S Mobile Gallery (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER177988",
+    "name": "Esha Mobile House (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178046",
+    "name": "Priya Enterprise(Silchar) (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178050",
+    "name": "Cell Beat(Hailakandi) (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178122",
+    "name": "M/S Reba Electronics (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178248",
+    "name": "Top in Stand (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178882",
+    "name": "Bapsab Electronics (Retailer)",
+    "tl": "Ratan Chandra Dey",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00229136",
+    "name": "Bless Mobile Shop (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177067",
+    "name": "RC Mobi World-Main (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177256",
+    "name": "Digiport (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177622",
+    "name": "Alpha Enterprise(Aizawl)-Main (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177804",
+    "name": "Digital House (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178340",
+    "name": "Electronic Centre-Bara Bazar (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178514",
+    "name": "Emarald Comms-Main (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179087",
+    "name": "Kolasib Mobile House (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179131",
+    "name": "Khiangte Mobile House-Main (Retailer)",
+    "tl": "Robert Zoramthara",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00296936",
+    "name": "Mazo Hub Private Limited (Imphal) (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00321974",
+    "name": "A1 Mobile (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176794",
+    "name": "Achy Cassete Gallery (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177333",
+    "name": "SK Mobile Store(NE) (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178016",
+    "name": "Star Mobile(Manipur)-Main (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178128",
+    "name": "Santosh Electronics(Moreh Bazar) (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178228",
+    "name": "Pasa Enterprises-Main (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178534",
+    "name": "Amplified Communications-Main (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178742",
+    "name": "Mobile Cafe-Main (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179047",
+    "name": "Shipra Mobile(NE) (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179278",
+    "name": "Ibohal Enterprises-Main (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179457",
+    "name": "Deepak Mobile(NE) (Retailer)",
+    "tl": "Stallon Ningthoujam",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176511",
+    "name": "JK Business Services-Main (Retailer)",
+    "tl": "V. Lalbiakdika",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER176858",
+    "name": "Mobile House Miz-Main (Retailer)",
+    "tl": "V. Lalbiakdika",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177748",
+    "name": "MRC Champhai (Retailer)",
+    "tl": "V. Lalbiakdika",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177897",
+    "name": "Two in One Sales n Services-Main (Retailer)",
+    "tl": "V. Lalbiakdika",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00212048",
+    "name": "Bardhan Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00212156",
+    "name": "Lokenath Communication(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00212309",
+    "name": "I T Planet(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00221700",
+    "name": "P & H (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00221702",
+    "name": "Julia Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00221706",
+    "name": "Abel Communication (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00225337",
+    "name": "Bina Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00227177",
+    "name": "Shree Ganesh Mobile Accessories (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00228444",
+    "name": "Zaman Mobile Hub (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00229138",
+    "name": "S&D Electronic Repairing Workshop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00238977",
+    "name": "M S Enterprise(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00248941",
+    "name": "K.Lalpara & Sons (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00261911",
+    "name": "R Mobile Store(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00263079",
+    "name": "Priyanka Studio Computer (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00264759",
+    "name": "Moriom Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00264777",
+    "name": "Mehreen Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00264794",
+    "name": "Popular Traders (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00265754",
+    "name": "N J Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00266199",
+    "name": "Allhera Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00266856",
+    "name": "F B Mobile And Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00268991",
+    "name": "Choudhury & Sons Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00269587",
+    "name": "Jayanti Communication (Silchar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00279320",
+    "name": "Om Trading(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00286202",
+    "name": "The Modern Computer & Travels (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00286204",
+    "name": "Mobile India(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00293233",
+    "name": "Mobile Service Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00293235",
+    "name": "Salamiya Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00293866",
+    "name": "JM Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00293878",
+    "name": "Popular Mobile Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00300626",
+    "name": "Bharat Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00301354",
+    "name": "S R World (NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00301920",
+    "name": "J N Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00304252",
+    "name": "Deb Electronics (NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00304476",
+    "name": "MI Digital World (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00309539",
+    "name": "PK Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00310699",
+    "name": "Smart Hub (Barjatrapur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00310907",
+    "name": "R2 Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00316240",
+    "name": "M/S New Digitech Communication (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00318982",
+    "name": "Deb Electronics (Silchar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00319579",
+    "name": "S K N Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00320026",
+    "name": "Arr Ess Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00321971",
+    "name": "A R Mobile Stores (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00322169",
+    "name": "Surjo Mobile & Electronics Hub (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00323297",
+    "name": "Touch Me (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00324305",
+    "name": "The Device Hub (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00327622",
+    "name": "Anjali Electronics (NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00327863",
+    "name": "Eimi Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00328426",
+    "name": "The Electronic Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00329007",
+    "name": "Digital Communication (NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176241",
+    "name": "Laskar Mobile Centre & Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176263",
+    "name": "Expression Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176318",
+    "name": "ND Mobile Hubs (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176336",
+    "name": "Mobile Zone (Yairipok) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176358",
+    "name": "Ethan Go Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176385",
+    "name": "Connecting World(Sil)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176403",
+    "name": "N S Mobile & Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER176424",
+    "name": "Star Mobile Service Patherkendi (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176438",
+    "name": "F n F-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176479",
+    "name": "Pakhangba Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176568",
+    "name": "Mobile Store Thoubal (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176642",
+    "name": "SS Mobile(Imphal) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176669",
+    "name": "Nihar Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176725",
+    "name": "Eimi Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176752",
+    "name": "Fone Inn-1 (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176754",
+    "name": "L R Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176760",
+    "name": "Glamour World (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176764",
+    "name": "Mobile World(Kanglatongbi) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176812",
+    "name": "Sumi Communication (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176816",
+    "name": "Afrina Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176822",
+    "name": "SK Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176836",
+    "name": "Ektta Planet Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176864",
+    "name": "Gupta Mobile Manipur (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176930",
+    "name": "Omega Electronics(Sil)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177145",
+    "name": "A Malik Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177173",
+    "name": "Universal Suppliers (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177226",
+    "name": "Star Mobile Hub-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177258",
+    "name": "Geetanjali (Karimganj) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177325",
+    "name": "Star Mobile(Silchar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177363",
+    "name": "Kathiababa Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177476",
+    "name": "Sethis Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177482",
+    "name": "Rosangliana Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177496",
+    "name": "BS Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177514",
+    "name": "Nubawihi Counter (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177543",
+    "name": "Galaxy Mobile Store (Patharkandi) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177648",
+    "name": "Network Enterprise(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177652",
+    "name": "J Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177666",
+    "name": "Refidim Infosys (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177678",
+    "name": "Radharaman Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177710",
+    "name": "Banik Communication (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177796",
+    "name": "Upto Date Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177853",
+    "name": "M/S Thambal Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177859",
+    "name": "Galaxy Mobile (ASMG) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177931",
+    "name": "Ronny Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177953",
+    "name": "Krishna Telecom(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177992",
+    "name": "Victor Mobile Hub (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178028",
+    "name": "Priyo Store (Hailakandi) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178096",
+    "name": "J S Music Corner -Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178104",
+    "name": "AR Mobile Centre (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178118",
+    "name": "Ema Mobile(Imphal) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178136",
+    "name": "Mobile House(Jiribam ) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178238",
+    "name": "Fone Inn-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178262",
+    "name": "Mobile Fashion 2 (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178300",
+    "name": "National Watch Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178326",
+    "name": "Arvind Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178365",
+    "name": "Laskar Mobile Point (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178462",
+    "name": "City Mobile n Repairing (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178466",
+    "name": "Rani Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178516",
+    "name": "Amazing Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178574",
+    "name": "S B Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178662",
+    "name": "M/S Mobile Centre(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178671",
+    "name": "Isreal Mobiles (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178714",
+    "name": "Rem Rem Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178780",
+    "name": "S R Prime (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178782",
+    "name": "AP Enterprises -Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178818",
+    "name": "J K Enterprises(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178824",
+    "name": "S L Mobile World-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178860",
+    "name": "M/S J Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178862",
+    "name": "Zolentu (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178874",
+    "name": "M/S Maa Monasha Mobile Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178888",
+    "name": "Rinliana Sailo Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178892",
+    "name": "Bonanza Communication (Mizoram) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178922",
+    "name": "Santosh Mobile(Kakching) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178944",
+    "name": "Mobile Gallery(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178962",
+    "name": "Anmol Mobile(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178980",
+    "name": "Hello Point(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178992",
+    "name": "Tata Indicom (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178998",
+    "name": "B5 Mobile House-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179010",
+    "name": "MP Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179065",
+    "name": "Mobile Care(Hailakhandi) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179111",
+    "name": "Chingtam Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179137",
+    "name": "Music World(Karimganj) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179141",
+    "name": "Memories Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179188",
+    "name": "New Mobile Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179196",
+    "name": "My Hamz (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179214",
+    "name": "Intercell (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179218",
+    "name": "Gopal Enterprises-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179220",
+    "name": "Smart Electronics(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179232",
+    "name": "Jahid Mobile Link (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179248",
+    "name": "Mobile Zone(Club Road) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179280",
+    "name": "C P Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Pappu Kumar",
+    "rds": "Rainbow Traders",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179302",
+    "name": "Anand Computer (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179427",
+    "name": "Sagar Enterprises(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179448",
+    "name": "Sandesh Mobile(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER180636",
+    "name": "Maa Telecom (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER180638",
+    "name": "Pukhram Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sougaijam Kennedy",
+    "rds": "Digital Infotech",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER181555",
+    "name": "Lokenath Mobile Shoppe (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER187388",
+    "name": "Mobile Hub(Pkd) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER187397",
+    "name": "Talukdar Communication (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Sujit Sinha",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER187401",
+    "name": "Akmal Mobile Shop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER188064",
+    "name": "Lokenath Furniture And Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER198060",
+    "name": "Maya's Gadgets (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Avisek Das",
+    "rds": "Star Telecom",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00261909",
+    "name": "Sikkim Mobile Hub (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176434",
+    "name": "Ram Niwas Agarwal (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176806",
+    "name": "R K Jain (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177203",
+    "name": "Awasna Enterprise (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177549",
+    "name": "R.S Traders-Showroom Gangtok-ES (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178116",
+    "name": "NG (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179006",
+    "name": "BK Furniture and Electronics (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00295244",
+    "name": "Karnamaya Limbuni (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176553",
+    "name": "Laxmikant (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177668",
+    "name": "Tour Care (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178000",
+    "name": "Sailesh Lakhotia (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178357",
+    "name": "V K Lakhotia (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178412",
+    "name": "Kishore Pradhan-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178706",
+    "name": "Jameel Electronic-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER201331",
+    "name": "Mazhar Hussain Ansari (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00255782",
+    "name": "Mobile Universe(NE) (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00274428",
+    "name": "Metro Electronics(Belonia) (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178159",
+    "name": "Sri Krishna Mobile Center (UDP) (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178746",
+    "name": "Mobile Centre (Udaipur)-Main (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179180",
+    "name": "Sahin Electronics -Main (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER179316",
+    "name": "S R Mobile(NE)-Main (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179322",
+    "name": "Mobile World n Repairing (Retailer)",
+    "tl": "Manidipta Bhattacharjee",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176305",
+    "name": "Rahul Enterprise(NE) (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176413",
+    "name": "Om Enterprise (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176695",
+    "name": "Maa Kali Store (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176776",
+    "name": "Nexus (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER176796",
+    "name": "Online Electronic (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177456",
+    "name": "Super Computer (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER177528",
+    "name": "New Utsav (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER178950",
+    "name": "Muktishree (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179190",
+    "name": "Global Marketing (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER202509",
+    "name": "Akash Enterprise (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00272408",
+    "name": "Jyoti Optics (Agartala) (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00299917",
+    "name": "Hello Electronics (Melarmath)-Main (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00318143",
+    "name": "Mobile Communication (Agartala) (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176590",
+    "name": "This n That-Main (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Titanium",
+    "status": "Active"
+  },
+  {
+    "code": "NER177119",
+    "name": "Abanrai Electronics-Main (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Grand Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178084",
+    "name": "Maa Electronics-Main (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178204",
+    "name": "Sarala Electronics-Main (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER178899",
+    "name": "Om Proxima (Retail) (Retailer)",
+    "tl": "Rajesh Deb",
+    "ss": "Prasenjit Deb",
+    "rds": "Om Proxima",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177224",
+    "name": "Impression (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177408",
+    "name": "Sri Ram Cellzone (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179174",
+    "name": "Amilal and Co (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179176",
+    "name": "Om Mobile Care (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER179202",
+    "name": "Darjeeling Tea House (Retailer)",
+    "tl": "Sachin Gurung",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00211046",
+    "name": "Joyram Mobile & Repairing (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00290888",
+    "name": "Manasha Electronic & Mobile (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00329539",
+    "name": "R.K Mobile & Service (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176986",
+    "name": "Susanta Store(Khowai) (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177335",
+    "name": "Maa Manasa (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177682",
+    "name": "Shan Computer(Ambassa) (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178018",
+    "name": "Net To Net (Agr)-Main (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Royal",
+    "status": "Active"
+  },
+  {
+    "code": "NER178288",
+    "name": "Poulami Interiors (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178510",
+    "name": "Maa Electronics Mobile(Khowai) (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178570",
+    "name": "JC Mobile-Main (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER178832",
+    "name": "Joyguru Mobile (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER189028",
+    "name": "Deb Varieties (Retailer)",
+    "tl": "Suman Dey",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00212725",
+    "name": "Mobile Parlour(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00213573",
+    "name": "Pema Mobile Shoppe (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER00213577",
+    "name": "M/S Sudhir Subba (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00214005",
+    "name": "Amardeep Gupta (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00214009",
+    "name": "Rajani Prasad (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00215468",
+    "name": "Pawan Kumar Gupta (Namchi) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00216129",
+    "name": "Das Varities (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00229752",
+    "name": "Joyguru Mobile Store(G B Bazar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00255779",
+    "name": "Maa Mobile House-Dhalai (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00255789",
+    "name": "The Mobile World(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00262051",
+    "name": "Mobile Zone(Agartala) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00265640",
+    "name": "Sampark (Teliamura) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00269246",
+    "name": "Maa P.C.O (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00269250",
+    "name": "Banik Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00270495",
+    "name": "Tithi Mobile Care (Bishalghar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00271123",
+    "name": "P. R. Electronics And Electrical (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00271129",
+    "name": "Standard Electronics(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00271131",
+    "name": "M/S Saha Gift House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00271548",
+    "name": "Joyram Electronic (Melaghar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00272059",
+    "name": "Saha Communication Centre (GB) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00272067",
+    "name": "Dreamline Tour & Travels (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00273840",
+    "name": "Debnath Electronics (Agartala) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00274423",
+    "name": "M/S-Loknath Electronics(Belonia) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00275024",
+    "name": "New Mani Electronics (Udaipur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00275067",
+    "name": "AK Mobile India (Udaipur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00275121",
+    "name": "Tech Plus(Agartala) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00276705",
+    "name": "Swarnasova Electric (Melarmath) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00276787",
+    "name": "K Mobile Service (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00277205",
+    "name": "Sk Mobile (Bankumari) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00289470",
+    "name": "Man Kumar Pradhan (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00289474",
+    "name": "Ram Niwas Thakur (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00290890",
+    "name": "Srimata Mobile Reparing (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00291085",
+    "name": "Parvez Ansari (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00291608",
+    "name": "M/S Joy Guru Beez Bhander (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00291612",
+    "name": "Insaf Mobile And Watch (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00295234",
+    "name": "Nima Bhutia (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00300571",
+    "name": "Prabhas Internet Banking (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00300573",
+    "name": "Khan Watch & Mobile Shop (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00300914",
+    "name": "Santosh Kumar Prasad (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00300936",
+    "name": "M/S Sara Enterprises (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00301409",
+    "name": "Saif Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00303419",
+    "name": "Computer World (NE)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER00304486",
+    "name": "Awadh Kishor Prasad (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00307557",
+    "name": "RT Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00311579",
+    "name": "Chowdhury Mobile Store (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00312078",
+    "name": "Shani Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00314782",
+    "name": "Anup Ghosh (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00314787",
+    "name": "Subhra Deep Varieties (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00316242",
+    "name": "S. M. Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00318087",
+    "name": "M/S Bhowmik Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00318140",
+    "name": "Camera Spot (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00318197",
+    "name": "Tulshi Agency & Mobile Repairing Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00321977",
+    "name": "Mahakal Mobile & Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00322928",
+    "name": "Ramthakur Stores (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00324216",
+    "name": "Ashish Mobile Shop(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00328720",
+    "name": "Rainbow E-Corner (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00328731",
+    "name": "Paul Brothers (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176235",
+    "name": "Micro Battery n Om Mobile Center(Agartala) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176269",
+    "name": "Nath Stores (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176326",
+    "name": "Pick n Speak (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176350",
+    "name": "Puja Electronics(Agr) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176352",
+    "name": "Maa Gift House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176362",
+    "name": "Rocky Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176430",
+    "name": "New Prem Video (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176432",
+    "name": "A.I Ranjan Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176459",
+    "name": "Hayat Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176495",
+    "name": "Mobiland(NE) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176525",
+    "name": "Sneha Enterprise(Dharmanagar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176535",
+    "name": "Noruttam Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176592",
+    "name": "Padam Times(Singtam) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176679",
+    "name": "Roy Eletronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176691",
+    "name": "Abdul Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER176826",
+    "name": "Das Mobile Centre(Kumarghat) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176852",
+    "name": "Ruma Travels (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER176856",
+    "name": "Fyafullo (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177006",
+    "name": "Arjya Mobile-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Platinum",
+    "status": "Active"
+  },
+  {
+    "code": "NER177093",
+    "name": "Basanti Lal Prasad(ES) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177214",
+    "name": "Shreyas (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177276",
+    "name": "RR Mobile Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177307",
+    "name": "Tripuraswari Mobile Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177398",
+    "name": "Ambika(Dharmanagar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177414",
+    "name": "Sachindra Varities (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177478",
+    "name": "Sai Enterprise (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177568",
+    "name": "Suhana Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177692",
+    "name": "SG Mobile Net (Melarmath)-Main (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177694",
+    "name": "M Zone(Pecharthol) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177750",
+    "name": "Laxmi Mobile(DMC) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177776",
+    "name": "Das Varieties (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177790",
+    "name": "Mobile Store-Dharmanagar (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177822",
+    "name": "Rajdeep Mobile Center (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177824",
+    "name": "New Link Line (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177830",
+    "name": "R.K. Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177863",
+    "name": "Online (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177865",
+    "name": "Prabha(Udaipur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER177867",
+    "name": "Gulmohar (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177879",
+    "name": "Pramod Kumar Rathi (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177899",
+    "name": "Solution X (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177939",
+    "name": "Bam Bam Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER177956",
+    "name": "SS Enterprise(Agt) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178004",
+    "name": "Mobile Solution (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178064",
+    "name": "Gopal Adhikari (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178182",
+    "name": "Uttam Varaitise(Manu) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178190",
+    "name": "Saha Varities(Tripura) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178373",
+    "name": "Motim Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178422",
+    "name": "KB Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178452",
+    "name": "Mobile City(Udaipur) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178502",
+    "name": "E Zone (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178648",
+    "name": "Tripureswari Mobile House (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178694",
+    "name": "Abid Electronics (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Vacant-Zone A",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178718",
+    "name": "Sharma Sons (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178750",
+    "name": "New Madhumita (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178762",
+    "name": "Mobile Planet(Gangtok) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178826",
+    "name": "Omker Electronics(Manubazar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178854",
+    "name": "Laxmi Varieties (Chakmaghat) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178911",
+    "name": "Rajesh Kumar Prashad (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER178932",
+    "name": "Khetaram Murlidhar (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179059",
+    "name": "New Susma Varities (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179079",
+    "name": "A To Z Mobile Bazar (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179166",
+    "name": "Tripureswari Enterprise(Agartala) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER179234",
+    "name": "Misto Varities (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179240",
+    "name": "Padam Electronics (Singtam Bazar) (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER179258",
+    "name": "Trishna Mobile Net (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER188089",
+    "name": "S.S Electronic (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Abhishek Pradhan",
+    "rds": "Himalayan Agencies",
+    "zone": "Zone A",
+    "club": "Gold",
+    "status": "Active"
+  },
+  {
+    "code": "NER196541",
+    "name": "Sweety Varities (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER199568",
+    "name": "Niyati Mobile (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER209060",
+    "name": "Utsav (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00330612",
+    "name": "Next Zone (Retailer)",
+    "tl": "Polash Roy",
+    "ss": "Prasenjit Deb",
+    "rds": "M/s Laxmi Stores",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00330626",
+    "name": "M/s Hello Mobiles (Retailer)",
+    "tl": "Rahul Sharma",
+    "ss": "Vacant-Zone A",
+    "rds": "M/S Ete Hi Choice",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  },
+  {
+    "code": "NER00331289",
+    "name": "Cell Central (Retailer)",
+    "tl": "VBM-Vacant",
+    "ss": "Prasenjit Deb",
+    "rds": "Net To Net",
+    "zone": "Zone A",
+    "club": "Non-Club",
+    "status": "Active"
+  }
+]
