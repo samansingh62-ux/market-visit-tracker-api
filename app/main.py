@@ -76,7 +76,7 @@ def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Retailer is not in the master list.")
     if scope and any(retailer.get(k) != v for k, v in scope.items()):
         raise HTTPException(status_code=403, detail="You can only log visits for retailers assigned to you.")
-    payload.submitted_by = user.get("sub", "Manager")
+    payload.submitted_by = user.get("name", "Manager")
     payload.submitted_role = user.get("role", "MANAGER")
     return crud.create_visit(payload)
 
@@ -163,8 +163,8 @@ def get_coverage(group_by: str = Query("tl", pattern="^(tl|ss|rds)$"), user: dic
         group_by = role.lower()
     rows = crud.get_coverage(group_by)
     if role in ("TL", "SS", "RDS"):
-        name = user.get("sub")
-        rows = [r for r in rows if r["name"] == name]
+    name = user.get("name")
+    rows = [r for r in rows if r["name"] == name]
     return rows
 
 
