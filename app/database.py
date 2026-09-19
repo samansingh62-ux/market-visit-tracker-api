@@ -66,11 +66,12 @@ def init_db():
         if count == 0 and RETAILERS_SEED_PATH.exists():
             with open(RETAILERS_SEED_PATH, "r", encoding="utf-8") as f:
                 seed = json.load(f)
-            conn.executemany("""
-                INSERT INTO retailers
-                    (code, name, tl, ss, rds, zone, club, status)
-                VALUES
-                    (%(code)s, %(name)s, %(tl)s, %(ss)s, %(rds)s,
-                     %(zone)s, %(club)s, %(status)s)
-                ON CONFLICT (code) DO NOTHING
-            """, seed)
+            with conn.cursor() as cur:
+    cur.executemany("""
+        INSERT INTO retailers
+            (code, name, tl, ss, rds, zone, club, status)
+        VALUES
+            (%(code)s, %(name)s, %(tl)s, %(ss)s, %(rds)s,
+             %(zone)s, %(club)s, %(status)s)
+        ON CONFLICT (code) DO NOTHING
+    """, seed)
