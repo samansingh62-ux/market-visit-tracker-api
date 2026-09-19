@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Market Visit Tracker</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#172033;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.top{background:#111827;color:#fff;padding:26px max(20px,calc((100% - 1200px)/2));display:flex;justify-content:space-between;align-items:center}.top h1{margin:2px 0;font-size:27px}.top p{margin:0;color:#b8c1cf}.ey{font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:700;color:#94a3b8}.pill{background:#263142;border:1px solid #3a4657;border-radius:99px;padding:8px 13px;font-size:12px}
+main{max-width:1200px;margin:22px auto;padding:0 16px}.card{background:#fff;border:1px solid #e4e8ef;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 3px 14px #10182808}
+.auth{display:flex;gap:14px;align-items:end}.auth>div:first-child{flex:1}.auth label{display:block}.auth input{max-width:500px}
+input,textarea,select{width:100%;border:1px solid #d0d5dd;border-radius:9px;padding:10px 11px;font:inherit;background:#fff;color:#172033;margin-top:6px}textarea{resize:vertical}
+button{border:0;border-radius:9px;padding:10px 15px;font-weight:700;cursor:pointer}.primary{background:#111827;color:#fff}.secondary{background:#eef2f7;color:#172033}.ghost{background:transparent;color:#667085}
+h2{margin:0 0 12px;font-size:18px}.muted{font-size:13px;color:#667085}.hidden{display:none}.msg{font-size:13px;margin-top:9px}.ok{color:#087443}.err{color:#b42318}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.metric{background:#fff;border:1px solid #e4e8ef;border-radius:14px;padding:17px}.metric span{display:block;color:#667085;font-size:12px}.metric b{font-size:28px;display:block;margin-top:7px}
+.grid{display:grid;grid-template-columns:1fr 1.25fr;gap:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-size:13px;font-weight:650;margin-bottom:12px}.meta{background:#f7f9fc;border:1px solid #e6eaf0;border-radius:9px;padding:9px 11px;font-size:12px;color:#667085;margin:-3px 0 13px}.wide{width:100%}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.filters{display:grid;grid-template-columns:2fr 1fr 1fr auto auto;gap:9px;margin-bottom:13px}.filters input{margin:0}
+.wrap{overflow:auto;max-height:520px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #edf0f4;vertical-align:top}th{background:#f8fafc;color:#667085;text-transform:uppercase;font-size:10px;letter-spacing:.05em;position:sticky;top:0}
+.bar{height:6px;background:#e9edf3;border-radius:99px;margin-top:4px;min-width:70px}.bar span{display:block;height:100%;background:#111827;border-radius:99px}
+@media(max-width:850px){.auth,.grid{display:block}.auth button{margin-top:8px}.metrics{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr}.filters input:first-child{grid-column:1/-1}}
+@media(max-width:520px){.metrics,.formgrid,.filters{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="top">
+<div><div class="ey">vivo NESA</div><h1>Market Visit Tracker</h1><p>Retailer coverage, market feedback and field execution.</p></div>
+<div id="status" class="pill">● Disconnected</div>
+</header>
+
+<main>
+<section class="card">
+<div class="auth">
+<div><label>API Key<input id="key" type="password" placeholder="Enter your current X-API-Key" autocomplete="off"></label></div>
+<button id="connect" class="primary">Connect</button>
+</div>
+<div id="authMsg" class="msg"></div>
+</section>
+
+<section id="app" class="hidden">
+<div class="metrics">
+<div class="metric"><span>Total Visits</span><b id="mv">—</b></div>
+<div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div>
+<div class="metric"><span>Markets Covered</span><b id="mm">—</b></div>
+<div class="metric"><span>Retailer Master</span><b id="mt">—</b></div>
+</div>
+
+<div class="grid" style="margin-top:18px">
+<section class="card">
+<h2>Log Market Visit</h2>
+<form id="form">
+<label>Retailer<input id="retailer" list="retailers" placeholder="Search retailer..." required></label>
+<datalist id="retailers"></datalist>
+<div id="meta" class="meta">Select a retailer from the master list.</div>
+<div class="formgrid">
+<label>Market<input id="market" placeholder="e.g. Guwahati" required></label>
+<label>Visit Date<input id="date" type="date" required></label>
+</div>
+<label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label>
+<label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label>
+<label>Submitted By<input id="by" placeholder="Name"></label>
+<button class="primary wide">Submit Visit</button>
+<div id="formMsg" class="msg"></div>
+</form>
+</section>
+
+<section class="card">
+<div class="head"><h2>Coverage</h2><select id="group" style="width:100px;margin:0"><option value="tl">TL</option><option value="ss">SS</option><option value="rds">RDS</option></select></div>
+<div class="wrap"><table><thead><tr><th>Name</th><th>Assigned</th><th>Visited</th><th>Coverage</th><th>Visits</th></tr></thead><tbody id="coverage"></tbody></table></div>
+</section>
+</div>
+
+<section class="card">
+<div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="export" class="secondary">Export CSV</button></div></div>
+<div class="filters">
+<input id="search" placeholder="Search retailer, market or feedback">
+<input id="from" type="date"><input id="to" type="date">
+<button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button>
+</div>
+<div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div>
+</section>
+</section>
+</main>
+
+<script>
+const API="";
+let key=sessionStorage.getItem("mvt_key")||"", master=[];
+const $=x=>document.getElementById(x);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+function msg(id,t,ok=false){$(id).textContent=t;$(id).className="msg "+(t?(ok?"ok":"err"):"")}
+async function api(path,opt={}){let h={"X-API-Key":key};if(opt.body)h["Content-Type"]="application/json";let r=await fetch(API+path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+" "+d)}return r.headers.get("content-type")?.includes("json")?r.json():r}
+async function connect(){key=$("key").value.trim();if(!key)return msg("authMsg","Enter your API key.");try{await api("/stats");sessionStorage.setItem("mvt_key",key);$("status").textContent="● Connected";$("status").style.background="#123d2b";$("app").classList.remove("hidden");msg("authMsg","Connected successfully.",true);await load()}catch(e){$("app").classList.add("hidden");msg("authMsg",e.message)}}
+async function load(){await Promise.all([stats(),retailers(),visits(),coverage()])}
+async function stats(){let x=await api("/stats");$("mv").textContent=x.total_visits;$("mr").textContent=x.unique_retailers_visited;$("mm").textContent=x.unique_markets;$("mt").textContent=x.total_retailers_in_master}
+async function retailers(){master=await api("/retailers");$("retailers").innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join("")}
+$("retailer").oninput=()=>{let r=master.find(x=>x.name===$("retailer").value.trim());$("meta").innerHTML=r?`<b>TL:</b> ${esc(r.tl||"—")} &nbsp; <b>SS:</b> ${esc(r.ss||"—")} &nbsp; <b>RDS:</b> ${esc(r.rds||"—")} &nbsp; <b>Zone:</b> ${esc(r.zone||"—")}`:"Select a retailer from the master list."}
+async function visits(){let p=new URLSearchParams({limit:"500"});if($("search").value)p.set("search",$("search").value);if($("from").value)p.set("date_from",$("from").value);if($("to").value)p.set("date_to",$("to").value);let a=await api("/visits?"+p);$("visits").innerHTML=a.length?a.map(v=>`<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.submitted_by)}</td><td>${esc(v.feedback)}</td></tr>`).join(""):`<tr><td colspan="8">No visits found.</td></tr>`}
+async function coverage(){let a=await api("/coverage?group_by="+$("group").value);$("coverage").innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(""):`<tr><td colspan="5">No coverage data.</td></tr>`}
+$("form").onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$("retailer").value.trim());if(!r)return msg("formMsg","Select an exact retailer from the master list.");try{let v=await api("/visits",{method:"POST",body:JSON.stringify({retailer:r.name,market:$("market").value.trim(),visit_date:$("date").value,feedback:$("feedback").value.trim(),suggestions:$("suggestions").value.trim(),submitted_by:$("by").value.trim()||"Unknown"})});msg("formMsg","Visit #"+v.id+" submitted successfully.",true);$("feedback").value="";$("suggestions").value="";await load()}catch(e){msg("formMsg",e.message)}}
+$("connect").onclick=connect;$("refresh").onclick=()=>load().catch(e=>msg("authMsg",e.message));$("filter").onclick=()=>visits().catch(e=>msg("authMsg",e.message));$("clear").onclick=()=>{$("search").value="";$("from").value="";$("to").value="";visits()};$("group").onchange=coverage;
+$("export").onclick=async()=>{try{let p=new URLSearchParams();if($("from").value)p.set("date_from",$("from").value);if($("to").value)p.set("date_to",$("to").value);let r=await fetch("/visits/export.csv?"+p,{headers:{"X-API-Key":key}});if(!r.ok)throw Error("Export failed");let b=await r.blob(),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="market-visits.csv";a.click()}catch(e){msg("authMsg",e.message)}};
+$("date").value=new Date().toISOString().slice(0,10);$("key").value=key;if(key)connect();
+</script>
+</body>
+</html>
