@@ -26,7 +26,6 @@ async def require_api_key(
     x_api_key: str | None = Security(api_key_header),
 ):
     if not API_KEY:
-        # No key configured - auth disabled (local development only).
         return
 
     if x_api_key != API_KEY:
