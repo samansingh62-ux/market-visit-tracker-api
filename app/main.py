@@ -1,5 +1,4 @@
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles"""
+"""
 Market Visit Tracker API
 
 A small FastAPI service for logging retailer visits and reporting
