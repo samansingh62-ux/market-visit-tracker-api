@@ -41,6 +41,7 @@ def init_db():
                 status TEXT
             )
         """)
+
         conn.execute("""
             CREATE TABLE IF NOT EXISTS visits (
                 id BIGSERIAL PRIMARY KEY,
@@ -56,22 +57,42 @@ def init_db():
                 created_at TEXT NOT NULL
             )
         """)
-        for col in ("retailer", "tl", "ss", "rds", "date"):
-            conn.execute(
-                f"CREATE INDEX IF NOT EXISTS idx_visits_{col} "
-                f"ON visits({ 'visit_date' if col == 'date' else col })"
-            )
 
-        count = conn.execute("SELECT COUNT(*) AS c FROM retailers").fetchone()["c"]
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_visits_retailer "
+            "ON visits(retailer)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_visits_tl "
+            "ON visits(tl)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_visits_ss "
+            "ON visits(ss)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_visits_rds "
+            "ON visits(rds)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_visits_date "
+            "ON visits(visit_date)"
+        )
+
+        count = conn.execute(
+            "SELECT COUNT(*) AS c FROM retailers"
+        ).fetchone()["c"]
+
         if count == 0 and RETAILERS_SEED_PATH.exists():
             with open(RETAILERS_SEED_PATH, "r", encoding="utf-8") as f:
                 seed = json.load(f)
+
             with conn.cursor() as cur:
-    cur.executemany("""
-        INSERT INTO retailers
-            (code, name, tl, ss, rds, zone, club, status)
-        VALUES
-            (%(code)s, %(name)s, %(tl)s, %(ss)s, %(rds)s,
-             %(zone)s, %(club)s, %(status)s)
-        ON CONFLICT (code) DO NOTHING
-    """, seed)
+                cur.executemany("""
+                    INSERT INTO retailers
+                        (code, name, tl, ss, rds, zone, club, status)
+                    VALUES
+                        (%(code)s, %(name)s, %(tl)s, %(ss)s, %(rds)s,
+                         %(zone)s, %(club)s, %(status)s)
+                    ON CONFLICT (code) DO NOTHING
+                """, seed)
