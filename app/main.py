@@ -156,7 +156,7 @@ def get_users(role: Optional[str] = Query(default=None, pattern="^(TL|SS|RDS)$")
     return crud.list_users(role=role)
 
 
-@app.post("/admin/users",
+@app.get("/admin/users",
     response_model=List[AdminUserOut],
     dependencies=[Depends(require_admin_key)],
 )
