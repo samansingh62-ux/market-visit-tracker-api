@@ -7,11 +7,11 @@ from pydantic import BaseModel, Field
 class VisitCreate(BaseModel):
     retailer: str = Field(..., min_length=1)
     market: str = Field(..., min_length=1)
-    visit_date: date = Field(...)
-    feedback: Optional[str] = Field(default="")
-    suggestions: Optional[str] = Field(default="")
-    submitted_by: Optional[str] = Field(default="Unknown")
-    submitted_role: Optional[str] = Field(default="Field")
+    visit_date: date
+    feedback: Optional[str] = ""
+    suggestions: Optional[str] = ""
+    submitted_by: Optional[str] = "Unknown"
+    submitted_role: Optional[str] = "Field"
 
 
 class VisitOut(BaseModel):
@@ -53,6 +53,18 @@ class StatsOut(BaseModel):
     unique_retailers_visited: int
     unique_markets: int
     total_retailers_in_master: int
+
+
+# IMPORTANT:
+# UserOut must be defined BEFORE LoginOut.
+class UserOut(BaseModel):
+    id: int
+    name: str
+    role: str
+    tl: Optional[str] = None
+    ss: Optional[str] = None
+    rds: Optional[str] = None
+    active: bool
 
 
 class AdminUserOut(BaseModel):
