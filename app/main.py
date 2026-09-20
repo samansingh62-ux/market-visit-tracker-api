@@ -156,10 +156,69 @@ def get_users(role: Optional[str] = Query(default=None, pattern="^(TL|SS|RDS)$")
     return crud.list_users(role=role)
 
 
-@app.post("/admin/provision-users", dependencies=[Depends(require_admin_key)])
-def provision_users():
-    return {"users": crud.provision_user_credentials(), "note": "Store these temporary passwords securely. They are shown only when credentials are first provisioned."}
+@app.post("/admin/users",
+    response_model=List[AdminUserOut],
+    dependencies=[Depends(require_admin_key)],
+)
+def admin_users():
+    return crud.list_users_admin()
 
+
+@app.post(
+    "/admin/users/{user_id}/reset-password",
+    response_model=PasswordResetOut,
+    dependencies=[Depends(require_admin_key)],
+)
+def admin_reset_password(user_id: int):
+    result = crud.reset_user_password(user_id)
+
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
+
+    return result
+
+
+@app.post(
+    "/admin/users/{user_id}/activate",
+    response_model=UserStatusOut,
+    dependencies=[Depends(require_admin_key)],
+)
+def admin_activate_user(user_id: int):
+    result = crud.set_user_status(
+        user_id,
+        True,
+    )
+
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
+
+    return result
+
+
+@app.post(
+    "/admin/users/{user_id}/deactivate",
+    response_model=UserStatusOut,
+    dependencies=[Depends(require_admin_key)],
+)
+def admin_deactivate_user(user_id: int):
+    result = crud.set_user_status(
+        user_id,
+        False,
+    )
+
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
+
+    return result
 
 @app.get("/stats", response_model=StatsOut)
 def get_stats(user: dict = Depends(get_current_user)):
