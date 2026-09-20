@@ -57,7 +57,7 @@ def login(payload: LoginRequest):
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
 
 
-@app.get("/auth/pin-users")
+@app.get("/auth/pin-users", include_in_schema=False)
 def pin_users():
     rows = crud.list_users_admin()
     return {
@@ -68,9 +68,9 @@ def pin_users():
 
 @app.post("/auth/pin-login", response_model=LoginOut)
 def pin_login(payload: PinLoginRequest):
-    user = crud.get_user_by_name_role(payload.name, payload.role)
-    if not user or not user.get("pin_hash") or not verify_password(payload.pin, user["pin_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid name, role or PIN.")
+    user = crud.get_user_by_pin(payload.pin)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid PIN.")
     token = create_token(user)
     safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
