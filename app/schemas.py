@@ -55,13 +55,31 @@ class StatsOut(BaseModel):
     total_retailers_in_master: int
 
 
-class UserOut(BaseModel):
+class AdminUserOut(BaseModel):
     id: int
     name: str
     role: str
     tl: Optional[str] = None
     ss: Optional[str] = None
     rds: Optional[str] = None
+    username: str
+    active: bool
+    assigned_retailers: int
+
+
+class PasswordResetOut(BaseModel):
+    id: int
+    name: str
+    role: str
+    username: str
+    temporary_password: str
+
+
+class UserStatusOut(BaseModel):
+    id: int
+    name: str
+    role: str
+    username: str
     active: bool
 
 
