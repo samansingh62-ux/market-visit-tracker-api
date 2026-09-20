@@ -92,13 +92,94 @@ def list_retailers(tl: Optional[str] = None, ss: Optional[str] = None,
         return [dict(r) for r in conn.execute(f"SELECT * FROM retailers {where} ORDER BY name", params).fetchall()]
 
 
-def list_users(role: Optional[str] = None) -> list:
+def list_users_admin() -> list:
     with database.get_conn() as conn:
-        if role:
-            rows = conn.execute("SELECT * FROM users WHERE role = %s AND active = TRUE ORDER BY name", (role,)).fetchall()
-        else:
-            rows = conn.execute("SELECT * FROM users WHERE active = TRUE ORDER BY role, name").fetchall()
-        return [dict(r) for r in rows]
+        rows = conn.execute("""
+            SELECT
+                u.id,
+                u.name,
+                u.role,
+                u.tl,
+                u.ss,
+                u.rds,
+                u.username,
+                u.active,
+                COUNT(r.code) AS assigned_retailers
+            FROM users u
+            LEFT JOIN retailers r
+                ON (
+                    (u.role = 'TL' AND r.tl = u.name)
+                    OR
+                    (u.role = 'SS' AND r.ss = u.name)
+                    OR
+                    (u.role = 'RDS' AND r.rds = u.name)
+                )
+            GROUP BY
+                u.id,
+                u.name,
+                u.role,
+                u.tl,
+                u.ss,
+                u.rds,
+                u.username,
+                u.active
+            ORDER BY u.role, u.name
+        """).fetchall()
+
+        return [dict(row) for row in rows]
+
+
+def reset_user_password(user_id: int) -> Optional[dict]:
+    import secrets
+    from .auth import hash_password
+
+    password = secrets.token_urlsafe(9)
+
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT id, name, role, username
+            FROM users
+            WHERE id = %s
+            """,
+            (user_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        conn.execute(
+            """
+            UPDATE users
+            SET password_hash = %s,
+                active = TRUE
+            WHERE id = %s
+            """,
+            (hash_password(password), user_id),
+        )
+
+        return {
+            "id": row["id"],
+            "name": row["name"],
+            "role": row["role"],
+            "username": row["username"],
+            "temporary_password": password,
+        }
+
+
+def set_user_status(user_id: int, active: bool) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            UPDATE users
+            SET active = %s
+            WHERE id = %s
+            RETURNING id, name, role, username, active
+            """,
+            (active, user_id),
+        ).fetchone()
+
+        return dict(row) if row else None
 
 
 def get_stats(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None) -> dict:
