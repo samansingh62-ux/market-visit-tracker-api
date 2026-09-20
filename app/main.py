@@ -59,7 +59,7 @@ def login(payload: LoginRequest):
 
 @app.get("/auth/pin-users")
 def pin_users():
-    rows = crud.list_users(role=None)
+    rows = crud.list_users_admin()
     return {
         "TL": sorted([r["name"] for r in rows if r["role"] == "TL"]),
         "SS": sorted([r["name"] for r in rows if r["role"] == "SS"]),
