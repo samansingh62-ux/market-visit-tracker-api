@@ -12,6 +12,9 @@ class VisitCreate(BaseModel):
     suggestions: Optional[str] = ""
     submitted_by: Optional[str] = "Unknown"
     submitted_role: Optional[str] = "Field"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    gps_accuracy: Optional[float] = None
 
 
 class VisitOut(BaseModel):
@@ -27,6 +30,10 @@ class VisitOut(BaseModel):
     ss: str
     rds: str
     created_at: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    gps_accuracy: Optional[float] = None
+    photo_count: int = 0
 
 
 class RetailerOut(BaseModel):
@@ -119,3 +126,13 @@ class LoginOut(BaseModel):
     access_token: str
     token_type: str
     user: UserOut
+
+
+class PhotoOut(BaseModel):
+    id: int
+    visit_id: int
+    filename: str
+    mime_type: str
+    size_bytes: int
+    created_at: str
+    url: str
