@@ -15,6 +15,7 @@ from .schemas import (
     AdminUserOut,
     CoverageRow,
     LoginOut,
+    PinLoginRequest,
     LoginRequest,
     PasswordResetOut,
     RetailerHealthOut,
@@ -51,6 +52,25 @@ def login(payload: LoginRequest):
     user = crud.get_user_by_username(payload.username)
     if not user or not user.get("password_hash") or not verify_password(payload.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
+    token = create_token(user)
+    safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "active")}
+    return {"access_token": token, "token_type": "bearer", "user": safe_user}
+
+
+@app.get("/auth/pin-users")
+def pin_users():
+    rows = crud.list_users(role=None)
+    return {
+        "TL": sorted([r["name"] for r in rows if r["role"] == "TL"]),
+        "SS": sorted([r["name"] for r in rows if r["role"] == "SS"]),
+    }
+
+
+@app.post("/auth/pin-login", response_model=LoginOut)
+def pin_login(payload: PinLoginRequest):
+    user = crud.get_user_by_name_role(payload.name, payload.role)
+    if not user or not user.get("pin_hash") or not verify_password(payload.pin, user["pin_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid name, role or PIN.")
     token = create_token(user)
     safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
