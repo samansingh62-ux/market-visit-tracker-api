@@ -447,7 +447,91 @@ th{
 <main>
 
 <section class="card">
+<div class="head">
+<div>
+<h2>Manager User Management</h2>
+<div class="sub">
+Admin-only account management for TL, SS and RDS users.
+</div>
+</div>
+</div>
 
+<div class="formgrid">
+
+<label>
+Admin API Key
+<input
+id="adminKey"
+type="password"
+placeholder="Enter admin API key">
+</label>
+
+<div style="display:flex;align-items:end">
+<button
+id="loadUsers"
+class="primary"
+style="width:100%">
+Load User List
+</button>
+</div>
+
+</div>
+
+<div id="adminMsg" class="msg"></div>
+
+<div
+id="adminPanel"
+class="hidden"
+style="margin-top:15px">
+
+<div class="filters">
+
+<select id="adminRole">
+<option value="">All Roles</option>
+<option value="TL">TL</option>
+<option value="SS">SS</option>
+<option value="RDS">RDS</option>
+</select>
+
+<input
+id="adminSearch"
+placeholder="Search name or username">
+
+<button
+id="adminRefresh"
+class="secondary">
+Refresh
+</button>
+
+</div>
+
+<div class="wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Role</th>
+<th>Username</th>
+<th>Hierarchy</th>
+<th>Retailers</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="adminUsers"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
 <form id="loginForm" class="auth">
 
 <label>
@@ -2324,7 +2408,436 @@ logout()
 );
 
 }
+let adminUsers = [];
 
+
+function adminHeaders(){
+
+return {
+"X-API-Key":
+$("adminKey").value.trim()
+};
+
+}
+
+
+async function loadAdminUsers(){
+
+const key =
+$("adminKey").value.trim();
+
+if(!key){
+
+return msg(
+"adminMsg",
+"Enter the admin API key."
+);
+
+}
+
+
+try{
+
+const response =
+await fetch(
+"/admin/users",
+{
+headers:{
+"X-API-Key":key
+}
+}
+);
+
+
+if(!response.ok){
+
+let data = {};
+
+try{
+data = await response.json();
+}catch{}
+
+throw Error(
+data.detail ||
+"Unable to load users."
+);
+
+}
+
+
+adminUsers =
+await response.json();
+
+
+$("adminPanel")
+.classList
+.remove("hidden");
+
+
+renderAdminUsers();
+
+msg(
+"adminMsg",
+"User list loaded.",
+true
+);
+
+
+}catch(error){
+
+msg(
+"adminMsg",
+error.message
+);
+
+}
+
+}
+
+
+function renderAdminUsers(){
+
+const role =
+$("adminRole").value;
+
+const search =
+$("adminSearch")
+.value
+.trim()
+.toLowerCase();
+
+
+const rows =
+adminUsers.filter(
+u =>
+
+(!role ||
+u.role === role)
+
+&&
+
+(
+!search ||
+
+u.name
+.toLowerCase()
+.includes(search)
+
+||
+
+u.username
+.toLowerCase()
+.includes(search)
+)
+
+);
+
+
+$("adminUsers").innerHTML =
+
+rows.length
+
+?
+
+rows.map(
+u => {
+
+const hierarchy =
+u.role === "TL"
+?
+u.tl || "—"
+
+:
+u.role === "SS"
+?
+u.ss || "—"
+
+:
+u.rds || "—";
+
+
+return `
+
+<tr>
+
+<td>
+<b>${esc(u.name)}</b>
+</td>
+
+<td>
+<span class="tag">
+${esc(u.role)}
+</span>
+</td>
+
+<td>
+<code>
+${esc(u.username)}
+</code>
+</td>
+
+<td>
+${esc(hierarchy)}
+</td>
+
+<td>
+${u.assigned_retailers}
+</td>
+
+<td>
+
+<span class="tag ${
+u.active
+?
+"ok"
+:
+"danger"
+}">
+
+${u.active
+?
+"Active"
+:
+"Inactive"}
+
+</span>
+
+</td>
+
+<td>
+
+<div class="actions">
+
+<button
+class="secondary"
+onclick="resetAdminPassword(${u.id})">
+
+Reset Password
+
+</button>
+
+<button
+class="ghost"
+onclick="toggleAdminUser(
+${u.id},
+${u.active}
+)">
+
+${u.active
+?
+"Deactivate"
+:
+"Activate"}
+
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+}
+)
+.join("")
+
+:
+
+`<tr>
+<td colspan="7">
+No users found.
+</td>
+</tr>`;
+
+}
+
+
+async function resetAdminPassword(
+userId
+){
+
+const user =
+adminUsers.find(
+u => u.id === userId
+);
+
+
+if(!user)
+return;
+
+
+const confirmed =
+confirm(
+"Reset password for " +
+user.name +
+"?"
+);
+
+
+if(!confirmed)
+return;
+
+
+try{
+
+const response =
+await fetch(
+"/admin/users/" +
+userId +
+"/reset-password",
+{
+method:"POST",
+headers:
+adminHeaders()
+}
+);
+
+
+const data =
+await response.json();
+
+
+if(!response.ok){
+
+throw Error(
+data.detail ||
+"Password reset failed."
+);
+
+}
+
+
+alert(
+"PASSWORD RESET\n\n" +
+
+"Name: " +
+data.name +
+
+"\nUsername: " +
+data.username +
+
+"\nTemporary Password: " +
+data.temporary_password +
+
+"\n\nSave this password now. It will not be shown again."
+);
+
+
+await loadAdminUsers();
+
+
+}catch(error){
+
+msg(
+"adminMsg",
+error.message
+);
+
+}
+
+}
+
+
+async function toggleAdminUser(
+userId,
+currentlyActive
+){
+
+const user =
+adminUsers.find(
+u => u.id === userId
+);
+
+
+if(!user)
+return;
+
+
+const action =
+currentlyActive
+?
+"deactivate"
+:
+"activate";
+
+
+const confirmed =
+confirm(
+(
+currentlyActive
+?
+"Deactivate "
+:
+"Activate "
+) +
+user.name +
+"?");
+
+if(!confirmed)
+return;
+
+
+try{
+
+const response =
+await fetch(
+"/admin/users/" +
+userId +
+"/" +
+action,
+{
+method:"POST",
+headers:
+adminHeaders()
+}
+);
+
+
+const data =
+await response.json();
+
+
+if(!response.ok){
+
+throw Error(
+data.detail ||
+"Status update failed."
+);
+
+}
+
+
+await loadAdminUsers();
+
+
+}catch(error){
+
+msg(
+"adminMsg",
+error.message
+);
+
+}
+
+}
+
+
+$("loadUsers").onclick =
+loadAdminUsers;
+
+
+$("adminRefresh").onclick =
+loadAdminUsers;
+
+
+$("adminRole").onchange =
+renderAdminUsers;
+
+
+$("adminSearch").oninput =
+renderAdminUsers;
 </script>
 
 </body>
