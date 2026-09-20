@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from . import database
+from .auth import verify_password
 
 
 def lookup_retailer(conn, name: str):
@@ -326,3 +327,18 @@ def get_user_by_name_role(name: str, role: str) -> Optional[dict]:
             (name.strip(), role),
         ).fetchone()
         return dict(row) if row else None
+
+
+def get_user_by_pin(pin: str) -> Optional[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS') AND pin_hash IS NOT NULL"
+        ).fetchall()
+        matches = []
+        for row in rows:
+            user = dict(row)
+            if verify_password(pin, user["pin_hash"]):
+                matches.append(user)
+        if len(matches) == 1:
+            return matches[0]
+        return None
