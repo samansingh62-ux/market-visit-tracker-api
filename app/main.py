@@ -5,9 +5,9 @@ import io
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, Response
 
 from . import crud, database
 from .auth import get_current_user, hash_password, require_admin_key, require_manager, verify_password, create_token
@@ -23,7 +23,7 @@ from .schemas import (
     UserOut,
     UserStatusOut,
     VisitCreate,
-    VisitOut,
+    VisitOut, PhotoOut,
 )
 app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits, coverage and field intelligence.", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
@@ -127,6 +127,51 @@ def get_visit(visit_id: int, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="You cannot access this visit.")
     return visit
 
+
+@app.get("/visits/{visit_id}/photos", response_model=List[PhotoOut])
+def visit_photos(visit_id: int, user: dict = Depends(get_current_user)):
+    visit = crud.get_visit(visit_id)
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found.")
+    scope = _scope(user)
+    if scope and any(visit.get(k) != v for k, v in scope.items()):
+        raise HTTPException(status_code=403, detail="You cannot access this visit.")
+    rows = crud.list_visit_photos(visit_id)
+    return [{**r, "url": f"/visits/{visit_id}/photos/{r['id']}"} for r in rows]
+
+@app.get("/visits/{visit_id}/photos/{photo_id}")
+def visit_photo(visit_id: int, photo_id: int, user: dict = Depends(get_current_user)):
+    visit = crud.get_visit(visit_id)
+    photo = crud.get_visit_photo(photo_id)
+    if not visit or not photo or photo["visit_id"] != visit_id:
+        raise HTTPException(status_code=404, detail="Photo not found.")
+    scope = _scope(user)
+    if scope and any(visit.get(k) != v for k, v in scope.items()):
+        raise HTTPException(status_code=403, detail="You cannot access this photo.")
+    return Response(content=photo["data"], media_type=photo["mime_type"])
+
+@app.post("/visits/{visit_id}/photos", response_model=List[PhotoOut])
+async def upload_visit_photos(visit_id: int, files: List[UploadFile] = File(...), user: dict = Depends(get_current_user)):
+    visit = crud.get_visit(visit_id)
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found.")
+    scope = _scope(user)
+    if scope and any(visit.get(k) != v for k, v in scope.items()):
+        raise HTTPException(status_code=403, detail="You cannot upload photos to this visit.")
+    existing = crud.list_visit_photos(visit_id)
+    if len(existing) + len(files) > 5:
+        raise HTTPException(status_code=400, detail="Maximum 5 stock photos per visit.")
+    allowed = {"image/jpeg", "image/png", "image/webp"}
+    out = []
+    for upload in files:
+        if upload.content_type not in allowed:
+            raise HTTPException(status_code=400, detail="Only JPG, PNG or WEBP images are allowed.")
+        data = await upload.read()
+        if len(data) > 4 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="Each photo must be 4 MB or smaller.")
+        row = crud.add_visit_photo(visit_id, upload.filename or "stock-photo", upload.content_type, data)
+        out.append({**row, "url": f"/visits/{visit_id}/photos/{row['id']}"})
+    return out
 
 @app.delete("/visits/{visit_id}", status_code=204, dependencies=[Depends(require_admin_key)])
 def delete_visit(visit_id: int):
