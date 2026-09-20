@@ -117,6 +117,32 @@ def init_db():
                     ON CONFLICT (code) DO NOTHING
                 """, seed)
 
+        # User identity/hierarchy master. Credentials are only populated by admin provisioning.
+        rows = conn.execute("""
+            SELECT DISTINCT tl AS name, 'TL' AS role, tl, NULL AS ss, NULL AS rds
+            FROM retailers WHERE tl IS NOT NULL AND tl != ''
+            UNION
+            SELECT DISTINCT ss AS name, 'SS' AS role, NULL AS tl, ss, NULL AS rds
+            FROM retailers WHERE ss IS NOT NULL AND ss != ''
+            UNION
+            SELECT DISTINCT rds AS name, 'RDS' AS role, NULL AS tl, NULL AS ss, rds
+            FROM retailers WHERE rds IS NOT NULL AND rds != ''
+        """).fetchall()
+        for row in rows:
+            base = "".join(ch.lower() if ch.isalnum() else "." for ch in row["name"]).strip(".")
+            row["username"] = f"{base}.{row['role'].lower()}"
+        with conn.cursor() as cur:
+            cur.executemany("""
+                INSERT INTO users (name, role, tl, ss, rds, username)
+                VALUES (%(name)s, %(role)s, %(tl)s, %(ss)s, %(rds)s, %(username)s)
+                ON CONFLICT (name, role) DO UPDATE SET
+                    tl = EXCLUDED.tl,
+                    ss = EXCLUDED.ss,
+                    rds = EXCLUDED.rds,
+                    username = COALESCE(users.username, EXCLUDED.username),
+                    active = TRUE
+            """, rows)
+
         # Zone A TL/SS PINs. Only PBKDF2 hashes are stored in the application.
         pin_seeds = {
     "V. Lalbiakdika":["TL","xYMtXqly1hZzsi62HVHcVg==$tNX3Ov9-m86C92YXDWo60t7ZN-U60JplsSvPWATXwrc="],
@@ -155,28 +181,3 @@ def init_db():
         for name, (role, pin_hash) in pin_seeds.items():
             conn.execute("UPDATE users SET pin_hash = %s WHERE name = %s AND role = %s", (pin_hash, name, role))
 
-        # User identity/hierarchy master. Credentials are only populated by admin provisioning.
-        rows = conn.execute("""
-            SELECT DISTINCT tl AS name, 'TL' AS role, tl, NULL AS ss, NULL AS rds
-            FROM retailers WHERE tl IS NOT NULL AND tl != ''
-            UNION
-            SELECT DISTINCT ss AS name, 'SS' AS role, NULL AS tl, ss, NULL AS rds
-            FROM retailers WHERE ss IS NOT NULL AND ss != ''
-            UNION
-            SELECT DISTINCT rds AS name, 'RDS' AS role, NULL AS tl, NULL AS ss, rds
-            FROM retailers WHERE rds IS NOT NULL AND rds != ''
-        """).fetchall()
-        for row in rows:
-            base = "".join(ch.lower() if ch.isalnum() else "." for ch in row["name"]).strip(".")
-            row["username"] = f"{base}.{row['role'].lower()}"
-        with conn.cursor() as cur:
-            cur.executemany("""
-                INSERT INTO users (name, role, tl, ss, rds, username)
-                VALUES (%(name)s, %(role)s, %(tl)s, %(ss)s, %(rds)s, %(username)s)
-                ON CONFLICT (name, role) DO UPDATE SET
-                    tl = EXCLUDED.tl,
-                    ss = EXCLUDED.ss,
-                    rds = EXCLUDED.rds,
-                    username = COALESCE(users.username, EXCLUDED.username),
-                    active = TRUE
-            """, rows)
