@@ -122,6 +122,12 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1)
 
 
+class PinLoginRequest(BaseModel):
+    name: str = Field(..., min_length=1)
+    role: str = Field(..., pattern="^(TL|SS)$")
+    pin: str = Field(..., min_length=4, max_length=4)
+
+
 class LoginOut(BaseModel):
     access_token: str
     token_type: str
