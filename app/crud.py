@@ -317,3 +317,12 @@ def get_visit_photo(photo_id: int) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute("SELECT * FROM visit_photos WHERE id = %s", (photo_id,)).fetchone()
         return dict(row) if row else None
+
+
+def get_user_by_name_role(name: str, role: str) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            "SELECT * FROM users WHERE LOWER(name) = LOWER(%s) AND role = %s AND active = TRUE",
+            (name.strip(), role),
+        ).fetchone()
+        return dict(row) if row else None
