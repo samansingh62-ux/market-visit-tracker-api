@@ -62,7 +62,23 @@ def init_db():
             )
         """)
         conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS submitted_role TEXT")
+        conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION")
+        conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION")
+        conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS gps_accuracy DOUBLE PRECISION")
         conn.execute("UPDATE visits SET submitted_role = 'Field' WHERE submitted_role IS NULL")
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS visit_photos (
+                id BIGSERIAL PRIMARY KEY,
+                visit_id BIGINT NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
+                filename TEXT NOT NULL,
+                mime_type TEXT NOT NULL,
+                data BYTEA NOT NULL,
+                size_bytes INTEGER NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_visit_photos_visit_id ON visit_photos(visit_id)")
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
