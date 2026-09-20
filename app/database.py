@@ -55,7 +55,10 @@ def init_db():
                 tl TEXT,
                 ss TEXT,
                 rds TEXT,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                latitude DOUBLE PRECISION,
+                longitude DOUBLE PRECISION,
+                gps_accuracy DOUBLE PRECISION
             )
         """)
         conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS submitted_role TEXT")
