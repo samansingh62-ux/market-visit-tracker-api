@@ -21,8 +21,8 @@ def create_visit(payload) -> dict:
         cur = conn.execute("""
             INSERT INTO visits
                 (retailer, market, visit_date, feedback, suggestions,
-                 submitted_by, submitted_role, tl, ss, rds, created_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 submitted_by, submitted_role, tl, ss, rds, created_at, latitude, longitude, gps_accuracy)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             payload.retailer, payload.market, payload.visit_date.isoformat(),
@@ -30,6 +30,7 @@ def create_visit(payload) -> dict:
             payload.submitted_by or "Unknown", payload.submitted_role or "Field",
             info.get("tl", ""), info.get("ss", ""), info.get("rds", ""),
             datetime.now(timezone.utc).isoformat(),
+            payload.latitude, payload.longitude, payload.gps_accuracy,
         ))
         visit_id = cur.fetchone()["id"]
         row = conn.execute("SELECT * FROM visits WHERE id = %s", (visit_id,)).fetchone()
@@ -60,7 +61,13 @@ def list_visits(retailer: Optional[str] = None, tl: Optional[str] = None,
         like = f"%{search}%"
         params.extend([like] * 4)
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-    query = f"SELECT * FROM visits {where} ORDER BY visit_date DESC, created_at DESC LIMIT %s OFFSET %s"
+    query = f"""SELECT v.*, COUNT(p.id) AS photo_count
+                 FROM visits v
+                 LEFT JOIN visit_photos p ON p.visit_id = v.id
+                 {where}
+                 GROUP BY v.id
+                 ORDER BY v.visit_date DESC, v.created_at DESC
+                 LIMIT %s OFFSET %s"""
     params.extend([limit, offset])
     with database.get_conn() as conn:
         return [dict(r) for r in conn.execute(query, params).fetchall()]
@@ -285,3 +292,28 @@ def provision_user_credentials() -> list:
             )
             result.append({"name": row["name"], "role": row["role"], "username": row["username"], "temporary_password": password})
         return result
+
+
+def add_visit_photo(visit_id: int, filename: str, mime_type: str, data: bytes) -> dict:
+    with database.get_conn() as conn:
+        row = conn.execute("""
+            INSERT INTO visit_photos (visit_id, filename, mime_type, data, size_bytes, created_at)
+            VALUES (%s,%s,%s,%s,%s,%s)
+            RETURNING id, visit_id, filename, mime_type, size_bytes, created_at
+        """, (visit_id, filename, mime_type, data, len(data), datetime.now(timezone.utc).isoformat())).fetchone()
+        return dict(row)
+
+
+def list_visit_photos(visit_id: int) -> list:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT id, visit_id, filename, mime_type, size_bytes, created_at FROM visit_photos WHERE visit_id = %s ORDER BY id",
+            (visit_id,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_visit_photo(photo_id: int) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute("SELECT * FROM visit_photos WHERE id = %s", (photo_id,)).fetchone()
+        return dict(row) if row else None
