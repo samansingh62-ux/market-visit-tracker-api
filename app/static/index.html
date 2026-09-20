@@ -4,11 +4,19 @@
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
-<section class="card"><div class="auth">
+<section class="card"><div class="sub" style="margin:0 0 8px;font-weight:800;color:#172033">Quick PIN Login</div>
+<div class="auth" style="grid-template-columns:1fr 1.4fr 180px 120px">
+<label>Role<select id="pinRole"><option value="TL">Team Leader (TL)</option><option value="SS">Store Supervisor (SS)</option></select></label>
+<label>Who are you?<select id="pinName"><option value="">Select your name</option></select></label>
+<label>4-digit PIN<input id="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" autocomplete="one-time-code"></label>
+<button id="pinLogin" class="primary">Login</button>
+</div><div id="authMsg" class="msg"></div>
+<div style="margin-top:10px"><button id="legacyToggle" class="ghost" type="button">Use username/password instead</button></div>
+<div id="legacyLogin" class="hidden" style="margin-top:10px"><div class="auth">
 <label>Username<input id="username" placeholder="Your username" autocomplete="username"></label>
 <label>Password<input id="password" type="password" placeholder="Password" autocomplete="current-password"></label>
-<button id="login" class="primary">Login</button>
-</div><div id="authMsg" class="msg"></div>
+<button id="login" class="secondary">Login</button>
+</div></div>
 <div style="margin-top:12px;padding-top:12px;border-top:1px solid #edf0f4">
 <div class="sub" style="margin:0 0 8px">Manager Administration</div>
 <div class="auth" style="grid-template-columns:1fr auto">
@@ -47,6 +55,9 @@ let token=sessionStorage.getItem('mvt_token')||'',user=JSON.parse(sessionStorage
 const $=id=>document.getElementById(id);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function msg(id,t,ok=false){$(id).textContent=t;$(id).className='msg '+(t?(ok?'ok':'err'):'')}
 async function api(path,opt={}){let h={};if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
+async function loadPinUsers(){try{let r=await fetch('/auth/pin-users');if(!r.ok)throw Error('Could not load team list');let d=await r.json();window.pinUsers=d;fillPinNames();$('pinRole').onchange=fillPinNames}catch(e){msg('authMsg',e.message)}}
+function fillPinNames(){let role=$('pinRole').value,names=(window.pinUsers||{})[role]||[];$('pinName').innerHTML='<option value="">Select your name</option>'+names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('')}
+async function pinLogin(){let role=$('pinRole').value,name=$('pinName').value,pin=$('pin').value.trim();if(!name||!/^[0-9]{4}$/.test(pin))return msg('authMsg','Select your name and enter the 4-digit PIN.');try{let r=await fetch('/auth/pin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,role,pin})});let d=await r.json();if(!r.ok)throw Error(d.detail||'Login failed');token=d.access_token;user=d.user;sessionStorage.setItem('mvt_token',token);sessionStorage.setItem('mvt_user',JSON.stringify(user));await showApp();msg('authMsg','Login successful.',true)}catch(e){msg('authMsg',e.message)}}
 async function login(){let username=$('username').value.trim(),password=$('password').value;if(!username||!password)return msg('authMsg','Enter username and password.');try{let r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});let d=await r.json();if(!r.ok)throw Error(d.detail||'Login failed');token=d.access_token;user=d.user;sessionStorage.setItem('mvt_token',token);sessionStorage.setItem('mvt_user',JSON.stringify(user));await showApp();msg('authMsg','Login successful.',true)}catch(e){msg('authMsg',e.message)}}
 function requestGPS(){if(!navigator.geolocation){$('gpsStatus').textContent='📍 GPS: This browser/device does not provide location.';return Promise.resolve(false)}$('gpsStatus').textContent='📍 GPS: Requesting current location…';return new Promise(resolve=>navigator.geolocation.getCurrentPosition(p=>{gps={latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy};$('gpsStatus').innerHTML=`📍 GPS: <b>Captured</b> · Accuracy ${Math.round(gps.accuracy)} m · ${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)}`;resolve(true)},()=>{$('gpsStatus').textContent='📍 GPS: Permission denied/unavailable. Allow location access and try again.';resolve(false)},{enableHighAccuracy:true,timeout:10000,maximumAge:60000}))}
 async function refreshGPS(){return requestGPS()}
@@ -128,7 +139,7 @@ $('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$(
 async function compressImage(file){if(!file.type.startsWith('image/'))return file;return new Promise(resolve=>{let img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{let max=1600,w=img.width,h=img.height;if(Math.max(w,h)>max){if(w>=h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}}let c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>{URL.revokeObjectURL(url);if(!b)return resolve(file);resolve(new File([b],(file.name||'stock').replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'}))},'image/jpeg',.78)};img.src=url})}
 $('stockPhotos').onchange=()=>{let fs=[...$('stockPhotos').files];if(fs.length>5){$('stockPhotos').value='';return msg('formMsg','Maximum 5 stock photos per visit.')}$('photoPreview').innerHTML=fs.length?fs.map(f=>`<span class="tag">${esc(f.name)} · ${Math.round(f.size/1024)} KB</span> `).join(''):'No photos selected.'};
 $('group').onchange=()=>coverage().catch(e=>msg('authMsg',e.message));
-$('login').onclick=login;$('logout').onclick=logout;$('refresh').onclick=()=>load().catch(e=>msg('authMsg',e.message));$('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
+$('pinLogin').onclick=pinLogin;$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')pinLogin()});$('legacyToggle').onclick=()=>$('legacyLogin').classList.toggle('hidden');loadPinUsers();$('login').onclick=login;$('logout').onclick=logout;$('refresh').onclick=()=>load().catch(e=>msg('authMsg',e.message));$('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
 $('export').onclick=async()=>{try{let p=new URLSearchParams();if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let r=await fetch('/visits/export.csv?'+p,{headers:{Authorization:'Bearer '+token}});if(!r.ok)throw Error('Export failed');let b=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market-visits.csv';a.click()}catch(e){msg('authMsg',e.message)}};
 $('date').value=new Date().toISOString().slice(0,10);if(token&&user)showApp().catch(()=>logout());
 </script></body></html>
