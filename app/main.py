@@ -11,9 +11,20 @@ from fastapi.responses import FileResponse, StreamingResponse
 
 from . import crud, database
 from .auth import get_current_user, hash_password, require_admin_key, require_manager, verify_password, create_token
-from .schemas import (CoverageRow, LoginOut, LoginRequest, RetailerHealthOut, RetailerOut, StatsOut,
-                      UserOut, VisitCreate, VisitOut)
-
+from .schemas import (
+    AdminUserOut,
+    CoverageRow,
+    LoginOut,
+    LoginRequest,
+    PasswordResetOut,
+    RetailerHealthOut,
+    RetailerOut,
+    StatsOut,
+    UserOut,
+    UserStatusOut,
+    VisitCreate,
+    VisitOut,
+)
 app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits, coverage and field intelligence.", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
