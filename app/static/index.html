@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>vivo NESA GTM Command Center</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#172033;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.top{background:#0b1426;color:#fff;padding:24px max(18px,calc((100% - 1280px)/2));display:flex;justify-content:space-between;align-items:center}.ey{font-size:11px;letter-spacing:.16em;color:#93a4bc;font-weight:800}.top h1{margin:4px 0;font-size:27px}.top p{margin:0;color:#b7c2d3}.pill{background:#263247;border:1px solid #40506a;border-radius:99px;padding:8px 13px;font-size:12px}main{max-width:1280px;margin:20px auto;padding:0 16px}.card,.metric{background:#fff;border:1px solid #e2e7ee;border-radius:14px;padding:17px;margin-bottom:17px;box-shadow:0 3px 14px #10182808}.auth{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric span{display:block;color:#667085;font-size:12px}.metric b{display:block;font-size:27px;margin-top:7px}.grid{display:grid;grid-template-columns:1fr 1.2fr;gap:17px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-size:13px;font-weight:700;margin-bottom:11px}input,select,textarea{width:100%;margin-top:6px;border:1px solid #d0d5dd;border-radius:9px;padding:10px 11px;font:inherit;background:#fff;color:#172033}textarea{resize:vertical}button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}.primary{background:#0b1426;color:#fff}.secondary{background:#edf1f6;color:#172033}.ghost{background:transparent;color:#667085}.hidden{display:none}.msg{font-size:13px;margin-top:9px}.ok{color:#087443}.err{color:#b42318}.meta{background:#f7f9fc;border:1px solid #e6eaf0;border-radius:9px;padding:9px 11px;font-size:12px;color:#667085;margin:-2px 0 12px}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h2,h2{margin:0 0 12px;font-size:18px}.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto auto;gap:8px;margin-bottom:12px}.filters input,.filters select{margin:0}.wrap{overflow:auto;max-height:510px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid #edf0f4;vertical-align:top}th{background:#f8fafc;color:#667085;text-transform:uppercase;font-size:10px;letter-spacing:.05em;position:sticky;top:0}.tag{display:inline-block;padding:4px 7px;border-radius:99px;background:#eef2f7;font-size:10px;font-weight:750}.tag.warn{background:#fff4e5}.tag.danger{background:#feeceb}.tag.ok{background:#e8f6ef}.bar{height:6px;background:#e9edf3;border-radius:99px;margin-top:4px;min-width:70px}.bar span{display:block;height:100%;background:#172033;border-radius:99px}.sub{font-size:12px;color:#667085;margin-top:-7px;margin-bottom:13px}@media(max-width:950px){.metrics{grid-template-columns:repeat(3,1fr)}.grid{display:block}.filters{grid-template-columns:1fr 1fr}.filters input:first-child{grid-column:1/-1}}@media(max-width:600px){.metrics,.formgrid,.filters,.auth{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#172033;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.top{background:#0b1426;color:#fff;padding:24px max(18px,calc((100% - 1280px)/2));display:flex;justify-content:space-between;align-items:center}.ey{font-size:11px;letter-spacing:.16em;color:#93a4bc;font-weight:800}.top h1{margin:4px 0;font-size:27px}.top p{margin:0;color:#b7c2d3}.pill{background:#263247;border:1px solid #40506a;border-radius:99px;padding:8px 13px;font-size:12px}main{max-width:1280px;margin:20px auto;padding:0 16px}.card,.metric{background:#fff;border:1px solid #e2e7ee;border-radius:14px;padding:17px;margin-bottom:17px;box-shadow:0 3px 14px #10182808}.auth{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric span{display:block;color:#667085;font-size:12px}.metric b{display:block;font-size:27px;margin-top:7px}.grid{display:grid;grid-template-columns:1fr 1.2fr;gap:17px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-size:13px;font-weight:700;margin-bottom:11px}input,select,textarea{width:100%;margin-top:6px;border:1px solid #d0d5dd;border-radius:9px;padding:10px 11px;font:inherit;background:#fff;color:#172033}textarea{resize:vertical}button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}.actions{display:flex;gap:6px;flex-wrap:wrap}.admin-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}.admin-stat{background:#f7f9fc;border:1px solid #e6eaf0;border-radius:10px;padding:11px}.admin-stat span{display:block;color:#667085;font-size:11px}.admin-stat b{display:block;font-size:20px;margin-top:4px}@media(max-width:600px){.admin-summary{grid-template-columns:1fr 1fr}}.primary{background:#0b1426;color:#fff}.secondary{background:#edf1f6;color:#172033}.ghost{background:transparent;color:#667085}.hidden{display:none}.msg{font-size:13px;margin-top:9px}.ok{color:#087443}.err{color:#b42318}.meta{background:#f7f9fc;border:1px solid #e6eaf0;border-radius:9px;padding:9px 11px;font-size:12px;color:#667085;margin:-2px 0 12px}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h2,h2{margin:0 0 12px;font-size:18px}.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto auto;gap:8px;margin-bottom:12px}.filters input,.filters select{margin:0}.wrap{overflow:auto;max-height:510px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid #edf0f4;vertical-align:top}th{background:#f8fafc;color:#667085;text-transform:uppercase;font-size:10px;letter-spacing:.05em;position:sticky;top:0}.tag{display:inline-block;padding:4px 7px;border-radius:99px;background:#eef2f7;font-size:10px;font-weight:750}.tag.warn{background:#fff4e5}.tag.danger{background:#feeceb}.tag.ok{background:#e8f6ef}.bar{height:6px;background:#e9edf3;border-radius:99px;margin-top:4px;min-width:70px}.bar span{display:block;height:100%;background:#172033;border-radius:99px}.sub{font-size:12px;color:#667085;margin-top:-7px;margin-bottom:13px}@media(max-width:950px){.metrics{grid-template-columns:repeat(3,1fr)}.grid{display:block}.filters{grid-template-columns:1fr 1fr}.filters input:first-child{grid-column:1/-1}}@media(max-width:600px){.metrics,.formgrid,.filters,.auth{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px;flex-direction:column}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -8,7 +8,31 @@
 <label>Username<input id="username" placeholder="Your username" autocomplete="username"></label>
 <label>Password<input id="password" type="password" placeholder="Password" autocomplete="current-password"></label>
 <button id="login" class="primary">Login</button>
-</div><div id="authMsg" class="msg"></div></section>
+</div><div id="authMsg" class="msg"></div>
+<div style="margin-top:12px;padding-top:12px;border-top:1px solid #edf0f4">
+<div class="sub" style="margin:0 0 8px">Manager Administration</div>
+<div class="auth" style="grid-template-columns:1fr auto">
+<label>Admin API Key<input id="adminKey" type="password" placeholder="Manager admin key" autocomplete="off"></label>
+<button id="managerAccess" class="secondary">Open Manager Panel</button>
+</div>
+</div></section>
+<section id="managerPanel" class="card hidden">
+<div class="head"><div><h2>Manager User Management</h2><div class="sub">Admin-only account management for TL, SS and RDS users.</div></div><button id="closeManager" class="ghost">Close</button></div>
+<div id="adminMsg" class="msg"></div>
+<div class="admin-summary">
+<div class="admin-stat"><span>Total Users</span><b id="adminTotal">—</b></div>
+<div class="admin-stat"><span>TL</span><b id="adminTL">—</b></div>
+<div class="admin-stat"><span>SS</span><b id="adminSS">—</b></div>
+<div class="admin-stat"><span>RDS</span><b id="adminRDS">—</b></div>
+</div>
+<div class="filters">
+<input id="adminSearch" placeholder="Search name or username">
+<select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select>
+<select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
+<button id="adminRefresh" class="secondary">Refresh</button>
+</div>
+<div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
+</section>
 <section id="app" class="hidden">
 <section class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div></section>
 <div class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
@@ -30,9 +54,74 @@ async function load(){await Promise.all([stats(),retailers(),visits(),coverage()
 async function stats(){let x=await api('/stats');$('mv').textContent=x.total_visits;$('mr').textContent=x.unique_retailers_visited;$('mm').textContent=x.unique_markets;$('mt').textContent=x.total_retailers_in_master}
 async function retailers(){master=await api('/retailers');$('retailers').innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
 $('retailer').oninput=()=>{let r=master.find(x=>x.name===$('retailer').value.trim());$('meta').innerHTML=r?`<b>TL:</b> ${esc(r.tl||'—')} &nbsp; <b>SS:</b> ${esc(r.ss||'—')} &nbsp; <b>RDS:</b> ${esc(r.rds||'—')} &nbsp; <b>Zone:</b> ${esc(r.zone||'—')} &nbsp; <b>Club:</b> ${esc(r.club||'—')}`:'Select a retailer from your assigned list.'}
-async function visits(){let p=new URLSearchParams({limit:'500'});if($('search').value)p.set('search',$('search').value);if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let a=await api('/visits?'+p);$('visits').innerHTML=a.length?a.map(v=>`<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.feedback)}</td></tr>`).join(''):'<tr><td colspan="7">No visits found.</td></tr>'}
+async function visits(){let p=new URLSearchParams({limit:'500'});if($('search').value)p.set('search',$('search').value);if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let a=await api('/visits?'+p);$('visits').innerHTML=a.length?a.map(v=>`<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.submitted_by)}</td><td>${esc(v.submitted_role)}</td><td>${esc(v.feedback)}</td></tr>`).join(''):'<tr><td colspan="9">No visits found.</td></tr>'}
 async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
+let adminKey='';
+let adminUsers=[];
+
+function adminHeaders(){return {'X-API-Key':adminKey}}
+
+async function loadAdminUsers(){
+  if(!adminKey)return msg('adminMsg','Enter the manager admin API key.');
+  try{
+    let r=await fetch('/admin/users',{headers:adminHeaders()});
+    let d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to load users.');
+    adminUsers=d;
+    $('managerPanel').classList.remove('hidden');
+    $('app').classList.add('hidden');
+    renderAdminUsers();
+    msg('adminMsg','User list loaded successfully.',true);
+  }catch(e){msg('adminMsg',e.message)}
+}
+
+function renderAdminUsers(){
+  let role=$('adminRole').value,status=$('adminStatus').value,s=$('adminSearch').value.trim().toLowerCase();
+  let rows=adminUsers.filter(u=>
+    (!role||u.role===role)&&
+    (!status||String(u.active)===status)&&
+    (!s||u.name.toLowerCase().includes(s)||u.username.toLowerCase().includes(s))
+  );
+  $('adminTotal').textContent=adminUsers.length;
+  $('adminTL').textContent=adminUsers.filter(u=>u.role==='TL').length;
+  $('adminSS').textContent=adminUsers.filter(u=>u.role==='SS').length;
+  $('adminRDS').textContent=adminUsers.filter(u=>u.role==='RDS').length;
+  $('adminUsers').innerHTML=rows.length?rows.map(u=>{
+    let hierarchy=u.role==='TL'?u.tl||'—':u.role==='SS'?u.ss||'—':u.rds||'—';
+    return `<tr><td><b>${esc(u.name)}</b></td><td><span class="tag">${esc(u.role)}</span></td><td><code>${esc(u.username)}</code></td><td>${esc(hierarchy)}</td><td>${u.assigned_retailers}</td><td><span class="tag ${u.active?'ok':'danger'}">${u.active?'Active':'Inactive'}</span></td><td><div class="actions"><button class="secondary" onclick="resetAdminPassword(${u.id})">Reset Password</button><button class="ghost" onclick="toggleAdminUser(${u.id},${u.active})">${u.active?'Deactivate':'Activate'}</button></div></td></tr>`
+  }).join(''):'<tr><td colspan="7">No users found.</td></tr>';
+}
+
+async function resetAdminPassword(id){
+  let u=adminUsers.find(x=>x.id===id);if(!u)return;
+  if(!confirm('Reset password for '+u.name+'?'))return;
+  try{
+    let r=await fetch('/admin/users/'+id+'/reset-password',{method:'POST',headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Password reset failed.');
+    alert('PASSWORD RESET\n\nName: '+d.name+'\nUsername: '+d.username+'\nTemporary Password: '+d.temporary_password+'\n\nSave this password now. It will not be shown again.');
+    await loadAdminUsers();
+  }catch(e){msg('adminMsg',e.message)}
+}
+
+async function toggleAdminUser(id,active){
+  let u=adminUsers.find(x=>x.id===id);if(!u)return;
+  let action=active?'deactivate':'activate';
+  if(!confirm((active?'Deactivate ':'Activate ')+u.name+'?'))return;
+  try{
+    let r=await fetch('/admin/users/'+id+'/'+action,{method:'POST',headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Status update failed.');
+    await loadAdminUsers();
+  }catch(e){msg('adminMsg',e.message)}
+}
+
+$('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUsers()};
+$('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(token)$('app').classList.remove('hidden')};
+$('adminRefresh').onclick=loadAdminUsers;
+$('adminRole').onchange=renderAdminUsers;
+$('adminStatus').onchange=renderAdminUsers;
+$('adminSearch').oninput=renderAdminUsers;
+
 $('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');try{let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim()})});msg('formMsg','Visit #'+v.id+' submitted successfully.',true);$('feedback').value='';$('suggestions').value='';await load()}catch(e){msg('formMsg',e.message)}};
 $('login').onclick=login;$('logout').onclick=logout;$('refresh').onclick=()=>load().catch(e=>msg('authMsg',e.message));$('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
 $('export').onclick=async()=>{try{let p=new URLSearchParams();if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let r=await fetch('/visits/export.csv?'+p,{headers:{Authorization:'Bearer '+token}});if(!r.ok)throw Error('Export failed');let b=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market-visits.csv';a.click()}catch(e){msg('authMsg',e.message)}};
