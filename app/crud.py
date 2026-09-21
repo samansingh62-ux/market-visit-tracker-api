@@ -23,7 +23,7 @@ def create_visit(payload) -> dict:
             INSERT INTO visits
                 (retailer, market, visit_date, feedback, suggestions,
                  submitted_by, submitted_role, tl, ss, rds, created_at, latitude, longitude, gps_accuracy)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             payload.retailer, payload.market, payload.visit_date.isoformat(),
