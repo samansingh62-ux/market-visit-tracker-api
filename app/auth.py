@@ -103,6 +103,21 @@ async def get_current_user(
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login required.")
 
 
+async def get_dashboard_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer),
+    x_api_key: str | None = Security(api_key_header),
+):
+    """Authenticate field users by bearer token and managers by API key for dashboard reads."""
+    if x_api_key:
+        if API_KEY and hmac.compare_digest(x_api_key, API_KEY):
+            return {"name": "Manager", "role": "MANAGER", "tl": None, "ss": None, "rds": None}
+        if ADMIN_API_KEY and hmac.compare_digest(x_api_key, ADMIN_API_KEY):
+            return {"name": "Manager", "role": "MANAGER", "tl": None, "ss": None, "rds": None}
+    if credentials:
+        return decode_token(credentials.credentials)
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login required.")
+
+
 def require_manager(user: dict):
     if user.get("role") != "MANAGER":
         raise HTTPException(status_code=403, detail="Manager access required.")
