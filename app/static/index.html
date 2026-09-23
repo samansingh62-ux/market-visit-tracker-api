@@ -79,6 +79,7 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 <button class="sideBtn" data-target="retailerIntelligence">▣ &nbsp; My Retailers</button>
 <button class="sideBtn" data-target="retailerIntelligence">▥ &nbsp; Market Intelligence</button>
 <button class="sideBtn" data-target="visitHistory">▤ &nbsp; Reports</button>
+<button id="managerNav" class="sideBtn hidden" data-target="managerPanel">⚙ &nbsp; Management</button>
 </nav>
 <div class="sideBottom">
 <button class="sideBtn" data-target="profileSection">♙ &nbsp; Profile</button>
@@ -111,7 +112,7 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 <section class="card" id="visitLogDetails"><div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="export" class="secondary">Export CSV</button></div></div><div class="filters"><input id="search" placeholder="Search retailer, market or feedback"><input id="from" type="date"><input id="to" type="date"><select id="visitRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select><button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Role</th><th>GPS</th><th>Photos</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div></section>
 </div></div></section></main>
 <script>
-let token=sessionStorage.getItem('mvt_token')||'',user=JSON.parse(sessionStorage.getItem('mvt_user')||'null'),master=[];let gps={latitude:null,longitude:null,accuracy:null};
+let token=sessionStorage.getItem('mvt_token')||'',user=JSON.parse(sessionStorage.getItem('mvt_user')||'null'),master=[],managerMode=false;let gps={latitude:null,longitude:null,accuracy:null};
 const $=id=>document.getElementById(id);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function msg(id,t,ok=false){$(id).textContent=t;$(id).className='msg '+(t?(ok?'ok':'err'):'')}
 function setStatus(connected,label){$('status').textContent='● '+(label|| (connected?'Connected':'Disconnected'));$('status').style.background=connected?'#123d2b':'#263142'}
@@ -136,7 +137,7 @@ async function checkConnection(){
   setStatus(false,'Disconnected');
   return false;
 }
-async function api(path,opt={}){let h={};if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
+async function api(path,opt={}){let h={};if(managerMode&&adminKey)h['X-API-Key']=adminKey;else if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
 async function pinLogin(){
   let pin=$('pin').value.trim();
   if(!/^[0-9]{4}$/.test(pin))return msg('authMsg','Enter your 4-digit PIN.');
@@ -197,7 +198,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   requestGPS().catch(e=>console.warn('GPS:',e));
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
-function logout(){token='';user=null;sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health()])}
 async function stats(){let x=await api('/stats');$('mv').textContent=x.total_visits;$('mr').textContent=x.unique_retailers_visited;$('mm').textContent=x.unique_markets;$('mt').textContent=x.total_retailers_in_master;$('dkVisits').textContent=x.total_visits;$('dkRetailers').textContent=x.unique_retailers_visited;$('dkMarkets').textContent=x.unique_markets;let total=x.total_retailers_in_master||0,visited=x.unique_retailers_visited||0;$('dkCoverage').textContent=(total?Math.round(visited*100/total):0)+'%';$('dkMaster').textContent=x.total_retailers_in_master;}
 async function retailers(){master=await api('/retailers');$('retailers').innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
@@ -217,10 +218,20 @@ async function loadAdminUsers(){
     let d=await r.json();
     if(!r.ok)throw Error(d.detail||'Unable to load users.');
     adminUsers=d;
+    managerMode=true;
+    user={name:'Manager',role:'MANAGER',active:true};
+    $('authPanel').classList.add('hidden');
     $('managerPanel').classList.remove('hidden');
-    $('app').classList.add('hidden');
+    $('managerNav').classList.remove('hidden');
+    $('app').classList.remove('hidden');
+    $('topUserName').textContent='Manager';
+    $('topUserRole').textContent='Management';
+    $('avatarInitials').textContent='MG';
+    $('userMeta').innerHTML='<b>Manager</b> · Management &nbsp; <span class="muted">Full NESA dashboard access is enabled in management mode.</span>';
+    setStatus(true,'Manager');
     renderAdminUsers();
-    msg('adminMsg','User list loaded successfully.',true);
+    msg('adminMsg','Management access enabled. Dashboard data is loading.',true);
+    load().catch(e=>msg('adminMsg','Dashboard refresh failed: '+e.message));
   }catch(e){msg('adminMsg',e.message)}
 }
 
@@ -264,7 +275,7 @@ async function toggleAdminUser(id,active){
 }
 
 $('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUsers()};
-$('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(token)$('app').classList.remove('hidden')};
+$('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(managerMode)$('app').classList.remove('hidden');else if(token)$('app').classList.remove('hidden')};
 $('adminRefresh').onclick=loadAdminUsers;
 $('adminRole').onchange=renderAdminUsers;
 $('adminStatus').onchange=renderAdminUsers;
