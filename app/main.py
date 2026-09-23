@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
 from . import crud, database
-from .auth import get_current_user, hash_password, require_admin_key, require_manager, verify_password, create_token
+from .auth import get_current_user, get_dashboard_user, hash_password, require_admin_key, require_manager, verify_password, create_token
 from .schemas import (
     AdminUserOut,
     CoverageRow,
@@ -118,7 +118,7 @@ def get_visits(retailer: Optional[str] = None, tl: Optional[str] = None, ss: Opt
                submitted_role: Optional[str] = None, date_from: Optional[str] = Query(default=None),
                date_to: Optional[str] = Query(default=None), search: Optional[str] = Query(default=None),
                limit: int = Query(default=500, ge=1, le=2000), offset: int = Query(default=0, ge=0),
-               user: dict = Depends(get_current_user)):
+               user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
@@ -130,7 +130,7 @@ def get_visits(retailer: Optional[str] = None, tl: Optional[str] = None, ss: Opt
 
 @app.get("/retailers", response_model=List[RetailerOut])
 def get_retailers(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
-                  search: Optional[str] = None, user: dict = Depends(get_current_user)):
+                  search: Optional[str] = None, user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
@@ -138,7 +138,7 @@ def get_retailers(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optio
 
 
 @app.get("/visits/{visit_id}", response_model=VisitOut)
-def get_visit(visit_id: int, user: dict = Depends(get_current_user)):
+def get_visit(visit_id: int, user: dict = Depends(get_dashboard_user)):
     visit = crud.get_visit(visit_id)
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
@@ -149,7 +149,7 @@ def get_visit(visit_id: int, user: dict = Depends(get_current_user)):
 
 
 @app.get("/visits/{visit_id}/photos", response_model=List[PhotoOut])
-def visit_photos(visit_id: int, user: dict = Depends(get_current_user)):
+def visit_photos(visit_id: int, user: dict = Depends(get_dashboard_user)):
     visit = crud.get_visit(visit_id)
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
@@ -160,7 +160,7 @@ def visit_photos(visit_id: int, user: dict = Depends(get_current_user)):
     return [{**r, "url": f"/visits/{visit_id}/photos/{r['id']}"} for r in rows]
 
 @app.get("/visits/{visit_id}/photos/{photo_id}")
-def visit_photo(visit_id: int, photo_id: int, user: dict = Depends(get_current_user)):
+def visit_photo(visit_id: int, photo_id: int, user: dict = Depends(get_dashboard_user)):
     visit = crud.get_visit(visit_id)
     photo = crud.get_visit_photo(photo_id)
     if not visit or not photo or photo["visit_id"] != visit_id:
@@ -203,7 +203,7 @@ def delete_visit(visit_id: int):
 @app.get("/visits/export.csv")
 def export_visits_csv(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
                       date_from: Optional[str] = None, date_to: Optional[str] = None,
-                      user: dict = Depends(get_current_user)):
+                      user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     if scope: tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
     rows = crud.list_visits(tl=tl, ss=ss, rds=rds, date_from=date_from, date_to=date_to, limit=2000)
@@ -286,7 +286,7 @@ def admin_deactivate_user(user_id: int):
     return result
 
 @app.get("/stats", response_model=StatsOut)
-def get_stats(user: dict = Depends(get_current_user)):
+def get_stats(user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     return crud.get_stats(**scope)
 
@@ -294,7 +294,7 @@ def get_stats(user: dict = Depends(get_current_user)):
 @app.get("/coverage", response_model=List[CoverageRow])
 def get_coverage(
     group_by: str = Query("tl", pattern="^(tl|ss|rds)$"),
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(get_dashboard_user)
 ):
     role = user.get("role")
 
@@ -313,7 +313,7 @@ def get_coverage(
 @app.get("/retailer-health", response_model=List[RetailerHealthOut])
 def retailer_health(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
                     zone: Optional[str] = None, priority: Optional[str] = None,
-                    limit: int = Query(default=500, ge=1, le=2000), user: dict = Depends(get_current_user)):
+                    limit: int = Query(default=500, ge=1, le=2000), user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     if scope: tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
     return crud.get_retailer_health(tl=tl, ss=ss, rds=rds, zone=zone, priority=priority, limit=limit)
