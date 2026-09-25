@@ -2,8 +2,12 @@
 
 import csv
 import io
+import os
+from datetime import date
 from pathlib import Path
 from typing import List, Optional
+
+import httpx
 
 from fastapi import Depends, FastAPI, HTTPException, Query, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,7 +30,10 @@ from .schemas import (
     VisitCreate,
     VisitOut, PhotoOut,
 )
-app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits, coverage and field intelligence.", version="2.0.0")
+app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits, coverage and field intelligence.", version="2.1.0")
+
+VWORK_LIVE_API_URL = os.getenv("VWORK_LIVE_API_URL", "http://127.0.0.1:8000").rstrip("/")
+VWORK_LIVE_API_KEY = os.getenv("VWORK_LIVE_API_KEY", "").strip()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -135,6 +142,94 @@ def get_retailers(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optio
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
     return crud.list_retailers(tl=tl, ss=ss, rds=rds, search=search)
+
+
+@app.get("/retailers/{retailer_code}/360")
+def retailer_360(
+    retailer_code: str,
+    start_date: Optional[str] = Query(default=None, alias="startDate"),
+    end_date: Optional[str] = Query(default=None, alias="endDate"),
+    inventory_date: Optional[str] = Query(default=None, alias="inventoryDate"),
+    user: dict = Depends(get_dashboard_user),
+):
+    retailer = crud.lookup_retailer_by_code(retailer_code)
+    if not retailer:
+        raise HTTPException(status_code=404, detail="Retailer is not in the Market Visit master.")
+
+    scope = _scope(user)
+    if scope and any(retailer.get(k) != v for k, v in scope.items()):
+        raise HTTPException(status_code=403, detail="You cannot access this retailer.")
+
+    today = date.today()
+    start_date = start_date or today.replace(day=1).isoformat()
+    end_date = end_date or today.isoformat()
+    inventory_date = inventory_date or end_date
+
+    params = {
+        "startDate": start_date,
+        "endDate": end_date,
+        "inventoryDate": inventory_date,
+        "pageSize": 500,
+        "maxPages": 100,
+    }
+    headers = {}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+
+    try:
+        with httpx.Client(timeout=120.0) as client:
+            response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/retailers/{retailer['code']}/360",
+                params=params,
+                headers=headers,
+            )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Retailer 360 service unavailable: {exc}") from exc
+
+    if response.status_code == 404:
+        raise HTTPException(status_code=404, detail="No live V-Work data found for this retailer.")
+    if not response.is_success:
+        detail = "Live retailer intelligence request failed."
+        try:
+            detail = response.json().get("detail") or detail
+        except Exception:
+            pass
+        raise HTTPException(status_code=502, detail=detail)
+
+    live = response.json()
+    visits = crud.retailer_visit_history(retailer["name"], limit=5)
+
+    sales = live.get("sales") or {}
+    inventory = live.get("inventory") or {}
+    performance = live.get("performance") or {}
+    sales_units = int(sales.get("units") or 0)
+    stock_units = int(inventory.get("units") or 0)
+    dos = performance.get("dos")
+
+    actions = []
+    if sales_units == 0:
+        actions.append("Discuss sell-out activation and identify why MTD sales are zero.")
+    if isinstance(dos, (int, float)):
+        if dos < 7:
+            actions.append("Stock cover is below 7 days. Prioritise replenishment on fast-moving models.")
+        elif dos > 30:
+            actions.append("Stock cover is above 30 days. Focus on ageing stock and sell-through actions.")
+    sold_models = {x.get("model"): int(x.get("units") or 0) for x in sales.get("models", [])}
+    stock_models = {x.get("model"): int(x.get("stock") or 0) for x in inventory.get("models", [])}
+    zero_stock_sellers = [m for m, units in sold_models.items() if units > 0 and stock_models.get(m, 0) == 0]
+    if zero_stock_sellers:
+        actions.append("Replenish sold models with zero stock: " + ", ".join(zero_stock_sellers[:5]) + ".")
+    if not visits:
+        actions.append("No prior market visit is recorded. Capture retailer feedback, commitments and follow-up actions.")
+
+    return {
+        **live,
+        "market_visit": {
+            "master": retailer,
+            "recent_visits": visits,
+            "what_to_discuss": actions[:5],
+        },
+    }
 
 
 @app.get("/visits/{visit_id}", response_model=VisitOut)
