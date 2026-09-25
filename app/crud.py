@@ -16,6 +16,32 @@ def lookup_retailer_by_name(name: str):
         return dict(row) if row else None
 
 
+
+def lookup_retailer_by_code(code: str):
+    with database.get_conn() as conn:
+        row = conn.execute(
+            "SELECT * FROM retailers WHERE UPPER(code) = UPPER(%s)",
+            (code.strip(),),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def retailer_visit_history(retailer_name: str, limit: int = 5) -> list:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, retailer, market, visit_date, feedback, suggestions,
+                   submitted_by, submitted_role, created_at
+            FROM visits
+            WHERE retailer = %s
+            ORDER BY visit_date DESC, created_at DESC
+            LIMIT %s
+            """,
+            (retailer_name, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def create_visit(payload) -> dict:
     with database.get_conn() as conn:
         info = lookup_retailer(conn, payload.retailer) or {}
