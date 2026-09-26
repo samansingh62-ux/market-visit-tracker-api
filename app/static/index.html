@@ -129,7 +129,7 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
   <div class="panelHeader"><h3>⚡ &nbsp; Visit These Retailers Today</h3><span class="viewAll">Live priority</span></div>
   <div class="sub" style="margin:0 0 10px">Ranked by days since last visit, live sales velocity and Good Phone DOS.</div>
   <div class="recentTable wrap">
-    <table><thead><tr><th>#</th><th>Retailer</th><th>Last Visit</th><th>MTD Sales</th><th>Avg/Day</th><th>Good Stock</th><th>DOS</th><th>Priority</th></tr></thead>
+    <table><thead><tr><th>#</th><th>Retailer</th><th>Last Visit</th><th>MTD Sales</th><th>Avg/Day</th><th>Stock</th><th>DOS</th><th>Priority</th></tr></thead>
     <tbody id="visitPriorities"><tr><td colspan="8">Loading visit priorities…</td></tr></tbody></table>
   </div>
 </div>
@@ -268,7 +268,7 @@ async function loadRetailer360(r){
     $('r360Body').innerHTML=
       '<div class="r360Grid">'+
       '<div class="r360Stat"><span>MTD Sales</span><b>'+esc(sales.units??0)+'</b></div>'+
-      '<div class="r360Stat"><span>Good Phone Stock</span><b>'+esc(inv.good_phone_units??inv.units??0)+'</b></div>'+
+      '<div class="r360Stat"><span>Stock</span><b>'+esc(inv.good_phone_units??inv.units??0)+'</b></div>'+
       '<div class="r360Stat"><span>Avg/Day</span><b>'+(perf.avg_daily_sales==null?'—':Math.round(Number(perf.avg_daily_sales)))+'</b></div>'+
       '<div class="r360Stat"><span>DOS</span><b>'+(perf.dos==null?'—':Math.round(Number(perf.dos)))+'</b></div>'+
       '</div>'+
