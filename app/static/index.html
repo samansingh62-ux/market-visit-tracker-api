@@ -40,6 +40,12 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 .r360List{font-size:12px;line-height:1.55;color:#344054}
 .r360List strong{color:#101828}
 @media(max-width:760px){.r360Grid{grid-template-columns:1fr 1fr}}
+
+.r360Table{width:100%;border-collapse:collapse;margin-top:10px;font-size:11px}
+.r360Table th,.r360Table td{padding:7px 6px;border-bottom:1px solid #e7ecf2;text-align:left}
+.r360Table th{font-size:9px;color:#667085;background:#f8fafc;text-transform:uppercase;letter-spacing:.04em;position:static}
+.r360Flag{font-weight:800}
+.r360Flag.ok{color:#087443}.r360Flag.warn{color:#b54708}.r360Flag.danger{color:#b42318}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -222,9 +228,20 @@ async function loadRetailer360(r){
   try{
     let d=await api('/retailers/'+encodeURIComponent(r.code)+'/360');
     let sales=d.sales||{},inv=d.inventory||{},perf=d.performance||{},mv=d.market_visit||{};
-    let models=(sales.models||[]).slice(0,4).map(x=>esc(x.model)+' '+x.units).join(' · ')||'—';
+    let intel=(perf.model_intelligence||[]).slice(0,8);
     let actions=(mv.what_to_discuss||[]).map(x=>'<div>• '+esc(x)+'</div>').join('')||'<div>• Review sales, stock and retailer feedback.</div>';
     let last=(mv.recent_visits||[])[0];
+    let modelRows=intel.map(x=>{
+      let cls=x.status==='Healthy'?'ok':(x.status==='Out of Stock'?'danger':'warn');
+      return '<tr>'+
+        '<td><b>'+esc(x.model)+'</b></td>'+
+        '<td>'+esc(x.sales??0)+'</td>'+
+        '<td>'+esc(x.stock??0)+'</td>'+
+        '<td>'+esc(x.dos??'—')+'</td>'+
+        '<td><span class="r360Flag '+cls+'">'+esc(x.status||'—')+'</span></td>'+
+        '<td>'+esc(x.action||'—')+'</td>'+
+      '</tr>';
+    }).join('');
     $('r360Body').innerHTML=
       '<div class="r360Grid">'+
       '<div class="r360Stat"><span>MTD Sales</span><b>'+esc(sales.units??0)+'</b></div>'+
@@ -232,8 +249,8 @@ async function loadRetailer360(r){
       '<div class="r360Stat"><span>Avg/Day</span><b>'+esc(perf.avg_daily_sales??'—')+'</b></div>'+
       '<div class="r360Stat"><span>DOS</span><b>'+esc(perf.dos??'—')+'</b></div>'+
       '</div>'+
-      '<div class="r360List"><strong>Top models:</strong> '+models+'</div>'+
-      '<div class="r360List" style="margin-top:7px"><strong>What to discuss</strong>'+actions+'</div>'+
+      (modelRows?'<table class="r360Table"><thead><tr><th>Model</th><th>Sales</th><th>Stock</th><th>DOS</th><th>Status</th><th>Action</th></tr></thead><tbody>'+modelRows+'</tbody></table>':'')+
+      '<div class="r360List" style="margin-top:9px"><strong>What to discuss</strong>'+actions+'</div>'+
       '<div class="r360List" style="margin-top:7px"><strong>Last visit:</strong> '+(last?esc(last.visit_date)+' · '+esc(last.feedback||'No feedback'):'No previous visit recorded')+'</div>';
     $('r360Status').textContent='Live';
   }catch(e){
