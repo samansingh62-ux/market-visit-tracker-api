@@ -81,6 +81,19 @@ def init_db():
         conn.execute("CREATE INDEX IF NOT EXISTS idx_visit_photos_visit_id ON visit_photos(visit_id)")
 
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS retailer_targets (
+                month TEXT NOT NULL,
+                retailer_code TEXT NOT NULL,
+                retailer_name TEXT,
+                target_volume INTEGER NOT NULL DEFAULT 0,
+                target_value BIGINT NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (month, retailer_code)
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_retailer_targets_month ON retailer_targets(month)")
+
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id BIGSERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
