@@ -243,6 +243,9 @@ async function loadRetailer360(r){
   try{
     let d=await api('/retailers/'+encodeURIComponent(r.code)+'/360');
     let sales=d.sales||{},inv=d.inventory||{},perf=d.performance||{},mv=d.market_visit||{};
+    let liveRetailer=d.retailer||{};
+    let marketLocation=liveRetailer.town_name||liveRetailer.city||liveRetailer.province||'';
+    if(marketLocation)$('market').value=marketLocation;
     let allIntel=perf.model_intelligence||[];
     let priorityIntel=allIntel.filter(x=>['Out of Stock','Low Stock','High Stock'].includes(x.status));
     let activationIntel=allIntel.filter(x=>x.status==='No MTD Sell-out' && Number(x.stock||0)>=5);
