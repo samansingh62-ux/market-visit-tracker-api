@@ -46,6 +46,9 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 .r360Table th{font-size:9px;color:#667085;background:#f8fafc;text-transform:uppercase;letter-spacing:.04em;position:static}
 .r360Flag{font-weight:800}
 .r360Flag.ok{color:#087443}.r360Flag.warn{color:#b54708}.r360Flag.danger{color:#b42318}
+
+.r360Priority{margin:8px 0 10px;padding:8px 10px;border-radius:9px;background:#fff;border:1px solid #e5eaf1;font-size:11px;color:#344054}
+.r360Priority b{color:#101828}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -228,7 +231,15 @@ async function loadRetailer360(r){
   try{
     let d=await api('/retailers/'+encodeURIComponent(r.code)+'/360');
     let sales=d.sales||{},inv=d.inventory||{},perf=d.performance||{},mv=d.market_visit||{};
-    let intel=(perf.model_intelligence||[]).slice(0,8);
+    let allIntel=perf.model_intelligence||[];
+    let priorityIntel=allIntel.filter(x=>['Out of Stock','Low Stock','High Stock'].includes(x.status));
+    let activationIntel=allIntel.filter(x=>x.status==='No MTD Sell-out' && Number(x.stock||0)>=5);
+    let healthyIntel=allIntel.filter(x=>x.status==='Healthy').sort((a,b)=>Number(b.sales||0)-Number(a.sales||0)).slice(0,2);
+    let intel=[...priorityIntel,...activationIntel,...healthyIntel].slice(0,8);
+    let replenishCount=allIntel.filter(x=>x.action==='Replenish').length;
+    let sellThroughCount=allIntel.filter(x=>x.action==='Drive Sell-through').length;
+    let activateCount=allIntel.filter(x=>x.action==='Activate' && Number(x.stock||0)>=5).length;
+    let prioritySummary='<div class="r360Priority"><b>Priority:</b> '+replenishCount+' Replenishment · '+sellThroughCount+' Sell-through · '+activateCount+' Activation</div>';
     let actions=(mv.what_to_discuss||[]).map(x=>'<div>• '+esc(x)+'</div>').join('')||'<div>• Review sales, stock and retailer feedback.</div>';
     let last=(mv.recent_visits||[])[0];
     let modelRows=intel.map(x=>{
@@ -249,6 +260,7 @@ async function loadRetailer360(r){
       '<div class="r360Stat"><span>Avg/Day</span><b>'+esc(perf.avg_daily_sales??'—')+'</b></div>'+
       '<div class="r360Stat"><span>DOS</span><b>'+esc(perf.dos??'—')+'</b></div>'+
       '</div>'+
+      prioritySummary+
       (modelRows?'<table class="r360Table"><thead><tr><th>Model</th><th>Sales</th><th>Stock</th><th>DOS</th><th>Status</th><th>Action</th></tr></thead><tbody>'+modelRows+'</tbody></table>':'')+
       '<div class="r360List" style="margin-top:9px"><strong>What to discuss</strong>'+actions+'</div>'+
       '<div class="r360List" style="margin-top:7px"><strong>Last visit:</strong> '+(last?esc(last.visit_date)+' · '+esc(last.feedback||'No feedback'):'No previous visit recorded')+'</div>';
