@@ -49,6 +49,10 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 
 .r360Priority{margin:8px 0 10px;padding:8px 10px;border-radius:9px;background:#fff;border:1px solid #e5eaf1;font-size:11px;color:#344054}
 .r360Priority b{color:#101828}
+
+.priorityScore{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;border-radius:99px;background:#eef4ff;color:#175cd3;font-weight:900;font-size:11px}
+.priorityReason{font-size:11px;color:#667085;margin-top:3px}
+.priorityRow{cursor:pointer}.priorityRow:hover{background:#f8fbff}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -120,6 +124,14 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 <div class="panelGrid">
 <div class="panel" id="retailerIntelligence"><div class="panelHeader"><h3>▥ &nbsp; Retailer Coverage Intelligence</h3><span class="viewAll" data-target="retailerIntelligence">View All</span></div><div class="coverageSummary"><div class="coverageMetric"><span>Recently Visited</span><b id="covRecent">—</b><span>Active coverage</span></div><div class="coverageMetric"><span>Due 8–14 Days</span><b id="covDue">—</b><span>Needs follow-up</span></div><div class="coverageMetric"><span>Overdue / Never</span><b id="covOverdue">—</b><span>Priority</span></div></div><div class="coverageBar"><i id="barRecent" style="width:0;background:#18b46b"></i><i id="barDue" style="width:0;background:#f5b82e"></i><i id="barOverdue" style="width:0;background:#f04444"></i></div></div>
 <div class="panel" id="visitHistory"><div class="panelHeader"><h3>☷ &nbsp; Recent Visit Log</h3><span class="viewAll" data-target="visitHistory">View All</span></div><div class="recentTable wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>Status</th></tr></thead><tbody id="recentVisits"></tbody></table></div></div>
+</div>
+<div class="panel" id="todayPriorities" style="margin-top:16px">
+  <div class="panelHeader"><h3>⚡ &nbsp; Visit These Retailers Today</h3><span class="viewAll">Live priority</span></div>
+  <div class="sub" style="margin:0 0 10px">Ranked by days since last visit, live sales velocity and Good Phone DOS.</div>
+  <div class="recentTable wrap">
+    <table><thead><tr><th>#</th><th>Retailer</th><th>Last Visit</th><th>MTD Sales</th><th>Avg/Day</th><th>Good Stock</th><th>DOS</th><th>Priority</th></tr></thead>
+    <tbody id="visitPriorities"><tr><td colspan="8">Loading visit priorities…</td></tr></tbody></table>
+  </div>
 </div>
 </div>
 <section id="profileSection" class="profileCard"></section>
@@ -219,7 +231,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
 function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
-async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health()])}
+async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities()])}
 async function stats(){let x=await api('/stats');$('mv').textContent=x.total_visits;$('mr').textContent=x.unique_retailers_visited;$('mm').textContent=x.unique_markets;$('mt').textContent=x.total_retailers_in_master;$('dkVisits').textContent=x.total_visits;$('dkRetailers').textContent=x.unique_retailers_visited;$('dkMarkets').textContent=x.unique_markets;let total=x.total_retailers_in_master||0,visited=x.unique_retailers_visited||0;$('dkCoverage').textContent=(total?Math.round(visited*100/total):0)+'%';$('dkMaster').textContent=x.total_retailers_in_master;}
 async function retailers(){master=await api('/retailers');$('retailers').innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
 let retailer360Timer=null;
@@ -277,6 +289,32 @@ $('retailer').oninput=()=>{
   retailer360Timer=setTimeout(()=>loadRetailer360(r),350);
 }
 async function visits(){let p=new URLSearchParams({limit:'500'});if($('search').value)p.set('search',$('search').value);if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let a=await api('/visits?'+p);let recent=a.slice(0,5);$('recentVisits').innerHTML=recent.length?recent.map(v=>`<tr><td>${esc(v.visit_date)}</td><td><b>${esc(v.retailer)}</b></td><td>${esc(v.market)}</td><td><span class="recentStatus">Visited</span></td></tr>`).join(''):'<tr><td colspan="4">No recent visits.</td></tr>';$('visits').innerHTML=a.length?a.map(v=>{let gps=v.latitude!=null&&v.longitude!=null?'<span class="tag ok">Captured</span>':'<span class="tag warn">Missing</span>';let photos=v.photo_count?'<span class="tag ok">'+v.photo_count+'</span>':'<span class="tag">0</span>';return `<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.submitted_by)}</td><td>${esc(v.submitted_role)}</td><td>${gps}</td><td>${photos}</td><td>${esc(v.feedback)}</td></tr>`}).join(''):'<tr><td colspan="11">No visits found.</td></tr>'}
+async function priorities(){
+  let body=$('visitPriorities');if(!body)return;
+  try{
+    let a=await api('/visit-priorities?limit=10');
+    body.innerHTML=a.length?a.map((r,i)=>`
+      <tr class="priorityRow" data-code="${esc(r.retailer_code)}" title="Click to open this retailer">
+        <td><b>${i+1}</b></td>
+        <td><b>${esc(r.retailer)}</b><div class="priorityReason">${esc(r.reason||'')}</div></td>
+        <td>${esc(r.last_visit||'Never')}</td>
+        <td>${esc(r.mtd_sales??0)}</td>
+        <td>${esc(r.avg_daily_sales??0)}</td>
+        <td>${esc(r.good_phone_stock??0)}</td>
+        <td>${esc(r.dos??'—')}</td>
+        <td><span class="priorityScore">${esc(r.priority_score??0)}</span></td>
+      </tr>`).join(''):'<tr><td colspan="8">No priority retailers found.</td></tr>';
+    body.querySelectorAll('.priorityRow').forEach(tr=>tr.onclick=()=>{
+      let r=master.find(x=>String(x.code||'').toUpperCase()===String(tr.dataset.code||'').toUpperCase());
+      if(!r)return;
+      $('retailer').value=r.name;
+      $('retailer').dispatchEvent(new Event('input'));
+      $('visitEntry').scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }catch(e){
+    body.innerHTML='<tr><td colspan="8">Priority list unavailable: '+esc(e.message)+'</td></tr>';
+  }
+}
 async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(user.role!=='MANAGER')$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));let recent=a.filter(r=>r.priority==='Recently Visited').length,due=a.filter(r=>r.priority==='Due 8–14 Days').length,overdue=a.filter(r=>r.priority==='Overdue 15+ Days'||r.priority==='Never Visited').length;$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('dkNever').textContent=$('mn').textContent;$('covRecent').textContent=recent;$('covDue').textContent=due;$('covOverdue').textContent=overdue;let totalH=Math.max(1,recent+due+overdue);$('barRecent').style.width=(recent*100/totalH)+'%';$('barDue').style.width=(due*100/totalH)+'%';$('barOverdue').style.width=(overdue*100/totalH)+'%';$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
 let adminKey='';
