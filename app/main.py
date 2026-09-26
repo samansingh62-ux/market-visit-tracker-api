@@ -177,7 +177,7 @@ def retailer_360(
         headers["X-API-Key"] = VWORK_LIVE_API_KEY
 
     try:
-        with httpx.Client(timeout=120.0) as client:
+        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
             response = client.get(
                 f"{VWORK_LIVE_API_URL}/api/v1/retailers/{retailer['code']}/360",
                 params=params,
