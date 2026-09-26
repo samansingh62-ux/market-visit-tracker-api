@@ -26,6 +26,51 @@ def lookup_retailer_by_code(code: str):
         return dict(row) if row else None
 
 
+def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT month, retailer_code, retailer_name, target_volume, target_value, updated_at
+            FROM retailer_targets
+            WHERE month = %s AND UPPER(retailer_code) = UPPER(%s)
+            """,
+            (month, retailer_code.strip()),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def upsert_retailer_targets(month: str, rows: list) -> dict:
+    now = datetime.now(timezone.utc).isoformat()
+    with database.get_conn() as conn:
+        for row in rows:
+            conn.execute(
+                """
+                INSERT INTO retailer_targets
+                    (month, retailer_code, retailer_name, target_volume, target_value, updated_at)
+                VALUES (%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (month, retailer_code) DO UPDATE SET
+                    retailer_name = EXCLUDED.retailer_name,
+                    target_volume = EXCLUDED.target_volume,
+                    target_value = EXCLUDED.target_value,
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (
+                    month,
+                    row["retailer_code"],
+                    row.get("retailer_name") or "",
+                    int(row.get("target_volume") or 0),
+                    int(row.get("target_value") or 0),
+                    now,
+                ),
+            )
+    return {
+        "month": month,
+        "retailers": len(rows),
+        "target_volume": sum(int(r.get("target_volume") or 0) for r in rows),
+        "target_value": sum(int(r.get("target_value") or 0) for r in rows),
+    }
+
+
 def retailer_visit_history(retailer_name: str, limit: int = 5) -> list:
     with database.get_conn() as conn:
         rows = conn.execute(
