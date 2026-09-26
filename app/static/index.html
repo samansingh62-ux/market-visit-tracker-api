@@ -256,10 +256,11 @@ async function loadRetailer360(r){
     $('r360Body').innerHTML=
       '<div class="r360Grid">'+
       '<div class="r360Stat"><span>MTD Sales</span><b>'+esc(sales.units??0)+'</b></div>'+
-      '<div class="r360Stat"><span>Current Stock</span><b>'+esc(inv.units??0)+'</b></div>'+
+      '<div class="r360Stat"><span>Good Phone Stock</span><b>'+esc(inv.good_phone_units??inv.units??0)+'</b></div>'+
       '<div class="r360Stat"><span>Avg/Day</span><b>'+esc(perf.avg_daily_sales??'—')+'</b></div>'+
       '<div class="r360Stat"><span>DOS</span><b>'+esc(perf.dos??'—')+'</b></div>'+
       '</div>'+
+      '<div class="r360List" style="margin-top:7px"><strong>Unactivated Stock:</strong> '+esc(inv.unactivated_units??'Pending filter mapping')+'</div>'+
       prioritySummary+
       (modelRows?'<table class="r360Table"><thead><tr><th>Model</th><th>Sales</th><th>Stock</th><th>DOS</th><th>Status</th><th>Action</th></tr></thead><tbody>'+modelRows+'</tbody></table>':'')+
       '<div class="r360List" style="margin-top:9px"><strong>What to discuss</strong>'+actions+'</div>'+
