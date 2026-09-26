@@ -12,3 +12,9 @@ services:
         sync: false
       - key: AUTH_SECRET
         sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: VWORK_LIVE_API_URL
+        sync: false
+      - key: VWORK_LIVE_API_KEY
+        sync: false
