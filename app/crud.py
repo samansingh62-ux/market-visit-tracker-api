@@ -42,6 +42,7 @@ def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
 def upsert_retailer_targets(month: str, rows: list) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     with database.get_conn() as conn:
+        conn.execute("DELETE FROM retailer_targets WHERE month = %s", (month,))
         for row in rows:
             conn.execute(
                 """
