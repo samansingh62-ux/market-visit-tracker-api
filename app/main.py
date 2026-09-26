@@ -1,5 +1,6 @@
 """Market Visit Tracker API with GTM hierarchy and retailer intelligence."""
 
+import calendar
 import csv
 import io
 import os
@@ -8,6 +9,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import httpx
+from openpyxl import load_workbook
 
 from fastapi import Depends, FastAPI, HTTPException, Query, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -206,6 +208,22 @@ def retailer_360(
     stock_units = int(inventory.get("units") or 0)
     dos = performance.get("dos")
 
+    target_month = start_date[:7]
+    target_row = crud.get_retailer_target(retailer["code"], target_month)
+    target_volume = int(target_row.get("target_volume") or 0) if target_row else None
+    target_value = int(target_row.get("target_value") or 0) if target_row else None
+    achievement_pct = None
+    gap_volume = None
+    required_run_rate = None
+    days_remaining = None
+    if target_volume is not None:
+        achievement_pct = round((sales_units / target_volume) * 100, 1) if target_volume > 0 else 0
+        gap_volume = max(target_volume - sales_units, 0)
+        period_end = date.fromisoformat(end_date)
+        month_days = calendar.monthrange(period_end.year, period_end.month)[1]
+        days_remaining = max(month_days - period_end.day + 1, 1)
+        required_run_rate = round(gap_volume / days_remaining, 1)
+
     actions = []
     if sales_units == 0:
         actions.append("Discuss sell-out activation and identify why MTD sales are zero.")
@@ -244,6 +262,16 @@ def retailer_360(
 
     return {
         **live,
+        "target": {
+            "month": target_month,
+            "volume": target_volume,
+            "value": target_value,
+            "achievement_pct": achievement_pct,
+            "gap_volume": gap_volume,
+            "required_run_rate": required_run_rate,
+            "days_remaining": days_remaining,
+            "loaded": target_row is not None,
+        },
         "market_visit": {
             "master": retailer,
             "recent_visits": visits,
@@ -334,6 +362,80 @@ def export_visits_csv(tl: Optional[str] = None, ss: Optional[str] = None, rds: O
 def get_users(role: Optional[str] = Query(default=None, pattern="^(TL|SS|RDS)$"), user: dict = Depends(get_current_user)):
     require_manager(user)
     return crud.list_users(role=role)
+
+
+@app.post("/admin/targets/upload", dependencies=[Depends(require_admin_key)])
+async def admin_upload_targets(
+    month: str = Query(..., pattern=r"^\d{4}-\d{2}$"),
+    file: UploadFile = File(...),
+):
+    """Import monthly retailer targets from the standard Zone A target workbook."""
+    filename = (file.filename or "").lower()
+    if not filename.endswith((".xlsx", ".xlsm")):
+        raise HTTPException(status_code=400, detail="Upload an .xlsx target workbook.")
+
+    try:
+        raw = await file.read()
+        workbook = load_workbook(io.BytesIO(raw), data_only=True, read_only=True)
+        sheet = workbook[workbook.sheetnames[0]]
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Unable to read target workbook: {exc}") from exc
+
+    required = {"Retailer Code", "Retailer Name", "Vol Target", "Val Target"}
+    header_row = None
+    headers = None
+    for row_no, values in enumerate(sheet.iter_rows(min_row=1, max_row=10, values_only=True), start=1):
+        candidate = [str(v).strip() if v is not None else "" for v in values]
+        if required.issubset(set(candidate)):
+            header_row = row_no
+            headers = candidate
+            break
+
+    if header_row is None or headers is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Target workbook must contain Retailer Code, Retailer Name, Vol Target and Val Target columns.",
+        )
+
+    idx = {name: headers.index(name) for name in required}
+    aggregated = {}
+    for values in sheet.iter_rows(min_row=header_row + 1, values_only=True):
+        code = values[idx["Retailer Code"]] if idx["Retailer Code"] < len(values) else None
+        if code is None or str(code).strip() == "":
+            continue
+        code = str(code).strip().upper()
+        name = values[idx["Retailer Name"]] if idx["Retailer Name"] < len(values) else ""
+        volume = values[idx["Vol Target"]] if idx["Vol Target"] < len(values) else 0
+        value = values[idx["Val Target"]] if idx["Val Target"] < len(values) else 0
+        try:
+            volume = int(round(float(volume or 0)))
+        except (TypeError, ValueError):
+            volume = 0
+        try:
+            value = int(round(float(value or 0)))
+        except (TypeError, ValueError):
+            value = 0
+
+        item = aggregated.setdefault(code, {
+            "retailer_code": code,
+            "retailer_name": str(name or "").strip(),
+            "target_volume": 0,
+            "target_value": 0,
+        })
+        item["target_volume"] += volume
+        item["target_value"] += value
+        if not item["retailer_name"] and name:
+            item["retailer_name"] = str(name).strip()
+
+    if not aggregated:
+        raise HTTPException(status_code=400, detail="No retailer target rows were found.")
+
+    result = crud.upsert_retailer_targets(month, list(aggregated.values()))
+    return {
+        **result,
+        "filename": file.filename,
+        "message": "Monthly retailer targets imported successfully.",
+    }
 
 
 @app.get("/admin/users",
