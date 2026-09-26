@@ -9,6 +9,7 @@ from psycopg.rows import dict_row
 APP_DIR = Path(__file__).resolve().parent
 DATABASE_URL = os.environ.get("DATABASE_URL")
 RETAILERS_SEED_PATH = APP_DIR / "retailers_seed.json"
+RETAILER_TARGETS_SEP26_PATH = APP_DIR / "retailer_targets_2026-09.json"
 
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL environment variable is not set")
@@ -92,6 +93,31 @@ def init_db():
             )
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_retailer_targets_month ON retailer_targets(month)")
+
+        # September 2026 targets supplied by management. Seed only when that month
+        # has not already been imported, so a later manager upload is preserved.
+        seed_month = "2026-09"
+        target_count = conn.execute(
+            "SELECT COUNT(*) AS c FROM retailer_targets WHERE month = %s",
+            (seed_month,),
+        ).fetchone()["c"]
+        if target_count == 0 and RETAILER_TARGETS_SEP26_PATH.exists():
+            with open(RETAILER_TARGETS_SEP26_PATH, "r", encoding="utf-8") as f:
+                target_seed = json.load(f)
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    INSERT INTO retailer_targets
+                        (month, retailer_code, retailer_name, target_volume, target_value, updated_at)
+                    VALUES
+                        (%s, %s,
+                         COALESCE((SELECT name FROM retailers WHERE UPPER(code) = UPPER(%s)), ''),
+                         %s, %s, CURRENT_TIMESTAMP::text)
+                    ON CONFLICT (month, retailer_code) DO NOTHING
+                """, [
+                    (seed_month, row[0], row[0], int(row[1] or 0), int(row[2] or 0))
+                    for row in target_seed
+                    if isinstance(row, list) and len(row) >= 3 and row[0]
+                ])
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
