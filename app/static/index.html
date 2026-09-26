@@ -260,7 +260,7 @@ async function loadRetailer360(r){
         '<td><b>'+esc(x.model)+'</b></td>'+
         '<td>'+esc(x.sales??0)+'</td>'+
         '<td>'+esc(x.stock??0)+'</td>'+
-        '<td>'+esc(x.dos??'—')+'</td>'+
+        '<td>'+(x.dos==null?'—':Math.round(Number(x.dos)))+'</td>'+
         '<td><span class="r360Flag '+cls+'">'+esc(x.status||'—')+'</span></td>'+
         '<td>'+esc(x.action||'—')+'</td>'+
       '</tr>';
@@ -269,8 +269,8 @@ async function loadRetailer360(r){
       '<div class="r360Grid">'+
       '<div class="r360Stat"><span>MTD Sales</span><b>'+esc(sales.units??0)+'</b></div>'+
       '<div class="r360Stat"><span>Good Phone Stock</span><b>'+esc(inv.good_phone_units??inv.units??0)+'</b></div>'+
-      '<div class="r360Stat"><span>Avg/Day</span><b>'+esc(perf.avg_daily_sales??'—')+'</b></div>'+
-      '<div class="r360Stat"><span>DOS</span><b>'+esc(perf.dos??'—')+'</b></div>'+
+      '<div class="r360Stat"><span>Avg/Day</span><b>'+(perf.avg_daily_sales==null?'—':Math.round(Number(perf.avg_daily_sales)))+'</b></div>'+
+      '<div class="r360Stat"><span>DOS</span><b>'+(perf.dos==null?'—':Math.round(Number(perf.dos)))+'</b></div>'+
       '</div>'+
       prioritySummary+
       (modelRows?'<table class="r360Table"><thead><tr><th>Model</th><th>Sales</th><th>Stock</th><th>DOS</th><th>Status</th><th>Action</th></tr></thead><tbody>'+modelRows+'</tbody></table>':'')+
@@ -299,9 +299,9 @@ async function priorities(){
         <td><b>${esc(r.retailer)}</b><div class="priorityReason">${esc(r.reason||'')}</div></td>
         <td>${esc(r.last_visit||'Never')}</td>
         <td>${esc(r.mtd_sales??0)}</td>
-        <td>${esc(r.avg_daily_sales??0)}</td>
-        <td>${esc(r.good_phone_stock??0)}</td>
-        <td>${esc(r.dos??'—')}</td>
+        <td>${Math.round(Number(r.avg_daily_sales||0))}</td>
+        <td>${Math.round(Number(r.good_phone_stock||0))}</td>
+        <td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
         <td><span class="priorityScore">${esc(r.priority_score??0)}</span></td>
       </tr>`).join(''):'<tr><td colspan="8">No priority retailers found.</td></tr>';
     body.querySelectorAll('.priorityRow').forEach(tr=>tr.onclick=()=>{
