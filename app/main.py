@@ -214,13 +214,33 @@ def retailer_360(
             actions.append("Stock cover is below 7 days. Prioritise replenishment on fast-moving models.")
         elif dos > 30:
             actions.append("Stock cover is above 30 days. Focus on ageing stock and sell-through actions.")
-    sold_models = {x.get("model"): int(x.get("units") or 0) for x in sales.get("models", [])}
-    stock_models = {x.get("model"): int(x.get("stock") or 0) for x in inventory.get("models", [])}
-    zero_stock_sellers = [m for m, units in sold_models.items() if units > 0 and stock_models.get(m, 0) == 0]
-    if zero_stock_sellers:
-        actions.append("Replenish sold models with zero stock: " + ", ".join(zero_stock_sellers[:5]) + ".")
+    model_intelligence = performance.get("model_intelligence") or []
+    critical_models = [
+        x for x in model_intelligence
+        if x.get("status") in ("Out of Stock", "Low Stock", "High Stock", "No MTD Sell-out")
+    ]
+
+    for item in critical_models[:4]:
+        model = item.get("model") or "Unknown model"
+        status = item.get("status")
+        sales_qty = int(item.get("sales") or 0)
+        stock_qty = int(item.get("stock") or 0)
+        model_dos = item.get("dos")
+        if status == "Out of Stock":
+            actions.append(f"{model}: {sales_qty} MTD sales but zero stock. Replenish immediately.")
+        elif status == "Low Stock":
+            actions.append(f"{model}: only {model_dos} DOS with {sales_qty} MTD sales. Prioritise replenishment.")
+        elif status == "High Stock":
+            actions.append(f"{model}: high stock cover at {model_dos} DOS. Discuss sell-through activity.")
+        elif status == "No MTD Sell-out":
+            actions.append(f"{model}: {stock_qty} units in stock with no MTD sell-out. Identify conversion blocker.")
+
     if not visits:
         actions.append("No prior market visit is recorded. Capture retailer feedback, commitments and follow-up actions.")
+    else:
+        last_visit = visits[0]
+        if last_visit.get("suggestions"):
+            actions.append("Review previous follow-up: " + str(last_visit["suggestions"])[:180])
 
     return {
         **live,
