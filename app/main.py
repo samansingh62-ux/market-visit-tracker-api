@@ -425,6 +425,132 @@ def get_coverage(
     return rows
 
 
+@app.get("/visit-priorities")
+def visit_priorities(
+    limit: int = Query(default=10, ge=1, le=25),
+    user: dict = Depends(get_dashboard_user),
+):
+    """Rank retailers for today's field visit using recency + live sales velocity + Good Phone DOS."""
+    scope = _scope(user)
+    health_rows = crud.get_retailer_health(
+        tl=scope.get("tl"),
+        ss=scope.get("ss"),
+        rds=scope.get("rds"),
+        limit=2000,
+    )
+
+    today = date.today()
+    params = {
+        "startDate": today.replace(day=1).isoformat(),
+        "endDate": today.isoformat(),
+        "inventoryDate": today.isoformat(),
+        "pageSize": 500,
+        "maxPages": 100,
+    }
+    headers = {}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
+            response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
+                params=params,
+                headers=headers,
+            )
+        response.raise_for_status()
+        live_rows = (response.json() or {}).get("retailers") or []
+    except Exception:
+        live_rows = []
+
+    live_by_code = {
+        str(r.get("retailer_code") or "").strip().upper(): r
+        for r in live_rows
+        if r.get("retailer_code")
+    }
+
+    ranked = []
+    for row in health_rows:
+        code = str(row.get("code") or "").strip().upper()
+        live = live_by_code.get(code, {})
+        days = row.get("days_since_visit")
+        avg_daily = float(live.get("avg_daily_sales") or 0)
+        dos = live.get("dos")
+        stock = int(live.get("good_phone_stock") or 0)
+        sales = int(live.get("mtd_sales") or 0)
+
+        if days is None:
+            recency_score = 50
+        elif days >= 30:
+            recency_score = 50
+        elif days >= 15:
+            recency_score = 40
+        elif days >= 8:
+            recency_score = 25
+        else:
+            recency_score = min(20, max(0, int(days) * 2))
+
+        if sales > 0 and stock == 0:
+            dos_score = 30
+            stock_signal = "Out of stock"
+        elif isinstance(dos, (int, float)) and dos < 7:
+            dos_score = 30
+            stock_signal = "Low stock"
+        elif isinstance(dos, (int, float)) and dos > 45:
+            dos_score = 25
+            stock_signal = "High stock"
+        elif isinstance(dos, (int, float)) and dos > 30:
+            dos_score = 15
+            stock_signal = "Elevated stock"
+        else:
+            dos_score = 0
+            stock_signal = "Stock balanced"
+
+        if avg_daily >= 5:
+            velocity_score = 20
+        elif avg_daily >= 2:
+            velocity_score = 15
+        elif avg_daily >= 1:
+            velocity_score = 10
+        elif avg_daily > 0:
+            velocity_score = 5
+        else:
+            velocity_score = 0
+
+        reasons = []
+        if days is None:
+            reasons.append("Never visited")
+        elif days >= 15:
+            reasons.append(f"{days} days since last visit")
+        elif days >= 8:
+            reasons.append(f"Follow-up due after {days} days")
+        if stock_signal != "Stock balanced":
+            reasons.append(stock_signal)
+        if avg_daily >= 2:
+            reasons.append(f"Strong velocity {avg_daily:.1f}/day")
+        elif sales == 0:
+            reasons.append("No MTD sales")
+
+        ranked.append({
+            "retailer_code": code,
+            "retailer": row.get("name"),
+            "zone": row.get("zone"),
+            "club": row.get("club"),
+            "rds": row.get("rds"),
+            "last_visit": row.get("last_visit"),
+            "days_since_visit": days,
+            "mtd_sales": sales,
+            "avg_daily_sales": avg_daily,
+            "good_phone_stock": stock,
+            "dos": dos,
+            "priority_score": recency_score + dos_score + velocity_score,
+            "reason": " · ".join(reasons[:3]) or "Routine coverage",
+        })
+
+    ranked.sort(key=lambda x: (x["priority_score"], x["avg_daily_sales"]), reverse=True)
+    return ranked[:limit]
+
+
 @app.get("/retailer-health", response_model=List[RetailerHealthOut])
 def retailer_health(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
                     zone: Optional[str] = None, priority: Optional[str] = None,
