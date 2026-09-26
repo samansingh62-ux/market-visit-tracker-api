@@ -26,6 +26,38 @@ def lookup_retailer_by_code(code: str):
         return dict(row) if row else None
 
 
+def get_hierarchy_target_summary(month: str, tl: Optional[str] = None, ss: Optional[str] = None) -> dict:
+    clauses = ["t.month = %s"]
+    params = [month]
+    if tl:
+        clauses.append("r.tl = %s")
+        params.append(tl)
+    if ss:
+        clauses.append("r.ss = %s")
+        params.append(ss)
+    where = " AND ".join(clauses)
+    with database.get_conn() as conn:
+        row = conn.execute(f"""
+            SELECT
+                COALESCE(SUM(t.target_volume), 0) AS target_volume,
+                COALESCE(SUM(t.target_value), 0) AS target_value,
+                COUNT(DISTINCT t.retailer_code) AS target_retailers
+            FROM retailer_targets t
+            JOIN retailers r ON UPPER(r.code) = UPPER(t.retailer_code)
+            WHERE {where}
+        """, params).fetchone()
+        retailers = conn.execute(
+            f"""SELECT code, name FROM retailers r WHERE {" AND ".join([c.replace("t.month = %s", "1=1") for c in clauses[1:]]) if len(clauses)>1 else "1=1"}""",
+            params[1:],
+        ).fetchall()
+    return {
+        "target_volume": int(row["target_volume"] or 0),
+        "target_value": int(row["target_value"] or 0),
+        "target_retailers": int(row["target_retailers"] or 0),
+        "retailer_codes": [str(x["code"]).strip().upper() for x in retailers if x.get("code")],
+    }
+
+
 def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute(
