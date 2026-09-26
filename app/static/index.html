@@ -53,6 +53,12 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 .priorityScore{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;border-radius:99px;background:#eef4ff;color:#175cd3;font-weight:900;font-size:11px}
 .priorityReason{font-size:11px;color:#667085;margin-top:3px}
 .priorityRow{cursor:pointer}.priorityRow:hover{background:#f8fbff}
+
+.photoActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.photoAction{display:block;border:1px solid #d3dae5;border-radius:10px;padding:12px;text-align:center;background:#fff;cursor:pointer;font-weight:800;color:#172033}
+.photoAction input{display:none}
+.photoHint{font-size:11px;color:#667085;margin-top:6px;font-weight:500}
+@media(max-width:600px){.photoActions{grid-template-columns:1fr}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -148,7 +154,13 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 <section class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
 <div class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
 <div class="grid" style="margin-top:17px">
-<section id="visitEntry" class="card"><h2>Log Market Visit</h2><form id="form"><label>Retailer<input id="retailer" list="retailers" placeholder="Search retailer..." required></label><datalist id="retailers"></datalist><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span><input id="stockPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><div id="photoPreview" class="meta">No photos selected.</div><button class="primary" style="width:100%">Submit Visit</button><div id="formMsg" class="msg"></div></form></section>
+<section id="visitEntry" class="card"><h2>Log Market Visit</h2><form id="form"><label>Retailer<input id="retailer" list="retailers" placeholder="Search retailer..." required></label><datalist id="retailers"></datalist><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
+<div class="photoActions">
+<label class="photoAction">📷 Take Photo<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label>
+<label class="photoAction">🖼 Upload from Gallery<input id="stockPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
+</div>
+<div class="photoHint">Uploaded photos will be stamped with the visit GPS location and capture/upload time.</div>
+</label><div id="photoPreview" class="meta">No photos selected.</div><button class="primary" style="width:100%">Submit Visit</button><div id="formMsg" class="msg"></div></form></section>
 <section class="card"><div class="head"><h2>Coverage</h2><select id="group" style="width:95px;margin:0"><option value="tl">TL</option><option value="ss">SS</option><option value="rds">RDS</option></select></div><div class="wrap"><table><thead><tr><th>Name</th><th>Assigned</th><th>Visited</th><th>Coverage</th><th>Visits</th></tr></thead><tbody id="coverage"></tbody></table></div></section></div>
 <section class="card" id="healthDetails"><div class="head"><div><h2>Retailer Coverage Intelligence</h2><div class="sub">Prioritise retailers by visit recency.</div></div><button id="refreshHealth" class="secondary">↻ Refresh</button></div><div class="filters"><select id="healthRole"><option value="">All hierarchy</option></select><select id="healthZone"><option value="">All zones</option></select><select id="priority"><option value="">All priorities</option><option>Never Visited</option><option>Overdue 15+ Days</option><option>Due 8–14 Days</option><option>Recently Visited</option></select><input id="healthSearch" placeholder="Search retailer"><button id="healthApply" class="secondary">Apply</button><button id="healthClear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Retailer</th><th>Hierarchy</th><th>Zone</th><th>Visits</th><th>Last Visit</th><th>Days</th><th>Priority</th></tr></thead><tbody id="health"></tbody></table></div></section>
 <section class="card" id="visitLogDetails"><div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="export" class="secondary">Export CSV</button></div></div><div class="filters"><input id="search" placeholder="Search retailer, market or feedback"><input id="from" type="date"><input id="to" type="date"><select id="visitRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select><button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Role</th><th>GPS</th><th>Photos</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div></section>
@@ -426,7 +438,73 @@ $('adminStatus').onchange=renderAdminUsers;
 $('adminSearch').oninput=renderAdminUsers;
 $('targetUpload').onclick=uploadTargets;
 
-$('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');let btn=$('form').querySelector('button[type="submit"],button.primary');try{if(btn){btn.disabled=true;btn.textContent='Getting GPS...'}let hasGPS=await refreshGPS();if(!hasGPS)throw Error('GPS location is required. Please allow location access and try again.');if(btn)btn.textContent='Submitting...';let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim(),latitude:gps.latitude,longitude:gps.longitude,gps_accuracy:gps.accuracy})});let fs=$('stockPhotos').files;if(fs.length){if(btn)btn.textContent='Uploading photos...';let fd=new FormData();for(let f of fs){let compressed=await compressImage(f);fd.append('files',compressed,compressed.name||'stock.jpg')}let pr=await fetch('/visits/'+v.id+'/photos',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});if(!pr.ok){let d={};try{d=await pr.json()}catch{}throw Error(d.detail||'Visit saved, but photo upload failed.')}}msg('formMsg','Visit #'+v.id+' submitted with '+fs.length+' stock photo(s). Refreshing dashboard...',true);$('feedback').value='';$('suggestions').value='';$('stockPhotos').value='';$('photoPreview').textContent='No photos selected.';await load();msg('formMsg','Visit #'+v.id+' submitted successfully. Dashboard refreshed.',true);$('retailer').focus()}catch(e){msg('formMsg',e.message)}finally{if(btn){btn.disabled=false;btn.textContent='Submit Visit'}}};
+$('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');let btn=$('form').querySelector('button[type="submit"],button.primary');try{if(btn){btn.disabled=true;btn.textContent='Getting GPS...'}let hasGPS=await refreshGPS();if(!hasGPS)throw Error('GPS location is required. Please allow location access and try again.');if(btn)btn.textContent='Submitting...';let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim(),latitude:gps.latitude,longitude:gps.longitude,gps_accuracy:gps.accuracy})});let fs=[...selectedPhotos];if(fs.length){if(btn)btn.textContent='Geotagging & uploading photos...';let fd=new FormData();for(let f of fs){let compressed=await compressImage(f);fd.append('files',compressed,compressed.name||'stock.jpg')}let pr=await fetch('/visits/'+v.id+'/photos',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});if(!pr.ok){let d={};try{d=await pr.json()}catch{}throw Error(d.detail||'Visit saved, but photo upload failed.')}}msg('formMsg','Visit #'+v.id+' submitted with '+fs.length+' geotagged stock photo(s). Refreshing dashboard...',true);$('feedback').value='';$('suggestions').value='';selectedPhotos=[];$('stockPhotos').value='';$('cameraPhoto').value='';$('photoPreview').textContent='No photos selected.';await load();msg('formMsg','Visit #'+v.id+' submitted successfully. Dashboard refreshed.',true);$('retailer').focus()}catch(e){msg('formMsg',e.message)}finally{if(btn){btn.disabled=false;btn.textContent='Submit Visit'}}};
+let selectedPhotos=[];
+
+function renderPhotoPreview(){
+  $('photoPreview').innerHTML=selectedPhotos.length
+    ? selectedPhotos.map((f,i)=>`<span class="tag">${i+1}. ${esc(f.name||'Camera photo')} · ${Math.round(f.size/1024)} KB</span> `).join('')
+    : 'No photos selected.';
+}
+
+function addPhotos(files){
+  let incoming=[...files].filter(f=>f.type.startsWith('image/'));
+  if(selectedPhotos.length+incoming.length>5){
+    return msg('formMsg','Maximum 5 stock photos per visit.');
+  }
+  selectedPhotos.push(...incoming);
+  renderPhotoPreview();
+}
+
+async function compressImage(file){
+  if(!file.type.startsWith('image/'))return file;
+  return new Promise(resolve=>{
+    let img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let max=1600,w=img.width,h=img.height;
+      if(Math.max(w,h)>max){
+        if(w>=h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}
+      }
+      let c=document.createElement('canvas');c.width=w;c.height=h;
+      let ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
+
+      if(gps && Number.isFinite(gps.latitude) && Number.isFinite(gps.longitude)){
+        let pad=Math.max(12,Math.round(w*0.012));
+        let fontSize=Math.max(18,Math.round(w*0.022));
+        let lineH=Math.round(fontSize*1.35);
+        let bandH=lineH*2+pad*2;
+        ctx.fillStyle='rgba(0,0,0,.62)';
+        ctx.fillRect(0,h-bandH,w,bandH);
+        ctx.fillStyle='#fff';
+        ctx.font=`600 ${fontSize}px system-ui,-apple-system,sans-serif`;
+        let market=($('market').value||'Market visit').trim();
+        let stamp=new Date().toLocaleString();
+        ctx.fillText(market, pad, h-bandH+pad+fontSize);
+        ctx.font=`500 ${Math.max(16,fontSize-2)}px system-ui,-apple-system,sans-serif`;
+        ctx.fillText(`GPS ${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)} · ±${Math.round(gps.accuracy||0)}m · ${stamp}`, pad, h-pad);
+      }
+
+      c.toBlob(b=>{
+        URL.revokeObjectURL(url);
+        if(!b)return resolve(file);
+        let base=(file.name||'stock-photo').replace(/\.[^.]+$/,'');
+        resolve(new File([b],base+'-geotagged.jpg',{type:'image/jpeg'}));
+      },'image/jpeg',.82);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);resolve(file)};
+    img.src=url;
+  });
+}
+
+$('cameraPhoto').onchange=()=>{
+  addPhotos($('cameraPhoto').files);
+  $('cameraPhoto').value='';
+};
+$('stockPhotos').onchange=()=>{
+  addPhotos($('stockPhotos').files);
+  $('stockPhotos').value='';
+};
+$('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');let btn=$('form').querySelector('button[type="submit"],button.primary');try{if(btn){btn.disabled=true;btn.textContent='Getting GPS...'}let hasGPS=await refreshGPS();if(!hasGPS)throw Error('GPS location is required. Please allow location access and try again.');if(btn)btn.textContent='Submitting...';let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim(),latitude:gps.latitude,longitude:gps.longitude,gps_accuracy:gps.accuracy})});let fs=[...selectedPhotos];if(fs.length){if(btn)btn.textContent='Geotagging & uploading photos...';let fd=new FormData();for(let f of fs){let compressed=await compressImage(f);fd.append('files',compressed,compressed.name||'stock.jpg')}let pr=await fetch('/visits/'+v.id+'/photos',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});if(!pr.ok){let d={};try{d=await pr.json()}catch{}throw Error(d.detail||'Visit saved, but photo upload failed.')}}msg('formMsg','Visit #'+v.id+' submitted with '+fs.length+' geotagged stock photo(s). Refreshing dashboard...',true);$('feedback').value='';$('suggestions').value='';selectedPhotos=[];$('stockPhotos').value='';$('cameraPhoto').value='';$('photoPreview').textContent='No photos selected.';await load();msg('formMsg','Visit #'+v.id+' submitted successfully. Dashboard refreshed.',true);$('retailer').focus()}catch(e){msg('formMsg',e.message)}finally{if(btn){btn.disabled=false;btn.textContent='Submit Visit'}}};
 async function compressImage(file){if(!file.type.startsWith('image/'))return file;return new Promise(resolve=>{let img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{let max=1600,w=img.width,h=img.height;if(Math.max(w,h)>max){if(w>=h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}}let c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>{URL.revokeObjectURL(url);if(!b)return resolve(file);resolve(new File([b],(file.name||'stock').replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'}))},'image/jpeg',.78)};img.src=url})}
 $('stockPhotos').onchange=()=>{let fs=[...$('stockPhotos').files];if(fs.length>5){$('stockPhotos').value='';return msg('formMsg','Maximum 5 stock photos per visit.')}$('photoPreview').innerHTML=fs.length?fs.map(f=>`<span class="tag">${esc(f.name)} · ${Math.round(f.size/1024)} KB</span> `).join(''):'No photos selected.'};
 $('group').onchange=()=>coverage().catch(e=>msg('authMsg',e.message));
