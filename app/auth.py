@@ -86,14 +86,14 @@ def decode_token(token: str) -> dict:
     return payload
 
 
-async def require_admin_key(x_api_key: str | None = Security(api_key_header)):
+async def require_admin_key(x_api_key: Optional[str] = Security(api_key_header)):
     if not ADMIN_API_KEY or x_api_key != ADMIN_API_KEY:
         raise HTTPException(status_code=401, detail="Missing or invalid admin API key.")
 
 
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer),
-    x_api_key: str | None = Security(api_key_header),
+    x_api_key: Optional[str] = Security(api_key_header),
 ):
     # Keep the existing manager/API-key path working.
     if x_api_key and API_KEY and hmac.compare_digest(x_api_key, API_KEY):
@@ -105,7 +105,7 @@ async def get_current_user(
 
 async def get_dashboard_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer),
-    x_api_key: str | None = Security(api_key_header),
+    x_api_key: Optional[str] = Security(api_key_header),
 ):
     """Authenticate field users by bearer token and managers by API key for dashboard reads."""
     if x_api_key:
