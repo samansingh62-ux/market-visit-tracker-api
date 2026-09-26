@@ -64,6 +64,13 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 .myTargetStat{background:#fff;border:1px solid #e4e9f0;border-radius:12px;padding:14px}
 .myTargetStat span{display:block;font-size:11px;color:#667085}.myTargetStat b{display:block;font-size:22px;margin-top:5px;color:#101828}
 @media(max-width:900px){.myTargetGrid{grid-template-columns:repeat(2,1fr)}}
+
+.visitPhotoModal{position:fixed;inset:0;background:#07142dcc;z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px}
+.visitPhotoModal.hidden{display:none}.visitPhotoBox{background:#fff;border-radius:18px;width:min(920px,100%);max-height:90vh;overflow:auto;padding:20px;box-shadow:0 24px 70px #0005}
+.visitPhotoHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.visitPhotoHead h3{margin:0 0 4px}.visitPhotoMeta{font-size:12px;color:#667085}
+.visitPhotoGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.visitPhotoGrid img{width:100%;height:auto;border-radius:12px;border:1px solid #e4e9f0;display:block}
+.visitActions{display:flex;gap:6px;flex-wrap:wrap}.miniBtn{border:1px solid #d3dae5;background:#fff;color:#172033;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:800;text-decoration:none;display:inline-block}
+@media(max-width:700px){.visitPhotoGrid{grid-template-columns:1fr}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -180,6 +187,15 @@ button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:point
 <section class="card" id="healthDetails"><div class="head"><div><h2>Retailer Coverage Intelligence</h2><div class="sub">Prioritise retailers by visit recency.</div></div><button id="refreshHealth" class="secondary">↻ Refresh</button></div><div class="filters"><select id="healthRole"><option value="">All hierarchy</option></select><select id="healthZone"><option value="">All zones</option></select><select id="priority"><option value="">All priorities</option><option>Never Visited</option><option>Overdue 15+ Days</option><option>Due 8–14 Days</option><option>Recently Visited</option></select><input id="healthSearch" placeholder="Search retailer"><button id="healthApply" class="secondary">Apply</button><button id="healthClear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Retailer</th><th>Hierarchy</th><th>Zone</th><th>Visits</th><th>Last Visit</th><th>Days</th><th>Priority</th></tr></thead><tbody id="health"></tbody></table></div></section>
 <section class="card" id="visitLogDetails"><div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="export" class="secondary">Export CSV</button></div></div><div class="filters"><input id="search" placeholder="Search retailer, market or feedback"><input id="from" type="date"><input id="to" type="date"><select id="visitRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select><button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Role</th><th>GPS</th><th>Photos</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div></section>
 </div></div></section></main>
+<div id="visitPhotoModal" class="visitPhotoModal hidden">
+  <div class="visitPhotoBox">
+    <div class="visitPhotoHead">
+      <div><h3 id="visitPhotoTitle">Visit Photos</h3><div id="visitPhotoMeta" class="visitPhotoMeta"></div></div>
+      <button id="visitPhotoClose" class="ghost" type="button">✕ Close</button>
+    </div>
+    <div id="visitPhotoGrid" class="visitPhotoGrid"></div>
+  </div>
+</div>
 <script>
 let token=sessionStorage.getItem('mvt_token')||'',user=JSON.parse(sessionStorage.getItem('mvt_user')||'null'),master=[],managerMode=false;let gps={latitude:null,longitude:null,accuracy:null};
 const $=id=>document.getElementById(id);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -334,7 +350,66 @@ $('retailer').oninput=()=>{
   clearTimeout(retailer360Timer);
   retailer360Timer=setTimeout(()=>loadRetailer360(r),350);
 }
-async function visits(){let p=new URLSearchParams({limit:'500'});if($('search').value)p.set('search',$('search').value);if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let a=await api('/visits?'+p);let recent=a.slice(0,5);$('recentVisits').innerHTML=recent.length?recent.map(v=>`<tr><td>${esc(v.visit_date)}</td><td><b>${esc(v.retailer)}</b></td><td>${esc(v.market)}</td><td><span class="recentStatus">Visited</span></td></tr>`).join(''):'<tr><td colspan="4">No recent visits.</td></tr>';$('visits').innerHTML=a.length?a.map(v=>{let gps=v.latitude!=null&&v.longitude!=null?'<span class="tag ok">Captured</span>':'<span class="tag warn">Missing</span>';let photos=v.photo_count?'<span class="tag ok">'+v.photo_count+'</span>':'<span class="tag">0</span>';return `<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.submitted_by)}</td><td>${esc(v.submitted_role)}</td><td>${gps}</td><td>${photos}</td><td>${esc(v.feedback)}</td></tr>`}).join(''):'<tr><td colspan="11">No visits found.</td></tr>'}
+let visitPhotoObjectUrls=[];
+
+function closeVisitPhotos(){
+  visitPhotoObjectUrls.forEach(u=>URL.revokeObjectURL(u));
+  visitPhotoObjectUrls=[];
+  $('visitPhotoGrid').innerHTML='';
+  $('visitPhotoModal').classList.add('hidden');
+}
+
+async function openVisitPhotos(visit){
+  $('visitPhotoTitle').textContent=visit.retailer+' · '+visit.visit_date;
+  let gpsText=visit.latitude!=null&&visit.longitude!=null
+    ? 'GPS: '+Number(visit.latitude).toFixed(5)+', '+Number(visit.longitude).toFixed(5)+(visit.gps_accuracy!=null?' · ±'+Math.round(Number(visit.gps_accuracy))+'m':'')
+    : 'GPS unavailable';
+  $('visitPhotoMeta').innerHTML=esc(visit.market||'')+' · '+esc(gpsText);
+  $('visitPhotoGrid').innerHTML='<div class="meta">Loading photos…</div>';
+  $('visitPhotoModal').classList.remove('hidden');
+
+  try{
+    let photos=await api('/visits/'+visit.id+'/photos');
+    if(!photos.length){$('visitPhotoGrid').innerHTML='<div class="meta">No photos attached to this visit.</div>';return}
+    let headers={};
+    if(managerMode&&adminKey)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
+    let cards=[];
+    for(let p of photos){
+      let response=await fetch(p.url,{headers});
+      if(!response.ok)throw Error('Unable to load visit photo.');
+      let blob=await response.blob(),url=URL.createObjectURL(blob);
+      visitPhotoObjectUrls.push(url);
+      cards.push('<div><img src="'+url+'" alt="Visit photo"><div class="visitPhotoMeta" style="margin-top:6px">'+esc(p.filename||'Visit photo')+'</div></div>');
+    }
+    $('visitPhotoGrid').innerHTML=cards.join('');
+  }catch(e){
+    $('visitPhotoGrid').innerHTML='<div class="msg err">'+esc(e.message)+'</div>';
+  }
+}
+
+async function visits(){
+  let p=new URLSearchParams({limit:'500'});
+  if($('search').value)p.set('search',$('search').value);
+  if($('from').value)p.set('date_from',$('from').value);
+  if($('to').value)p.set('date_to',$('to').value);
+  let a=await api('/visits?'+p);
+  let recent=a.slice(0,5);
+  $('recentVisits').innerHTML=recent.length?recent.map(v=>`<tr><td>${esc(v.visit_date)}</td><td><b>${esc(v.retailer)}</b></td><td>${esc(v.market)}</td><td><span class="recentStatus">Visited</span></td></tr>`).join(''):'<tr><td colspan="4">No recent visits.</td></tr>';
+  $('visits').innerHTML=a.length?a.map(v=>{
+    let hasGps=v.latitude!=null&&v.longitude!=null;
+    let gps=hasGps
+      ? '<div class="visitActions"><span class="tag ok">Captured</span><a class="miniBtn" target="_blank" rel="noopener" href="https://www.google.com/maps?q='+encodeURIComponent(v.latitude+','+v.longitude)+'">View on Map</a></div>'
+      : '<span class="tag warn">Missing</span>';
+    let photos=v.photo_count
+      ? '<button class="miniBtn visitPhotoBtn" type="button" data-visit-id="'+v.id+'">View '+v.photo_count+'</button>'
+      : '<span class="tag">0</span>';
+    return `<tr><td>${esc(v.visit_date)}</td><td>${esc(v.retailer)}</td><td>${esc(v.market)}</td><td>${esc(v.tl)}</td><td>${esc(v.ss)}</td><td>${esc(v.rds)}</td><td>${esc(v.submitted_by)}</td><td>${esc(v.submitted_role)}</td><td>${gps}</td><td>${photos}</td><td>${esc(v.feedback)}</td></tr>`;
+  }).join(''):'<tr><td colspan="11">No visits found.</td></tr>';
+  $('visits').querySelectorAll('.visitPhotoBtn').forEach(btn=>btn.onclick=()=>{
+    let v=a.find(x=>String(x.id)===String(btn.dataset.visitId));
+    if(v)openVisitPhotos(v);
+  });
+}
 async function myTargetPerformance(){
   let panel=$('myTargetPanel');if(!panel)return;
   if(!user || !['TL','SS'].includes(user.role)){panel.classList.add('hidden');return}
@@ -538,6 +613,8 @@ $('group').onchange=()=>coverage().catch(e=>msg('authMsg',e.message));
 $('pinLogin').onclick=pinLogin;$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')pinLogin()});$('legacyToggle').onclick=()=>$('legacyLogin').classList.toggle('hidden');$('welcomeClose').onclick=closeWelcome;$('login').onclick=login;$('logout').onclick=logout;$('refresh').onclick=()=>load().catch(e=>msg('authMsg',e.message));$('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
 $('export').onclick=async()=>{try{let p=new URLSearchParams();if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let r=await fetch('/visits/export.csv?'+p,{headers:{Authorization:'Bearer '+token}});if(!r.ok)throw Error('Export failed');let b=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market-visits.csv';a.click()}catch(e){msg('authMsg',e.message)}};
 document.querySelectorAll('.sideBtn[data-target],.viewAll[data-target]').forEach(el=>el.addEventListener('click',()=>{let t=$(el.dataset.target);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.sideBtn[data-target]').forEach(b=>b.classList.remove('active'));if(el.classList.contains('sideBtn'))el.classList.add('active')}));$('sideLogout').onclick=logout;$('date').value=new Date().toISOString().slice(0,10);
+$('visitPhotoClose').onclick=closeVisitPhotos;
+$('visitPhotoModal').onclick=e=>{if(e.target===$('visitPhotoModal'))closeVisitPhotos()};
 setStatus(false,'Checking...');
 checkConnection();
 if(token&&user)showApp().catch(()=>logout());
