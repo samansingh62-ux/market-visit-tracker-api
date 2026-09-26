@@ -527,6 +527,78 @@ def get_coverage(
     return rows
 
 
+@app.get("/my-target-performance")
+def my_target_performance(user: dict = Depends(get_dashboard_user)):
+    """TL/SS monthly target vs achievement using assigned retailer targets and live V-Work MTD sales."""
+    role = user.get("role")
+    if role not in ("TL", "SS"):
+        return {
+            "available": False,
+            "role": role,
+            "name": user.get("name"),
+            "message": "Target performance is available for TL and SS users.",
+        }
+
+    today = date.today()
+    month = today.strftime("%Y-%m")
+    scope = _scope(user)
+    target = crud.get_hierarchy_target_summary(
+        month,
+        tl=scope.get("tl"),
+        ss=scope.get("ss"),
+    )
+    retailer_codes = set(target.get("retailer_codes") or [])
+
+    params = {
+        "startDate": today.replace(day=1).isoformat(),
+        "endDate": today.isoformat(),
+        "inventoryDate": today.isoformat(),
+        "pageSize": 500,
+        "maxPages": 100,
+    }
+    headers = {}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
+            response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
+                params=params,
+                headers=headers,
+            )
+        response.raise_for_status()
+        live_rows = (response.json() or {}).get("retailers") or []
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Live target achievement unavailable: {exc}") from exc
+
+    achievement_units = sum(
+        int(row.get("mtd_sales") or 0)
+        for row in live_rows
+        if str(row.get("retailer_code") or "").strip().upper() in retailer_codes
+    )
+    target_volume = int(target.get("target_volume") or 0)
+    achievement_pct = round((achievement_units / target_volume) * 100, 1) if target_volume > 0 else 0
+    gap = max(target_volume - achievement_units, 0)
+    month_days = calendar.monthrange(today.year, today.month)[1]
+    days_remaining = max(month_days - today.day + 1, 1)
+    required_per_day = round(gap / days_remaining, 1) if target_volume > 0 else 0
+
+    return {
+        "available": True,
+        "month": month,
+        "role": role,
+        "name": user.get("name"),
+        "target": target_volume,
+        "achievement": achievement_units,
+        "achievement_pct": achievement_pct,
+        "gap": gap,
+        "required_per_day": required_per_day,
+        "days_remaining": days_remaining,
+        "retailers": len(retailer_codes),
+    }
+
+
 @app.get("/visit-priorities")
 def visit_priorities(
     limit: int = Query(default=10, ge=1, le=25),
