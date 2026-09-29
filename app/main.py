@@ -527,6 +527,158 @@ def get_coverage(
     return rows
 
 
+@app.get("/performance-dashboard")
+def performance_dashboard(user: dict = Depends(get_dashboard_user)):
+    """Hierarchy-aware retailer performance for TL, SS, RDS and management."""
+    today = date.today()
+    month = today.strftime("%Y-%m")
+    scope = _scope(user)
+    rows = crud.get_performance_scope_rows(
+        month,
+        tl=scope.get("tl"),
+        ss=scope.get("ss"),
+        rds=scope.get("rds"),
+    )
+
+    params = {
+        "startDate": today.replace(day=1).isoformat(),
+        "endDate": today.isoformat(),
+        "inventoryDate": today.isoformat(),
+        "pageSize": 500,
+        "maxPages": 100,
+    }
+    headers = {}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
+            response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
+                params=params,
+                headers=headers,
+            )
+        response.raise_for_status()
+        live_rows = (response.json() or {}).get("retailers") or []
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Live performance data unavailable: {exc}") from exc
+
+    live_by_code = {
+        str(x.get("retailer_code") or "").strip().upper(): x
+        for x in live_rows if x.get("retailer_code")
+    }
+
+    month_days = calendar.monthrange(today.year, today.month)[1]
+    days_remaining = max(month_days - today.day + 1, 1)
+    retailer_rows = []
+    for row in rows:
+        code = str(row.get("code") or "").strip().upper()
+        live = live_by_code.get(code, {})
+        sales = int(live.get("mtd_sales") or 0)
+        stock = int(live.get("good_phone_stock") or 0)
+        avg_daily = float(live.get("avg_daily_sales") or 0)
+        dos = live.get("dos")
+        target = int(row.get("target_volume") or 0)
+        gap = max(target - sales, 0)
+        ach = round((sales / target) * 100, 1) if target > 0 else 0
+        req = round(gap / days_remaining, 1) if target > 0 else 0
+        last_visit = row.get("last_visit")
+        days_since = None
+        if last_visit:
+            try:
+                days_since = (today - date.fromisoformat(str(last_visit)[:10])).days
+            except Exception:
+                pass
+
+        if target > 0 and ach < 50:
+            status = "Behind"
+        elif isinstance(dos, (int, float)) and dos > 45:
+            status = "High Stock"
+        elif sales > 0 and stock == 0:
+            status = "Out of Stock"
+        elif sales == 0:
+            status = "No Sales"
+        else:
+            status = "On Track"
+
+        retailer_rows.append({
+            "code": code,
+            "name": row.get("name"),
+            "tl": row.get("tl"),
+            "ss": row.get("ss"),
+            "rds": row.get("rds"),
+            "zone": row.get("zone"),
+            "club": row.get("club"),
+            "target": target,
+            "sales": sales,
+            "achievement_pct": ach,
+            "gap": gap,
+            "required_per_day": req,
+            "stock": stock,
+            "avg_daily_sales": avg_daily,
+            "dos": dos,
+            "last_visit": last_visit,
+            "days_since_visit": days_since,
+            "visit_count": int(row.get("visit_count") or 0),
+            "status": status,
+        })
+
+    total_target = sum(x["target"] for x in retailer_rows)
+    total_sales = sum(x["sales"] for x in retailer_rows)
+    total_stock = sum(x["stock"] for x in retailer_rows)
+    total_gap = max(total_target - total_sales, 0)
+    total_ach = round((total_sales / total_target) * 100, 1) if total_target > 0 else 0
+    active_sales = [x for x in retailer_rows if x["sales"] > 0]
+
+    hierarchy = {}
+    for field in ("tl", "ss", "rds"):
+        groups = {}
+        for item in retailer_rows:
+            name = item.get(field) or "Unassigned"
+            g = groups.setdefault(name, {
+                "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
+            })
+            g["retailers"] += 1
+            g["target"] += item["target"]
+            g["sales"] += item["sales"]
+            g["stock"] += item["stock"]
+        out = []
+        for g in groups.values():
+            g["achievement_pct"] = round((g["sales"] / g["target"]) * 100, 1) if g["target"] > 0 else 0
+            g["gap"] = max(g["target"] - g["sales"], 0)
+            out.append(g)
+        hierarchy[field] = sorted(out, key=lambda x: x["sales"], reverse=True)
+
+    retailer_rows.sort(key=lambda x: (x["achievement_pct"], -x["sales"]))
+
+    return {
+        "period": {
+            "month": month,
+            "start": today.replace(day=1).isoformat(),
+            "end": today.isoformat(),
+            "days_remaining": days_remaining,
+        },
+        "user": {
+            "name": user.get("name", "Manager"),
+            "role": user.get("role", "MANAGER"),
+            "scope": scope,
+        },
+        "summary": {
+            "retailers": len(retailer_rows),
+            "target": total_target,
+            "sales": total_sales,
+            "achievement_pct": total_ach,
+            "gap": total_gap,
+            "required_per_day": round(total_gap / days_remaining, 1) if total_target > 0 else 0,
+            "stock": total_stock,
+            "productive_retailers": len(active_sales),
+            "zero_sales_retailers": len(retailer_rows) - len(active_sales),
+        },
+        "hierarchy": hierarchy,
+        "retailers": retailer_rows,
+    }
+
+
 @app.get("/my-target-performance")
 def my_target_performance(user: dict = Depends(get_dashboard_user)):
     """TL/SS monthly target vs achievement using assigned retailer targets and live V-Work MTD sales."""
