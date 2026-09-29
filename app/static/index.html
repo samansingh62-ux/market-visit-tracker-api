@@ -228,6 +228,35 @@ button{min-height:44px}
   .myTargetGrid{grid-template-columns:1fr 1fr}
   .sidebar .sideBtn{font-size:8.5px}
 }
+
+/* PERFORMANCE_DASHBOARD_V1 */
+.perfShell{margin-bottom:18px}
+.perfTabs{display:flex;gap:26px;border-bottom:1px solid #e7e3dc;margin-bottom:16px;overflow-x:auto;white-space:nowrap}
+.perfTab{background:transparent;border-radius:0;padding:12px 3px 11px;min-height:auto;color:#8b8a84;font-weight:800;border-bottom:3px solid transparent}
+.perfTab.active{color:#1d1d1b;border-bottom-color:#2f7dd3}
+.perfFilterBar{background:#f4f2ed;border:1px solid #e5e0d7;border-radius:13px;padding:12px 14px;display:flex;gap:12px;align-items:end;margin-bottom:16px}
+.perfFilterBar label{margin:0;min-width:170px;font-size:10px;letter-spacing:.08em;color:#8b8a84;text-transform:uppercase}
+.perfFilterBar select,.perfFilterBar input{margin-top:5px;background:#fff}
+.perfKpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.perfKpi{background:#fff;border:1px solid #e5e0d7;border-radius:13px;padding:16px;box-shadow:0 2px 9px #00000008}
+.perfKpi span{display:block;color:#88867f;font-size:12px}.perfKpi b{display:block;font-size:23px;margin-top:7px;color:#111}
+.perfPanel{background:#fff;border:1px solid #e5e0d7;border-radius:13px;padding:16px;box-shadow:0 2px 9px #00000008;margin-bottom:16px}
+.perfPanel h3{margin:0 0 5px;font-size:15px}.perfSub{font-size:12px;color:#88867f;margin-bottom:12px}
+.perfTable{width:100%;border-collapse:collapse}.perfTable th{background:#f3f1ec;color:#8a8880;font-size:10px;letter-spacing:.07em}.perfTable td{font-size:12px}
+.perfAch{min-width:120px}.perfBar{height:7px;background:#efede8;border-radius:99px;overflow:hidden;margin-top:4px}.perfBar i{height:100%;display:block;background:#2f7dd3;border-radius:99px}
+.perfStatus{display:inline-block;padding:4px 8px;border-radius:99px;font-size:10px;font-weight:800}.perfStatus.track{background:#e9f7ef;color:#247a50}.perfStatus.behind{background:#fff1db;color:#a15b00}.perfStatus.stock{background:#fff0f0;color:#b42318}.perfStatus.none{background:#f2f4f7;color:#667085}
+.perfHierarchyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.perfMiniTable{width:100%;border-collapse:collapse}.perfMiniTable td,.perfMiniTable th{padding:8px 6px;border-bottom:1px solid #eeeae3;font-size:11px}.perfMiniTable th{background:#f8f6f2;color:#89867f}
+.perfView.hidden{display:none!important}
+@media(max-width:1000px){.perfKpis{grid-template-columns:repeat(3,1fr)}.perfHierarchyGrid{grid-template-columns:1fr}}
+@media(max-width:700px){
+ .perfTabs{gap:18px}
+ .perfFilterBar{display:grid;grid-template-columns:1fr 1fr}
+ .perfFilterBar label{min-width:0}
+ .perfKpis{grid-template-columns:1fr 1fr;gap:8px}
+ .perfKpi{padding:12px}.perfKpi b{font-size:20px}
+ .perfPanel{padding:12px}
+ .perfTable{min-width:980px}
+}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -298,6 +327,56 @@ button{min-height:44px}
 <div class="dashMain">
 <div id="dashboardHome">
 <div class="dashTitle"><div><h2>Dashboard</h2><p>Overview of your market coverage and field activity.</p></div><div class="dashboardTools"><select id="dashboardPeriod"><option>This Month</option><option>Last 30 Days</option><option>All Time</option></select><div id="profileTop" class="profileTop"><div class="avatar" id="avatarInitials">—</div><div><div class="profileName" id="topUserName">—</div><div class="profileRole" id="topUserRole">—</div></div></div></div></div>
+<div id="performanceDashboard" class="perfShell">
+  <div class="perfTabs">
+    <button class="perfTab active" data-perf-tab="retailers">Retailer Wise Status</button>
+    <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
+    <button class="perfTab" data-perf-tab="stock">Stock & DOS</button>
+    <button class="perfTab" data-perf-tab="visits">Visit Status</button>
+  </div>
+  <div class="perfFilterBar">
+    <label>Search Retailer<input id="perfSearch" placeholder="Retailer name"></label>
+    <label>Status<select id="perfStatusFilter"><option value="">All</option><option>On Track</option><option>Behind</option><option>High Stock</option><option>Out of Stock</option><option>No Sales</option></select></label>
+    <label id="perfHierarchyFilterWrap">Hierarchy<select id="perfHierarchyFilter"><option value="">All</option></select></label>
+    <button id="perfReset" class="secondary" type="button">Reset</button>
+  </div>
+  <div class="perfKpis">
+    <div class="perfKpi"><span>Target</span><b id="perfTarget">—</b></div>
+    <div class="perfKpi"><span>MTD Achievement</span><b id="perfSales">—</b></div>
+    <div class="perfKpi"><span>Achievement %</span><b id="perfAch">—</b></div>
+    <div class="perfKpi"><span>Gap</span><b id="perfGap">—</b></div>
+    <div class="perfKpi"><span>Required / Day</span><b id="perfReq">—</b></div>
+    <div class="perfKpi"><span>Retailers in View</span><b id="perfRetailers">—</b></div>
+  </div>
+
+  <div id="perfRetailerView" class="perfView perfPanel">
+    <h3>Retailer wise performance</h3>
+    <div class="perfSub">Live sales, target achievement, stock cover and visit status for your assigned hierarchy.</div>
+    <div class="wrap"><table class="perfTable"><thead><tr>
+      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>Sales</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Last Visit</th><th>Status</th>
+    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="13">Loading…</td></tr></tbody></table></div>
+  </div>
+
+  <div id="perfHierarchyView" class="perfView hidden">
+    <div class="perfHierarchyGrid">
+      <div class="perfPanel"><h3>TL wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>TL</th><th>Target</th><th>Sales</th><th>Ach%</th></tr></thead><tbody id="perfTLRows"></tbody></table></div></div>
+      <div class="perfPanel"><h3>SS wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>SS</th><th>Target</th><th>Sales</th><th>Ach%</th></tr></thead><tbody id="perfSSRows"></tbody></table></div></div>
+      <div class="perfPanel"><h3>RDS wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>RDS</th><th>Target</th><th>Sales</th><th>Ach%</th></tr></thead><tbody id="perfRDSRows"></tbody></table></div></div>
+    </div>
+  </div>
+
+  <div id="perfStockView" class="perfView hidden perfPanel">
+    <h3>Stock & DOS</h3>
+    <div class="perfSub">Retailers sorted by highest days of stock cover.</div>
+    <div class="wrap"><table class="perfTable"><thead><tr><th>Retailer</th><th>Sales</th><th>Avg/Day</th><th>Stock</th><th>DOS</th><th>Signal</th></tr></thead><tbody id="perfStockRows"></tbody></table></div>
+  </div>
+
+  <div id="perfVisitsView" class="perfView hidden perfPanel">
+    <h3>Visit Status</h3>
+    <div class="perfSub">Retailer recency and field coverage within the logged-in hierarchy.</div>
+    <div class="wrap"><table class="perfTable"><thead><tr><th>Retailer</th><th>Last Visit</th><th>Days Since</th><th>Visits</th><th>Sales</th><th>Status</th></tr></thead><tbody id="perfVisitRows"></tbody></table></div>
+  </div>
+</div>
 <div class="kpiGrid">
 <div class="kpiCard"><div class="kpiLabel">Total Visits</div><div class="kpiValue" id="dkVisits">—</div><div class="kpiIcon blue">▣</div></div>
 <div class="kpiCard"><div class="kpiLabel">Retailers Visited</div><div class="kpiValue" id="dkRetailers">—</div><div class="kpiIcon green">▤</div></div>
@@ -441,7 +520,97 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
 function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
-async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance()])}
+async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard()])}
+let perfData=null;
+
+function perfStatusClass(s){
+  if(s==='On Track')return 'track';
+  if(s==='Behind')return 'behind';
+  if(s==='High Stock'||s==='Out of Stock')return 'stock';
+  return 'none';
+}
+
+function filteredPerfRows(){
+  if(!perfData)return [];
+  let rows=[...(perfData.retailers||[])];
+  let search=($('perfSearch').value||'').trim().toLowerCase();
+  let status=$('perfStatusFilter').value;
+  let h=$('perfHierarchyFilter').value;
+  if(search)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(search));
+  if(status)rows=rows.filter(r=>r.status===status);
+  if(h)rows=rows.filter(r=>r.tl===h||r.ss===h||r.rds===h);
+  return rows;
+}
+
+function renderPerfTables(){
+  if(!perfData)return;
+  let rows=filteredPerfRows();
+  let target=rows.reduce((a,r)=>a+Number(r.target||0),0);
+  let sales=rows.reduce((a,r)=>a+Number(r.sales||0),0);
+  let gap=Math.max(target-sales,0);
+  let days=Math.max(Number(perfData.period?.days_remaining||1),1);
+  $('perfTarget').textContent=Math.round(target).toLocaleString();
+  $('perfSales').textContent=Math.round(sales).toLocaleString();
+  $('perfAch').textContent=(target?Math.round(sales*100/target):0)+'%';
+  $('perfGap').textContent=Math.round(gap).toLocaleString();
+  $('perfReq').textContent=Math.round(gap/days).toLocaleString();
+  $('perfRetailers').textContent=rows.length;
+
+  $('perfRetailerRows').innerHTML=rows.length?rows.map(r=>{
+    let ach=Math.round(Number(r.achievement_pct||0));
+    return `<tr class="priorityRow" data-code="${esc(r.code)}">
+      <td><b>${esc(r.name)}</b><div class="priorityReason">${esc(r.club||'')}</div></td>
+      <td>${esc(r.tl||'—')}</td><td>${esc(r.ss||'—')}</td><td>${esc(r.rds||'—')}</td>
+      <td>${Math.round(Number(r.target||0))}</td><td><b>${Math.round(Number(r.sales||0))}</b></td>
+      <td class="perfAch">${ach}%<div class="perfBar"><i style="width:${Math.min(100,ach)}%"></i></div></td>
+      <td>${Math.round(Number(r.gap||0))}</td><td>${Math.round(Number(r.required_per_day||0))}</td>
+      <td>${Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
+      <td>${esc(r.last_visit||'Never')}</td>
+      <td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="13">No retailers match the selected filters.</td></tr>';
+
+  $('perfRetailerRows').querySelectorAll('tr[data-code]').forEach(tr=>tr.onclick=()=>{
+    let r=master.find(x=>String(x.code||'').toUpperCase()===String(tr.dataset.code||'').toUpperCase());
+    if(r){
+      $('retailer').value=r.name;
+      $('retailer').dispatchEvent(new Event('input'));
+      $('visitEntry').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  });
+
+  let stockRows=[...rows].sort((a,b)=>(Number(b.dos||-1)-Number(a.dos||-1))).slice(0,80);
+  $('perfStockRows').innerHTML=stockRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.sales}</td><td>${Math.round(Number(r.avg_daily_sales||0))}</td><td>${r.stock}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td><td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td></tr>`).join('');
+
+  let visitRows=[...rows].sort((a,b)=>(Number(b.days_since_visit??9999)-Number(a.days_since_visit??9999)));
+  $('perfVisitRows').innerHTML=visitRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.last_visit||'Never')}</td><td>${r.days_since_visit==null?'—':r.days_since_visit}</td><td>${r.visit_count}</td><td>${r.sales}</td><td><span class="perfStatus ${r.days_since_visit==null||r.days_since_visit>14?'behind':'track'}">${r.days_since_visit==null?'Never Visited':r.days_since_visit>14?'Overdue':'Covered'}</span></td></tr>`).join('');
+
+  const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td></tr>`).join('')||'<tr><td colspan="4">No data</td></tr>'};
+  renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
+  renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
+  renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);
+}
+
+async function performanceDashboard(){
+  try{
+    perfData=await api('/performance-dashboard');
+    let role=perfData.user?.role||'';
+    let options=[];
+    if(role==='MANAGER'){
+      options=[
+        ...(perfData.hierarchy?.tl||[]).map(x=>x.name),
+        ...(perfData.hierarchy?.ss||[]).map(x=>x.name),
+        ...(perfData.hierarchy?.rds||[]).map(x=>x.name),
+      ];
+    }
+    $('perfHierarchyFilterWrap').style.display=role==='MANAGER'?'block':'none';
+    $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
+    renderPerfTables();
+  }catch(e){
+    $('perfRetailerRows').innerHTML='<tr><td colspan="13">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
+  }
+}
+
 async function stats(){let x=await api('/stats');$('mv').textContent=x.total_visits;$('mr').textContent=x.unique_retailers_visited;$('mm').textContent=x.unique_markets;$('mt').textContent=x.total_retailers_in_master;$('dkVisits').textContent=x.total_visits;$('dkRetailers').textContent=x.unique_retailers_visited;$('dkMarkets').textContent=x.unique_markets;let total=x.total_retailers_in_master||0,visited=x.unique_retailers_visited||0;$('dkCoverage').textContent=(total?Math.round(visited*100/total):0)+'%';$('dkMaster').textContent=x.total_retailers_in_master;}
 async function retailers(){master=await api('/retailers');$('retailers').innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
 let retailer360Timer=null;
@@ -695,6 +864,20 @@ async function toggleAdminUser(id,active){
     await loadAdminUsers();
   }catch(e){msg('adminMsg',e.message)}
 }
+
+document.querySelectorAll('.perfTab').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('.perfTab').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  let tab=btn.dataset.perfTab;
+  $('perfRetailerView').classList.toggle('hidden',tab!=='retailers');
+  $('perfHierarchyView').classList.toggle('hidden',tab!=='hierarchy');
+  $('perfStockView').classList.toggle('hidden',tab!=='stock');
+  $('perfVisitsView').classList.toggle('hidden',tab!=='visits');
+});
+$('perfSearch').oninput=renderPerfTables;
+$('perfStatusFilter').onchange=renderPerfTables;
+$('perfHierarchyFilter').onchange=renderPerfTables;
+$('perfReset').onclick=()=>{$('perfSearch').value='';$('perfStatusFilter').value='';$('perfHierarchyFilter').value='';renderPerfTables()};
 
 $('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUsers()};
 $('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(managerMode)$('app').classList.remove('hidden');else if(token)$('app').classList.remove('hidden')};
