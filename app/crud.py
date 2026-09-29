@@ -58,6 +58,46 @@ def get_hierarchy_target_summary(month: str, tl: Optional[str] = None, ss: Optio
     }
 
 
+def get_performance_scope_rows(
+    month: str,
+    tl: Optional[str] = None,
+    ss: Optional[str] = None,
+    rds: Optional[str] = None,
+) -> list[dict]:
+    clauses = ["1=1"]
+    params = []
+    if tl:
+        clauses.append("r.tl = %s")
+        params.append(tl)
+    if ss:
+        clauses.append("r.ss = %s")
+        params.append(ss)
+    if rds:
+        clauses.append("r.rds = %s")
+        params.append(rds)
+    where = " AND ".join(clauses)
+    with database.get_conn() as conn:
+        rows = conn.execute(f"""
+            SELECT
+                r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club,
+                COALESCE(t.target_volume, 0) AS target_volume,
+                COALESCE(t.target_value, 0) AS target_value,
+                v.last_visit,
+                COALESCE(v.visit_count, 0) AS visit_count
+            FROM retailers r
+            LEFT JOIN retailer_targets t
+              ON UPPER(t.retailer_code) = UPPER(r.code) AND t.month = %s
+            LEFT JOIN (
+                SELECT retailer, MAX(visit_date) AS last_visit, COUNT(*) AS visit_count
+                FROM visits
+                GROUP BY retailer
+            ) v ON v.retailer = r.name
+            WHERE {where}
+            ORDER BY r.name
+        """, [month, *params]).fetchall()
+    return [dict(row) for row in rows]
+
+
 def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute(
