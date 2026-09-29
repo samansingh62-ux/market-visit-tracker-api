@@ -257,6 +257,21 @@ button{min-height:44px}
  .perfPanel{padding:12px}
  .perfTable{min-width:980px}
 }
+
+.trendGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.trendStat{background:#fff;border:1px solid #e5e0d7;border-radius:13px;padding:15px}
+.trendStat span{display:block;color:#8a8880;font-size:12px}.trendStat b{display:block;font-size:22px;margin-top:6px;color:#111}
+.trendBars{height:260px;display:flex;align-items:flex-end;gap:7px;padding:18px 10px 26px;border-top:1px solid #e8e3da;overflow-x:auto}
+.trendBarWrap{min-width:24px;flex:1;max-width:46px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+.trendBar{width:100%;background:#3b82d0;border-radius:5px 5px 0 0;min-height:2px}
+.trendBarLabel{font-size:9px;color:#89867f;white-space:nowrap;transform:rotate(-35deg);transform-origin:center}
+.trendBarValue{font-size:9px;color:#555}
+.modelCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.modelHighlight{background:#fff;border:1px solid #e5e0d7;border-radius:13px;padding:16px}
+.modelHighlight.good{border-top:3px solid #20a35a}.modelHighlight.watch{border-top:3px solid #e0a018}
+.modelHighlight h4{margin:5px 0 8px;font-size:18px}.modelHighlight .big{font-size:24px;font-weight:900}
+.modelProgress{height:8px;background:#efede8;border-radius:99px;overflow:hidden;margin:10px 0}.modelProgress i{display:block;height:100%;background:#2f7dd3;border-radius:99px}
+@media(max-width:700px){.trendGrid{grid-template-columns:1fr 1fr}.modelCards{grid-template-columns:1fr}.trendBars{height:220px}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -330,6 +345,8 @@ button{min-height:44px}
 <div id="performanceDashboard" class="perfShell">
   <div class="perfTabs">
     <button class="perfTab active" data-perf-tab="retailers">Retailer Wise Status</button>
+    <button class="perfTab" data-perf-tab="day">Day by Day</button>
+    <button class="perfTab" data-perf-tab="models">Model Performance</button>
     <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
     <button class="perfTab" data-perf-tab="stock">Stock & DOS</button>
     <button class="perfTab" data-perf-tab="visits">Visit Status</button>
@@ -355,6 +372,32 @@ button{min-height:44px}
     <div class="wrap"><table class="perfTable"><thead><tr>
       <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>Sales</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Last Visit</th><th>Status</th>
     </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="13">Loading…</td></tr></tbody></table></div>
+  </div>
+
+  <div id="perfDayView" class="perfView hidden">
+    <div class="trendGrid">
+      <div class="trendStat"><span>MTD Sales Volume</span><b id="trendMTD">—</b></div>
+      <div class="trendStat"><span>Latest Day</span><b id="trendLatest">—</b></div>
+      <div class="trendStat"><span>Previous Day</span><b id="trendPrevious">—</b></div>
+      <div class="trendStat"><span>Day-on-Day</span><b id="trendChange">—</b></div>
+    </div>
+    <div class="perfPanel">
+      <h3>Sales volume by day</h3>
+      <div class="perfSub" id="trendPeriod">Live daily sales for the logged-in hierarchy.</div>
+      <div id="trendBars" class="trendBars"></div>
+    </div>
+  </div>
+
+  <div id="perfModelsView" class="perfView hidden">
+    <div class="modelCards">
+      <div class="modelHighlight good"><span class="perfSub">Highest selling model</span><h4 id="modelTopName">—</h4><div class="big" id="modelTopSales">—</div><div class="perfSub">MTD units</div></div>
+      <div class="modelHighlight watch"><span class="perfSub">Highest stock cover</span><h4 id="modelHighDosName">—</h4><div class="big" id="modelHighDos">—</div><div class="perfSub">days of cover</div></div>
+    </div>
+    <div class="perfPanel">
+      <h3>Model sales, stock & DOS</h3>
+      <div class="perfSub" id="modelTargetNote">Actual sales, stock and DOS are live. Model targets will appear once a model-target source is connected.</div>
+      <div class="wrap"><table class="perfTable"><thead><tr><th>Model</th><th>MTD Sales</th><th>Avg/Day</th><th>Stock</th><th>DOS</th><th>Signal</th></tr></thead><tbody id="modelPerfRows"></tbody></table></div>
+    </div>
   </div>
 
   <div id="perfHierarchyView" class="perfView hidden">
@@ -520,7 +563,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
 function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
-async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard()])}
+async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
 function perfStatusClass(s){
@@ -589,6 +632,53 @@ function renderPerfTables(){
   renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
   renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
   renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);
+}
+
+let perfTrendData=null;
+
+function modelSignal(m){
+  if(Number(m.sales||0)>0 && Number(m.stock||0)===0)return 'Out of Stock';
+  if(m.dos!=null && Number(m.dos)>60)return 'Overstock Risk';
+  if(m.dos!=null && Number(m.dos)>45)return 'High Stock';
+  if(m.dos!=null && Number(m.dos)<7)return 'Low Stock';
+  if(Number(m.sales||0)===0 && Number(m.stock||0)>0)return 'No Sales';
+  return 'Healthy';
+}
+
+async function performanceTrends(){
+  try{
+    perfTrendData=await api('/performance-trends');
+    let daily=perfTrendData.daily||[];
+    let total=daily.reduce((a,x)=>a+Number(x.units||0),0);
+    $('trendMTD').textContent=Math.round(total).toLocaleString();
+    $('trendLatest').textContent=Math.round(Number(perfTrendData.latest_day_units||0)).toLocaleString();
+    $('trendPrevious').textContent=perfTrendData.previous_day_units==null?'—':Math.round(Number(perfTrendData.previous_day_units||0)).toLocaleString();
+    let change=perfTrendData.latest_day_change_pct;
+    $('trendChange').textContent=change==null?'—':(change>=0?'▲ ':'▼ ')+Math.abs(Math.round(change))+'%';
+    $('trendPeriod').textContent=(perfTrendData.period?.start||'')+' – '+(perfTrendData.period?.end||'')+' · '+(perfTrendData.retailer_count||0)+' retailers';
+
+    let max=Math.max(1,...daily.map(x=>Number(x.units||0)));
+    $('trendBars').innerHTML=daily.map(x=>{
+      let h=Math.max(2,Math.round(Number(x.units||0)*100/max));
+      let label=(x.date||'').slice(5);
+      return `<div class="trendBarWrap"><div class="trendBarValue">${Math.round(Number(x.units||0))}</div><div class="trendBar" style="height:${h}%"></div><div class="trendBarLabel">${esc(label)}</div></div>`;
+    }).join('')||'<div class="meta">No day-wise sales data available.</div>';
+
+    let models=[...(perfTrendData.models||[])];
+    let top=models[0];
+    if(top){$('modelTopName').textContent=top.model||'—';$('modelTopSales').textContent=Math.round(Number(top.sales||0)).toLocaleString()+' units'}
+    let highDos=models.filter(x=>x.dos!=null).sort((a,b)=>Number(b.dos)-Number(a.dos))[0];
+    if(highDos){$('modelHighDosName').textContent=highDos.model||'—';$('modelHighDos').textContent=Math.round(Number(highDos.dos||0))}
+    $('modelTargetNote').textContent=perfTrendData.model_target_note||'Actual sales, stock and DOS are live.';
+
+    $('modelPerfRows').innerHTML=models.slice(0,80).map(m=>{
+      let sig=modelSignal(m),cls=sig==='Healthy'?'track':sig==='High Stock'||sig==='Overstock Risk'||sig==='Out of Stock'?'stock':sig==='Low Stock'?'behind':'none';
+      return `<tr><td><b>${esc(m.model||'—')}</b></td><td>${Math.round(Number(m.sales||0))}</td><td>${Number(m.avg_daily_sales||0).toFixed(1)}</td><td>${Math.round(Number(m.stock||0))}</td><td>${m.dos==null?'—':Math.round(Number(m.dos))}</td><td><span class="perfStatus ${cls}">${esc(sig)}</span></td></tr>`;
+    }).join('')||'<tr><td colspan="6">No model data available.</td></tr>';
+  }catch(e){
+    $('trendBars').innerHTML='<div class="msg err">Day-by-day data unavailable: '+esc(e.message)+'</div>';
+    $('modelPerfRows').innerHTML='<tr><td colspan="6">Model data unavailable: '+esc(e.message)+'</td></tr>';
+  }
 }
 
 async function performanceDashboard(){
@@ -870,6 +960,8 @@ document.querySelectorAll('.perfTab').forEach(btn=>btn.onclick=()=>{
   btn.classList.add('active');
   let tab=btn.dataset.perfTab;
   $('perfRetailerView').classList.toggle('hidden',tab!=='retailers');
+  $('perfDayView').classList.toggle('hidden',tab!=='day');
+  $('perfModelsView').classList.toggle('hidden',tab!=='models');
   $('perfHierarchyView').classList.toggle('hidden',tab!=='hierarchy');
   $('perfStockView').classList.toggle('hidden',tab!=='stock');
   $('perfVisitsView').classList.toggle('hidden',tab!=='visits');
