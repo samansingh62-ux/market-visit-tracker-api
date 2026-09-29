@@ -527,6 +527,54 @@ def get_coverage(
     return rows
 
 
+@app.get("/performance-trends")
+def performance_trends(user: dict = Depends(get_dashboard_user)):
+    """Scoped daily sales and model stock/DOS for the logged-in hierarchy."""
+    today = date.today()
+    scope = _scope(user)
+    month = today.strftime("%Y-%m")
+    scope_rows = crud.get_performance_scope_rows(
+        month,
+        tl=scope.get("tl"),
+        ss=scope.get("ss"),
+        rds=scope.get("rds"),
+    )
+    codes = [str(r.get("code") or "").strip().upper() for r in scope_rows if r.get("code")]
+
+    headers = {"Content-Type": "application/json"}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+    payload = {
+        "store_codes": codes,
+        "start_date": today.replace(day=1).isoformat(),
+        "end_date": today.isoformat(),
+        "inventory_date": today.isoformat(),
+    }
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+            response = client.post(
+                f"{VWORK_LIVE_API_URL}/api/v1/dashboard/sales-trends",
+                json=payload,
+                headers=headers,
+            )
+        response.raise_for_status()
+        data = response.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Performance trend data unavailable: {exc}") from exc
+
+    return {
+        **data,
+        "user": {
+            "name": user.get("name", "Manager"),
+            "role": user.get("role", "MANAGER"),
+        },
+        "retailer_count": len(codes),
+        "model_targets_loaded": False,
+        "model_target_note": "Model-level target source is not connected yet; actual sales, stock and DOS are live.",
+    }
+
+
 @app.get("/performance-dashboard")
 def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     """Hierarchy-aware retailer performance for TL, SS, RDS and management."""
