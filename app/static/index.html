@@ -516,7 +516,7 @@ button{min-height:44px}
 </label><div id="photoPreview" class="meta">No photos selected.</div><button class="primary" style="width:100%">Submit Visit</button><div id="formMsg" class="msg"></div></form></section>
 <section class="card"><div class="head"><h2>Coverage</h2><select id="group" style="width:95px;margin:0"><option value="tl">TL</option><option value="ss">SS</option><option value="rds">RDS</option></select></div><div class="wrap"><table><thead><tr><th>Name</th><th>Assigned</th><th>Visited</th><th>Coverage</th><th>Visits</th></tr></thead><tbody id="coverage"></tbody></table></div></section></div>
 <section class="card" id="healthDetails"><div class="head"><div><h2>Retailer Coverage Intelligence</h2><div class="sub">Prioritise retailers by visit recency.</div></div><button id="refreshHealth" class="secondary">↻ Refresh</button></div><div class="filters"><select id="healthRole"><option value="">All hierarchy</option></select><select id="healthZone"><option value="">All zones</option></select><select id="priority"><option value="">All priorities</option><option>Never Visited</option><option>Overdue 15+ Days</option><option>Due 8–14 Days</option><option>Recently Visited</option></select><input id="healthSearch" placeholder="Search retailer"><button id="healthApply" class="secondary">Apply</button><button id="healthClear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Retailer</th><th>Hierarchy</th><th>Zone</th><th>Visits</th><th>Last Visit</th><th>Days</th><th>Priority</th></tr></thead><tbody id="health"></tbody></table></div></section>
-<section class="card" id="visitLogDetails"><div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="export" class="secondary">Export CSV</button> <button id="exportExcel" class="secondary">⬇ Download All Data (Excel)</button></div></div><div class="filters"><input id="search" placeholder="Search retailer, market or feedback"><input id="from" type="date"><input id="to" type="date"><select id="visitRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select><button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Role</th><th>GPS</th><th>Photos</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div></section>
+<section class="card" id="visitLogDetails"><div class="head"><h2>Visit Log</h2><div><button id="refresh" class="secondary">↻ Refresh</button> <button id="exportExcel" class="secondary">⬇ Download All Data (Excel)</button></div></div><div class="filters"><input id="search" placeholder="Search retailer, market or feedback"><input id="from" type="date"><input id="to" type="date"><select id="visitRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select><button id="filter" class="secondary">Apply</button><button id="clear" class="ghost">Clear</button></div><div class="wrap"><table><thead><tr><th>Date</th><th>Retailer</th><th>Market</th><th>TL</th><th>SS</th><th>RDS</th><th>By</th><th>Role</th><th>GPS</th><th>Photos</th><th>Feedback</th></tr></thead><tbody id="visits"></tbody></table></div></section>
 </div></div></section></main>
 <div id="visitPhotoModal" class="visitPhotoModal hidden">
   <div class="visitPhotoBox">
@@ -1141,52 +1141,7 @@ $('refresh').onclick=async()=>{
 
 $('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
 
-$('export').onclick=async()=>{
-  let btn=$('export'),old=btn.textContent;
-  try{
-    btn.disabled=true;btn.textContent='Preparing…';
-    let p=new URLSearchParams();
-    if($('from').value)p.set('date_from',$('from').value);
-    if($('to').value)p.set('date_to',$('to').value);
-    let headers={};
 
-$('exportExcel').onclick=async()=>{
-  let btn=$('exportExcel'),old=btn.textContent;
-  try{
-    btn.disabled=true;btn.textContent='Preparing Excel…';
-    let headers={};
-    if(managerMode&&adminKey)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
-    let r=await fetch('/exports/all-data.xlsx',{headers,cache:'no-store'});
-    if(r.status===401&&!managerMode){
-      token='';user=null;
-      sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');
-      $('app').classList.add('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Session expired');
-      throw Error('Session expired. Please log in again.');
-    }
-    if(!r.ok){
-      let detail='';try{detail=(await r.json()).detail||''}catch{}
-      throw Error(detail||('Excel export failed ('+r.status+')'));
-    }
-    let b=await r.blob();
-    if(!b.size)throw Error('Excel export returned an empty file.');
-    let url=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=url;
-    let cd=r.headers.get('content-disposition')||'';
-    let m=cd.match(/filename="?([^"]+)"?/i);
-    a.download=m?m[1]:'market-visit-tracker.xlsx';
-    a.style.display='none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
-    btn.textContent='✓ Downloaded';
-    setTimeout(()=>{if(btn)btn.textContent=old},1400);
-  }catch(e){
-    btn.textContent=old;
-    msg('authMsg','Excel export failed: '+e.message);
-  }finally{
-    btn.disabled=false;
-  }
-};
     if(managerMode&&adminKey)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
     let r=await fetch('/visits/export.csv?'+p.toString(),{headers,cache:'no-store'});
     if(r.status===401&&!managerMode){
