@@ -501,7 +501,23 @@ async function checkConnection(){
   setStatus(false,'Disconnected');
   return false;
 }
-async function api(path,opt={}){let h={};if(managerMode&&adminKey)h['X-API-Key']=adminKey;else if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
+const SESSION_EXPIRED_MESSAGE='Your session has expired. Please log in again.';
+async function sessionFetch(path,opt={}){
+  const authorization=new Headers(opt.headers||{}).get('Authorization');
+  const requestToken=authorization?.startsWith('Bearer ')?authorization.slice(7):null;
+  const response=await fetch(path,opt);
+  // Only the current bearer session can log this user out. Login and admin-key
+  // failures, and responses from a previous session, must not clear a new login.
+  if(requestToken&&requestToken===token&&response.status===401){
+    logout();
+    msg('authMsg',SESSION_EXPIRED_MESSAGE);
+    $('pin').focus();
+    throw Error(SESSION_EXPIRED_MESSAGE);
+  }
+  if(requestToken&&requestToken!==token)throw Error('Session changed. Please retry.');
+  return response;
+}
+async function api(path,opt={}){let h={};if(managerMode&&adminKey)h['X-API-Key']=adminKey;else if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await sessionFetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
 async function pinLogin(){
   let pin=$('pin').value.trim();
   if(!/^[0-9]{4}$/.test(pin))return msg('authMsg','Enter your 4-digit PIN.');
@@ -560,9 +576,9 @@ function requestGPS(){if(!navigator.geolocation){$('gpsStatus').textContent='ðŸ“
 async function refreshGPS(){return requestGPS()}
 async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$('authPanel').classList.add('hidden');$('app').classList.remove('hidden');$('topUserName').textContent=user.name||'User';$('topUserRole').textContent=user.role||'';$('avatarInitials').textContent=(user.name||'U').split(/\\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();$('userMeta').innerHTML=`<b>${esc(user.name)}</b> Â· ${esc(user.role)} &nbsp; <span class="muted">Retailers are automatically restricted to your assigned ${esc(user.role)} hierarchy.</span>`;
   requestGPS().catch(e=>console.warn('GPS:',e));
-  load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
+  load().catch(e=>{console.error(e);msg('authMsg',token?'Dashboard refresh failed: '+e.message:SESSION_EXPIRED_MESSAGE)});
 }
-function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');closeWelcome();closeVisitPhotos();master=[];perfData=null;setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
@@ -791,7 +807,7 @@ async function openVisitPhotos(visit){
     if(managerMode&&adminKey)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
     let cards=[];
     for(let p of photos){
-      let response=await fetch(p.url,{headers});
+      let response=await sessionFetch(p.url,{headers});
       if(!response.ok)throw Error('Unable to load visit photo.');
       let blob=await response.blob(),url=URL.createObjectURL(blob);
       visitPhotoObjectUrls.push(url);
@@ -1040,10 +1056,10 @@ $('cameraPhoto').onchange=()=>{
   addPhotos($('cameraPhoto').files);
   $('cameraPhoto').value='';
 };
-$('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');let btn=$('form').querySelector('button[type="submit"],button.primary');try{if(btn){btn.disabled=true;btn.textContent='Getting GPS...'}let hasGPS=await refreshGPS();if(!hasGPS)throw Error('GPS location is required. Please allow location access and try again.');if(btn)btn.textContent='Submitting...';let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim(),latitude:gps.latitude,longitude:gps.longitude,gps_accuracy:gps.accuracy})});let fs=[...selectedPhotos];if(fs.length){if(btn)btn.textContent='Geotagging & uploading photos...';let fd=new FormData();for(let f of fs){let compressed=await compressImage(f);fd.append('files',compressed,compressed.name||'stock.jpg')}let pr=await fetch('/visits/'+v.id+'/photos',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});if(!pr.ok){let d={};try{d=await pr.json()}catch{}throw Error(d.detail||'Visit saved, but photo upload failed.')}}msg('formMsg','Visit #'+v.id+' submitted with '+fs.length+' geotagged stock photo(s). Refreshing dashboard...',true);$('feedback').value='';$('suggestions').value='';selectedPhotos=[];$('cameraPhoto').value='';$('photoPreview').textContent='No photos selected.';await load();msg('formMsg','Visit #'+v.id+' submitted successfully. Dashboard refreshed.',true);$('retailer').focus()}catch(e){msg('formMsg',e.message)}finally{if(btn){btn.disabled=false;btn.textContent='Submit Visit'}}};
+$('form').onsubmit=async e=>{e.preventDefault();let r=master.find(x=>x.name===$('retailer').value.trim());if(!r)return msg('formMsg','Select an exact retailer from your assigned list.');let btn=$('form').querySelector('button[type="submit"],button.primary');try{if(btn){btn.disabled=true;btn.textContent='Getting GPS...'}let hasGPS=await refreshGPS();if(!hasGPS)throw Error('GPS location is required. Please allow location access and try again.');if(btn)btn.textContent='Submitting...';let v=await api('/visits',{method:'POST',body:JSON.stringify({retailer:r.name,market:$('market').value.trim(),visit_date:$('date').value,feedback:$('feedback').value.trim(),suggestions:$('suggestions').value.trim(),latitude:gps.latitude,longitude:gps.longitude,gps_accuracy:gps.accuracy})});let fs=[...selectedPhotos];if(fs.length){if(btn)btn.textContent='Geotagging & uploading photos...';let fd=new FormData();for(let f of fs){let compressed=await compressImage(f);fd.append('files',compressed,compressed.name||'stock.jpg')}let pr=await sessionFetch('/visits/'+v.id+'/photos',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});if(!pr.ok){let d={};try{d=await pr.json()}catch{}throw Error(d.detail||'Visit saved, but photo upload failed.')}}msg('formMsg','Visit #'+v.id+' submitted with '+fs.length+' geotagged stock photo(s). Refreshing dashboard...',true);$('feedback').value='';$('suggestions').value='';selectedPhotos=[];$('cameraPhoto').value='';$('photoPreview').textContent='No photos selected.';await load();msg('formMsg','Visit #'+v.id+' submitted successfully. Dashboard refreshed.',true);$('retailer').focus()}catch(e){msg('formMsg',e.message)}finally{if(btn){btn.disabled=false;btn.textContent='Submit Visit'}}};
 $('group').onchange=()=>coverage().catch(e=>msg('authMsg',e.message));
 $('pinLogin').onclick=pinLogin;$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')pinLogin()});$('legacyToggle').onclick=()=>$('legacyLogin').classList.toggle('hidden');$('welcomeClose').onclick=closeWelcome;$('login').onclick=login;$('logout').onclick=logout;$('refresh').onclick=()=>load().catch(e=>msg('authMsg',e.message));$('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').onclick=()=>{$('search').value='';$('from').value='';$('to').value='';visits()};$('healthApply').onclick=health;$('healthClear').onclick=()=>{$('healthZone').value='';$('priority').value='';$('healthSearch').value='';health()};$('refreshHealth').onclick=health;
-$('export').onclick=async()=>{try{let p=new URLSearchParams();if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let r=await fetch('/visits/export.csv?'+p,{headers:{Authorization:'Bearer '+token}});if(!r.ok)throw Error('Export failed');let b=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market-visits.csv';a.click()}catch(e){msg('authMsg',e.message)}};
+$('export').onclick=async()=>{try{let p=new URLSearchParams();if($('from').value)p.set('date_from',$('from').value);if($('to').value)p.set('date_to',$('to').value);let r=await sessionFetch('/visits/export.csv?'+p,{headers:{Authorization:'Bearer '+token}});if(!r.ok)throw Error('Export failed');let b=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market-visits.csv';a.click()}catch(e){msg('authMsg',e.message)}};
 document.querySelectorAll('.sideBtn[data-target],.viewAll[data-target]').forEach(el=>el.addEventListener('click',()=>{let t=$(el.dataset.target);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.sideBtn[data-target]').forEach(b=>b.classList.remove('active'));if(el.classList.contains('sideBtn'))el.classList.add('active')}));$('sideLogout').onclick=logout;$('date').value=new Date().toISOString().slice(0,10);
 $('visitPhotoClose').onclick=closeVisitPhotos;
 $('visitPhotoModal').onclick=e=>{if(e.target===$('visitPhotoModal'))closeVisitPhotos()};
