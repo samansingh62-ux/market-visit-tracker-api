@@ -344,6 +344,86 @@ def delete_visit(visit_id: int):
     return None
 
 
+@app.get("/exports/all-data.xlsx")
+def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
+    scope = _scope(user)
+    perf = performance_dashboard(user)
+    visits = crud.list_visits(
+        tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), limit=10000
+    )
+
+    wb = Workbook()
+    wb.remove(wb.active)
+    header_fill = PatternFill("solid", fgColor="DCEBFF")
+    header_font = Font(bold=True, color="17365D")
+
+    def finish(ws):
+        ws.freeze_panes = "A2"
+        ws.auto_filter.ref = ws.dimensions
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center")
+        for col in ws.columns:
+            letter = col[0].column_letter
+            width = max(12, min(36, max(len(str(x.value or "")) for x in col) + 2))
+            ws.column_dimensions[letter].width = width
+
+    ws = wb.create_sheet("Summary")
+    ws.append(["Metric", "Value"])
+    summary = perf.get("summary", {})
+    rows = [
+        ("User", user.get("name", "Manager")),
+        ("Role", user.get("role", "MANAGER")),
+        ("Month", perf.get("period", {}).get("month")),
+        ("Retailers", summary.get("retailers", 0)),
+        ("Target", summary.get("target", 0)),
+        ("MTD Sales", summary.get("sales", 0)),
+        ("Achievement %", summary.get("achievement_pct", 0)),
+        ("Gap", summary.get("gap", 0)),
+        ("Required / Day", summary.get("required_per_day", 0)),
+        ("Stock", summary.get("stock", 0)),
+        ("Productive Retailers", summary.get("productive_retailers", 0)),
+        ("Zero Sales Retailers", summary.get("zero_sales_retailers", 0)),
+        ("Visits", len(visits)),
+        ("Scope", "Full Zone A" if user.get("role") == "MANAGER" else f"{user.get('role')} hierarchy only"),
+    ]
+    for row in rows:
+        ws.append(row)
+    finish(ws)
+
+    ws = wb.create_sheet("Retailer Performance")
+    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Last Visit","Days Since Visit","Visit Count","Status"])
+    for x in perf.get("retailers", []):
+        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
+    finish(ws)
+
+    ws = wb.create_sheet("Visit History")
+    ws.append(["Visit ID","Visit Date","Retailer","Market","TL","SS","RDS","Submitted By","Role","Latitude","Longitude","GPS Accuracy","Photos","Feedback","Suggestions","Created At"])
+    for x in visits:
+        ws.append([x.get("id"),x.get("visit_date"),x.get("retailer"),x.get("market"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("submitted_by"),x.get("submitted_role"),x.get("latitude"),x.get("longitude"),x.get("gps_accuracy"),x.get("photo_count"),x.get("feedback"),x.get("suggestions"),x.get("created_at")])
+    finish(ws)
+
+    for key, title in (("tl","TL Summary"),("ss","SS Summary"),("rds","RDS Summary")):
+        ws = wb.create_sheet(title)
+        ws.append(["Name","Retailers","Target","MTD Sales","Achievement %","Gap","Stock"])
+        for x in perf.get("hierarchy", {}).get(key, []):
+            ws.append([x.get("name"),x.get("retailers"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("stock")])
+        finish(ws)
+
+    out = io.BytesIO()
+    wb.save(out)
+    out.seek(0)
+    role = str(user.get("role") or "MANAGER").lower()
+    name = "".join(ch for ch in str(user.get("name") or "Manager") if ch.isalnum() or ch in "-_") or "Manager"
+    filename = f"market-visit-tracker-{role}-{name}-{date.today().isoformat()}.xlsx"
+    return StreamingResponse(
+        out,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @app.get("/visits/export.csv")
 def export_visits_csv(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
                       date_from: Optional[str] = None, date_to: Optional[str] = None,
