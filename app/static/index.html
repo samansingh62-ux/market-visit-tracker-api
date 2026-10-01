@@ -272,6 +272,60 @@ button{min-height:44px}
 .modelHighlight h4{margin:5px 0 8px;font-size:18px}.modelHighlight .big{font-size:24px;font-weight:900}
 .modelProgress{height:8px;background:#efede8;border-radius:99px;overflow:hidden;margin:10px 0}.modelProgress i{display:block;height:100%;background:#2f7dd3;border-radius:99px}
 @media(max-width:700px){.trendGrid{grid-template-columns:1fr 1fr}.modelCards{grid-template-columns:1fr}.trendBars{height:220px}}
+
+/* BLUE_OUTLINE_SHADOW_V1 */
+.perfTabs{
+  gap:10px;
+  border-bottom:0;
+  padding-bottom:6px;
+}
+.perfTab{
+  border:1px solid #c9ddfb;
+  border-radius:10px;
+  padding:10px 14px;
+  background:#ffffff;
+  box-shadow:0 4px 12px rgba(47,125,211,.10);
+  color:#5f6f86;
+}
+.perfTab:hover{
+  border-color:#8fb8f3;
+  box-shadow:0 6px 16px rgba(47,125,211,.14);
+}
+.perfTab.active{
+  color:#1f5fae;
+  background:#f5f9ff;
+  border:1.5px solid #2f7dd3;
+  box-shadow:0 6px 18px rgba(47,125,211,.18);
+}
+
+#performanceDashboard .perfPanel,
+#performanceDashboard .perfKpi,
+#fieldProfileCard,
+#visitMetrics .metric,
+#visitWorkGrid > .card,
+#dashboardHome > .panelGrid .panel,
+#dashboardHome > .kpiGrid .kpiCard,
+#myTargetPanel,
+#todayPriorities{
+  border:1px solid #c9ddfb !important;
+  box-shadow:0 6px 18px rgba(47,125,211,.10) !important;
+}
+
+#performanceDashboard .perfPanel:hover,
+#fieldProfileCard:hover,
+#visitMetrics .metric:hover,
+#visitWorkGrid > .card:hover,
+#dashboardHome > .panelGrid .panel:hover{
+  border-color:#9fc2f4 !important;
+  box-shadow:0 8px 22px rgba(47,125,211,.14) !important;
+}
+
+@media(max-width:700px){
+  .perfTab{
+    padding:9px 11px;
+    border-radius:9px;
+  }
+}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA • GTM</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
