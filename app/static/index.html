@@ -344,12 +344,10 @@ button{min-height:44px}
 <div class="dashTitle"><div><h2>Dashboard</h2><p>Overview of your market coverage and field activity.</p></div><div class="dashboardTools"><select id="dashboardPeriod"><option>This Month</option><option>Last 30 Days</option><option>All Time</option></select><div id="profileTop" class="profileTop"><div class="avatar" id="avatarInitials">—</div><div><div class="profileName" id="topUserName">—</div><div class="profileRole" id="topUserRole">—</div></div></div></div></div>
 <div id="performanceDashboard" class="perfShell">
   <div class="perfTabs">
-    <button class="perfTab active" data-perf-tab="retailers">Retailer Wise Status</button>
-    <button class="perfTab" data-perf-tab="day">Day by Day</button>
-    <button class="perfTab" data-perf-tab="models">Model Performance</button>
-    <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
+    <button class="perfTab active" data-perf-tab="visits">Visit Status</button>
+    <button class="perfTab" data-perf-tab="retailers">Retailer Wise Status</button>
     <button class="perfTab" data-perf-tab="stock">Stock & DOS</button>
-    <button class="perfTab" data-perf-tab="visits">Visit Status</button>
+    <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
   </div>
   <div class="perfFilterBar">
     <label>Search Retailer<input id="perfSearch" placeholder="Retailer name"></label>
@@ -366,7 +364,7 @@ button{min-height:44px}
     <div class="perfKpi"><span>Retailers in View</span><b id="perfRetailers">—</b></div>
   </div>
 
-  <div id="perfRetailerView" class="perfView perfPanel">
+  <div id="perfRetailerView" class="perfView hidden perfPanel">
     <h3>Retailer wise performance</h3>
     <div class="perfSub">Live sales, target achievement, stock cover and visit status for your assigned hierarchy.</div>
     <div class="wrap"><table class="perfTable"><thead><tr>
@@ -414,7 +412,7 @@ button{min-height:44px}
     <div class="wrap"><table class="perfTable"><thead><tr><th>Retailer</th><th>Sales</th><th>Avg/Day</th><th>Stock</th><th>DOS</th><th>Signal</th></tr></thead><tbody id="perfStockRows"></tbody></table></div>
   </div>
 
-  <div id="perfVisitsView" class="perfView hidden perfPanel">
+  <div id="perfVisitsView" class="perfView hidden perfPanel" style="display:none!important">
     <h3>Visit Status</h3>
     <div class="perfSub">Retailer recency and field coverage within the logged-in hierarchy.</div>
     <div class="wrap"><table class="perfTable"><thead><tr><th>Retailer</th><th>Last Visit</th><th>Days Since</th><th>Visits</th><th>Sales</th><th>Status</th></tr></thead><tbody id="perfVisitRows"></tbody></table></div>
@@ -453,9 +451,9 @@ button{min-height:44px}
 </div>
 </div>
 <section id="profileSection" class="profileCard"></section>
-<section class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
-<div class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
-<div class="grid" style="margin-top:17px">
+<section id="fieldProfileCard" class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
+<div id="visitMetrics" class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
+<div id="visitWorkGrid" class="grid" style="margin-top:17px">
 <section id="visitEntry" class="card"><h2>Log Market Visit</h2><form id="form"><label>Retailer<input id="retailer" list="retailers" placeholder="Search retailer..." required></label><datalist id="retailers"></datalist><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
 <div class="photoActions">
 <label class="photoAction">📷 Take Photo<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label>
@@ -560,6 +558,7 @@ function requestGPS(){if(!navigator.geolocation){$('gpsStatus').textContent='�
 async function refreshGPS(){return requestGPS()}
 async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$('authPanel').classList.add('hidden');$('app').classList.remove('hidden');$('topUserName').textContent=user.name||'User';$('topUserRole').textContent=user.role||'';$('avatarInitials').textContent=(user.name||'U').split(/\\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();$('userMeta').innerHTML=`<b>${esc(user.name)}</b> · ${esc(user.role)} &nbsp; <span class="muted">Retailers are automatically restricted to your assigned ${esc(user.role)} hierarchy.</span>`;
   requestGPS().catch(e=>console.warn('GPS:',e));
+  setPerfTabLayout('visits');
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
 function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
@@ -955,16 +954,43 @@ async function toggleAdminUser(id,active){
   }catch(e){msg('adminMsg',e.message)}
 }
 
+function setPerfTabLayout(tab){
+  const isVisit=tab==='visits';
+  const filter=$('performanceDashboard').querySelector('.perfFilterBar');
+  const kpis=$('performanceDashboard').querySelector('.perfKpis');
+  if(filter)filter.classList.toggle('hidden',isVisit);
+  if(kpis)kpis.classList.toggle('hidden',isVisit);
+
+  const mainKpis=document.querySelector('#dashboardHome > .kpiGrid');
+  const mainPanels=document.querySelector('#dashboardHome > .panelGrid');
+  if(mainKpis)mainKpis.classList.toggle('hidden',isVisit);
+  if(mainPanels)mainPanels.classList.toggle('hidden',isVisit);
+  if($('myTargetPanel'))$('myTargetPanel').classList.toggle('hidden',isVisit || !['TL','SS'].includes(user?.role));
+  if($('todayPriorities'))$('todayPriorities').classList.toggle('hidden',isVisit);
+
+  ['fieldProfileCard','visitMetrics','visitWorkGrid'].forEach(id=>{
+    const el=$(id); if(el)el.classList.toggle('hidden',!isVisit);
+  });
+
+  if(!isVisit){
+    $('perfRetailerView').classList.toggle('hidden',tab!=='retailers');
+    $('perfStockView').classList.toggle('hidden',tab!=='stock');
+    $('perfHierarchyView').classList.toggle('hidden',tab!=='hierarchy');
+  }else{
+    $('perfRetailerView').classList.add('hidden');
+    $('perfStockView').classList.add('hidden');
+    $('perfHierarchyView').classList.add('hidden');
+  }
+
+  // Day-by-day and model views remain available in code but are intentionally not shown in the UI.
+  if($('perfDayView'))$('perfDayView').classList.add('hidden');
+  if($('perfModelsView'))$('perfModelsView').classList.add('hidden');
+}
+
 document.querySelectorAll('.perfTab').forEach(btn=>btn.onclick=()=>{
   document.querySelectorAll('.perfTab').forEach(x=>x.classList.remove('active'));
   btn.classList.add('active');
-  let tab=btn.dataset.perfTab;
-  $('perfRetailerView').classList.toggle('hidden',tab!=='retailers');
-  $('perfDayView').classList.toggle('hidden',tab!=='day');
-  $('perfModelsView').classList.toggle('hidden',tab!=='models');
-  $('perfHierarchyView').classList.toggle('hidden',tab!=='hierarchy');
-  $('perfStockView').classList.toggle('hidden',tab!=='stock');
-  $('perfVisitsView').classList.toggle('hidden',tab!=='visits');
+  setPerfTabLayout(btn.dataset.perfTab);
 });
 $('perfSearch').oninput=renderPerfTables;
 $('perfStatusFilter').onchange=renderPerfTables;
