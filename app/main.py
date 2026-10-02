@@ -42,6 +42,67 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False,
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
+FESTIVE_SCHEME_START = date(2026, 10, 5)
+FESTIVE_SCHEME_END = date(2026, 10, 20)
+
+def _festive_scheme_payout(club_value, scheme_sales):
+    """Provisional Oct-2026 festive booster payout from eligible sales buckets."""
+    club_text = str(club_value or "").strip()
+    if not club_text:
+        return {
+            "scheme_type": "Unclassified",
+            "slab": None,
+            "eligible_units": 0,
+            "payout": None,
+            "unknown_price_units": int((scheme_sales or {}).get("unknown_price_units") or 0),
+            "segments": (scheme_sales or {}).get("segments") or {},
+        }
+
+    is_non_club = club_text.lower() == "non-club"
+    units = int((scheme_sales or {}).get("eligible_units") or 0)
+    segments = (scheme_sales or {}).get("segments") or {}
+    unknown_price_units = int((scheme_sales or {}).get("unknown_price_units") or 0)
+
+    if is_non_club:
+        scheme_type = "NPO / Non-Club"
+        if 2 <= units <= 4:
+            slab, rates = "2-4 Units", [200, 300, 400, 500]
+        elif 5 <= units <= 9:
+            slab, rates = "5-9 Units", [300, 400, 500, 600]
+        elif 10 <= units <= 14:
+            slab, rates = "10-14 Units", [500, 600, 700, 800]
+        elif units >= 15:
+            slab, rates = "15 Units & Above", [600, 700, 800, 900]
+        else:
+            slab, rates = None, [0, 0, 0, 0]
+    else:
+        scheme_type = "Club / PO"
+        if 5 <= units <= 9:
+            slab, rates = "5-9 Units", [100, 200, 300, 400]
+        elif 10 <= units <= 15:
+            slab, rates = "10-15 Units", [200, 300, 400, 500]
+        elif 16 <= units <= 20:
+            slab, rates = "16-20 Units", [300, 400, 500, 600]
+        elif 21 <= units <= 29:
+            slab, rates = "21-29 Units", [400, 500, 600, 700]
+        elif units >= 30:
+            slab, rates = "30 Units & Above", [500, 600, 700, 800]
+        else:
+            slab, rates = None, [0, 0, 0, 0]
+
+    keys = ["15K-25K", "25K-35K", "35K-50K", "50K+"]
+    payout = sum(int(segments.get(k) or 0) * rate for k, rate in zip(keys, rates))
+
+    return {
+        "scheme_type": scheme_type,
+        "slab": slab,
+        "eligible_units": units,
+        "payout": payout,
+        "unknown_price_units": unknown_price_units,
+        "segments": {k: int(segments.get(k) or 0) for k in keys},
+    }
+
+
 @app.on_event("startup")
 def on_startup():
     database.init_db()
@@ -687,14 +748,26 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
                 params=params,
                 headers=headers,
             )
+            scheme_response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-festive-sales",
+                headers=headers,
+            )
         response.raise_for_status()
+        scheme_response.raise_for_status()
         live_rows = (response.json() or {}).get("retailers") or []
+        scheme_payload = scheme_response.json() or {}
+        scheme_rows = scheme_payload.get("retailers") or []
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Live performance data unavailable: {exc}") from exc
 
     live_by_code = {
         str(x.get("retailer_code") or "").strip().upper(): x
         for x in live_rows if x.get("retailer_code")
+    }
+
+    scheme_by_code = {
+        str(x.get("retailer_code") or "").strip().upper(): x
+        for x in scheme_rows if x.get("retailer_code")
     }
 
     month_days = calendar.monthrange(today.year, today.month)[1]
@@ -708,6 +781,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         avg_daily = float(live.get("avg_daily_sales") or 0)
         dos = live.get("dos")
         target = int(row.get("target_volume") or 0)
+        scheme = _festive_scheme_payout(row.get("club"), scheme_by_code.get(code, {}))
         gap = max(target - sales, 0)
         ach = round((sales / target) * 100, 1) if target > 0 else 0
         req = round(gap / days_remaining, 1) if target > 0 else 0
@@ -750,6 +824,12 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "days_since_visit": days_since,
             "visit_count": int(row.get("visit_count") or 0),
             "status": status,
+            "scheme_type": scheme.get("scheme_type"),
+            "scheme_slab": scheme.get("slab"),
+            "scheme_eligible_units": scheme.get("eligible_units"),
+            "scheme_payout": scheme.get("payout"),
+            "scheme_unknown_price_units": scheme.get("unknown_price_units"),
+            "scheme_segments": scheme.get("segments"),
         })
 
     total_target = sum(x["target"] for x in retailer_rows)
@@ -758,6 +838,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     total_gap = max(total_target - total_sales, 0)
     total_ach = round((total_sales / total_target) * 100, 1) if total_target > 0 else 0
     active_sales = [x for x in retailer_rows if x["sales"] > 0]
+    total_scheme_payout = sum(int(x.get("scheme_payout") or 0) for x in retailer_rows)
+    total_scheme_units = sum(int(x.get("scheme_eligible_units") or 0) for x in retailer_rows)
 
     hierarchy = {}
     for field in ("tl", "ss", "rds"):
@@ -802,6 +884,15 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "stock": total_stock,
             "productive_retailers": len(active_sales),
             "zero_sales_retailers": len(retailer_rows) - len(active_sales),
+            "scheme_payout": total_scheme_payout,
+            "scheme_eligible_units": total_scheme_units,
+        },
+        "scheme": {
+            "name": "Festive Booster Scheme - October 2026",
+            "start": FESTIVE_SCHEME_START.isoformat(),
+            "end": FESTIVE_SCHEME_END.isoformat(),
+            "provisional": True,
+            "eligibility_note": "Provisional sales-based payout. Final payout remains subject to upload, activation, pre-activation, MOP and infiltration conditions.",
         },
         "hierarchy": hierarchy,
         "retailers": retailer_rows,
