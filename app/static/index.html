@@ -326,6 +326,12 @@ button{min-height:44px}
     border-radius:9px;
   }
 }
+
+.schemeBanner{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#f7fbff;border:1px solid #b8d5fa;border-radius:12px;padding:12px 14px;margin:0 0 14px;box-shadow:0 4px 12px rgba(47,125,211,.08)}
+.schemeBannerTitle{font-weight:900;color:#244f86;font-size:13px}
+.schemeBannerMeta{font-size:11px;color:#667085;margin-top:3px}
+.schemeBannerValue{text-align:right;white-space:nowrap}.schemeBannerValue b{display:block;font-size:20px;color:#0f5cab}.schemeBannerValue span{font-size:10px;color:#667085}
+@media(max-width:700px){.schemeBanner{align-items:flex-start;flex-direction:column}.schemeBannerValue{text-align:left}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA ZONE A</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -420,10 +426,17 @@ button{min-height:44px}
 
   <div id="perfRetailerView" class="perfView hidden perfPanel">
     <h3>Retailer wise performance</h3>
-    <div class="perfSub">Live sales, target achievement, stock cover and visit status for your assigned hierarchy.</div>
+    <div class="perfSub">Live sales, target achievement, stock cover, visit status and provisional festive scheme payout for your assigned hierarchy.</div>
+    <div class="schemeBanner">
+      <div>
+        <div class="schemeBannerTitle">Festive Booster Scheme · 5–20 October 2026</div>
+        <div class="schemeBannerMeta">Provisional payout based on eligible sales. Final payout remains subject to scheme eligibility and compliance conditions.</div>
+      </div>
+      <div class="schemeBannerValue"><b id="perfSchemePayout">₹0</b><span><span id="perfSchemeUnits">0</span> eligible units</span></div>
+    </div>
     <div class="wrap"><table class="perfTable"><thead><tr>
-      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>Sales</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Last Visit</th><th>Status</th>
-    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="13">Loading…</td></tr></tbody></table></div>
+      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>Sales</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Scheme</th><th>Slab</th><th>Payout</th><th>Last Visit</th><th>Status</th>
+    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="16">Loading…</td></tr></tbody></table></div>
   </div>
 
   <div id="perfDayView" class="perfView hidden">
@@ -619,6 +632,8 @@ function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorag
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
+function inr(n){return '₹'+Math.round(Number(n||0)).toLocaleString('en-IN')}
+
 function perfStatusClass(s){
   if(s==='On Track')return 'track';
   if(s==='Behind')return 'behind';
@@ -651,6 +666,10 @@ function renderPerfTables(){
   $('perfGap').textContent=Math.round(gap).toLocaleString();
   $('perfReq').textContent=Math.round(gap/days).toLocaleString();
   $('perfRetailers').textContent=rows.length;
+  let schemePayout=rows.reduce((a,r)=>a+Number(r.scheme_payout||0),0);
+  let schemeUnits=rows.reduce((a,r)=>a+Number(r.scheme_eligible_units||0),0);
+  if($('perfSchemePayout'))$('perfSchemePayout').textContent=inr(schemePayout);
+  if($('perfSchemeUnits'))$('perfSchemeUnits').textContent=Math.round(schemeUnits).toLocaleString('en-IN');
 
   $('perfRetailerRows').innerHTML=rows.length?rows.map(r=>{
     let ach=Math.round(Number(r.achievement_pct||0));
@@ -661,10 +680,11 @@ function renderPerfTables(){
       <td class="perfAch">${ach}%<div class="perfBar"><i style="width:${Math.min(100,ach)}%"></i></div></td>
       <td>${Math.round(Number(r.gap||0))}</td><td>${Math.round(Number(r.required_per_day||0))}</td>
       <td>${Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
+      <td>${esc(r.scheme_type||'—')}</td><td>${esc(r.scheme_slab||'Not qualified')}</td><td><b>${r.scheme_payout==null?'—':inr(r.scheme_payout)}</b></td>
       <td>${esc(r.last_visit||'Never')}</td>
       <td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="13">No retailers match the selected filters.</td></tr>';
+  }).join(''):'<tr><td colspan="16">No retailers match the selected filters.</td></tr>';
 
   $('perfRetailerRows').querySelectorAll('tr[data-code]').forEach(tr=>tr.onclick=()=>{
     let r=master.find(x=>String(x.code||'').toUpperCase()===String(tr.dataset.code||'').toUpperCase());
