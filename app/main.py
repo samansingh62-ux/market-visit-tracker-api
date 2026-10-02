@@ -447,6 +447,8 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
         ("Productive Retailers", summary.get("productive_retailers", 0)),
         ("Zero Sales Retailers", summary.get("zero_sales_retailers", 0)),
         ("Visits", len(visits)),
+        ("Festive Scheme Eligible Units", summary.get("scheme_eligible_units", 0)),
+        ("Festive Scheme Provisional Payout", summary.get("scheme_payout", 0)),
         ("Scope", "Full Zone A" if user.get("role") == "MANAGER" else f"{user.get('role')} hierarchy only"),
     ]
     for row in rows:
@@ -454,9 +456,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
     finish(ws)
 
     ws = wb.create_sheet("Retailer Performance")
-    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Last Visit","Days Since Visit","Visit Count","Status"])
+    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Scheme Type","Scheme Slab","Scheme Eligible Units","Provisional Payout","Unknown Price Units","Last Visit","Days Since Visit","Visit Count","Status"])
     for x in perf.get("retailers", []):
-        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
+        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("scheme_unknown_price_units"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
     finish(ws)
 
     ws = wb.create_sheet("Visit History")
