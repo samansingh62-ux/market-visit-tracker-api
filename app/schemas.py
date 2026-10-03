@@ -45,6 +45,8 @@ class RetailerOut(BaseModel):
     zone: str
     club: str
     status: str
+    town_name: Optional[str] = None
+    district_name: Optional[str] = None
 
 
 class CoverageRow(BaseModel):
@@ -111,6 +113,8 @@ class RetailerHealthOut(BaseModel):
     zone: str
     club: str
     status: str
+    town_name: Optional[str] = None
+    district_name: Optional[str] = None
     visit_count: int
     last_visit: Optional[str] = None
     days_since_visit: Optional[int] = None
