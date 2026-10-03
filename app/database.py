@@ -10,6 +10,7 @@ APP_DIR = Path(__file__).resolve().parent
 DATABASE_URL = os.environ.get("DATABASE_URL")
 RETAILERS_SEED_PATH = APP_DIR / "retailers_seed.json"
 RETAILER_TARGETS_SEP26_PATH = APP_DIR / "retailer_targets_2026-09.json"
+RETAILER_LOCATION_SEED_GLOB = "retailer_locations_*.json"
 
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL environment variable is not set")
@@ -158,6 +159,33 @@ def init_db():
                          %(zone)s, %(club)s, %(status)s)
                     ON CONFLICT (code) DO NOTHING
                 """, seed)
+
+        # Apply retailer town/district seed from the September 2026 alignment master.
+        # Only matching retailer codes are updated; unmatched retailers remain blank until
+        # a newer alignment master provides their location.
+        location_rows = []
+        for path in sorted(APP_DIR.glob(RETAILER_LOCATION_SEED_GLOB)):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    rows_in_file = json.load(f)
+                for row in rows_in_file:
+                    if isinstance(row, list) and len(row) >= 3 and row[0]:
+                        location_rows.append({
+                            "code": str(row[0]).strip().upper(),
+                            "town_name": str(row[1] or "").strip(),
+                            "district_name": str(row[2] or "").strip(),
+                        })
+            except Exception:
+                continue
+
+        if location_rows:
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    UPDATE retailers
+                    SET town_name = %(town_name)s,
+                        district_name = %(district_name)s
+                    WHERE UPPER(code) = UPPER(%(code)s)
+                """, location_rows)
 
         # User identity/hierarchy master. Credentials are only populated by admin provisioning.
         rows = conn.execute("""
