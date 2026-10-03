@@ -548,6 +548,11 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
         ("Visits", len(visits)),
         ("Festive Scheme Eligible Units", summary.get("scheme_eligible_units", 0)),
         ("Festive Scheme Provisional Payout", summary.get("scheme_payout", 0)),
+        ("Focus Model Provisional Payout", summary.get("focus_scheme_payout", 0)),
+        ("V80 Normal Sales Provisional Payout", summary.get("v80_normal_sales_payout", 0)),
+        ("V80 Maximum Conditional Payout", summary.get("v80_max_total_payout", 0)),
+        ("Back Support Base Margin", summary.get("back_support_base_margin", 0)),
+        ("Back Support Known Payable", summary.get("back_support_payable_known", 0)),
         ("Scope", "Full Zone A" if user.get("role") == "MANAGER" else f"{user.get('role')} hierarchy only"),
     ]
     for row in rows:
@@ -555,9 +560,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
     finish(ws)
 
     ws = wb.create_sheet("Retailer Performance")
-    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Scheme Type","Scheme Slab","Scheme Eligible Units","Provisional Payout","Unknown Price Units","Last Visit","Days Since Visit","Visit Count","Status"])
+    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Festive Type","Festive Slab","Festive Eligible Units","Festive Payout","Focus Eligible Units","Focus Payout","V80 Units","V80 Slab","V80 Normal Payout","V80 Max Conditional Payout","Back Support Base Margin","Back Support Payable","Back Support Achievement %","Back Support Eligibility","Last Visit","Days Since Visit","Visit Count","Status"])
     for x in perf.get("retailers", []):
-        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("scheme_unknown_price_units"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
+        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("focus_scheme_units"),x.get("focus_scheme_payout"),x.get("v80_units"),x.get("v80_slab"),x.get("v80_normal_sales_payout"),x.get("v80_max_total_payout"),x.get("back_support_base_margin"),x.get("back_support_payable"),x.get("back_support_achievement_pct"),x.get("back_support_eligibility"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
     finish(ws)
 
     ws = wb.create_sheet("Visit History")
@@ -568,9 +573,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
 
     for key, title in (("tl","TL Summary"),("ss","SS Summary"),("rds","RDS Summary")):
         ws = wb.create_sheet(title)
-        ws.append(["Name","Retailers","Target","MTD Sales","Achievement %","Gap","Stock"])
+        ws.append(["Name","Retailers","Target","MTD Sales","Achievement %","Gap","Stock","Festive Payout","Focus Payout","V80 Normal Payout","Back Support Known","Total Known Payout"])
         for x in perf.get("hierarchy", {}).get(key, []):
-            ws.append([x.get("name"),x.get("retailers"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("stock")])
+            ws.append([x.get("name"),x.get("retailers"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("stock"),x.get("festive_payout"),x.get("focus_payout"),x.get("v80_normal_payout"),x.get("back_support_known"),x.get("total_known_payout")])
         finish(ws)
 
     out = io.BytesIO()
