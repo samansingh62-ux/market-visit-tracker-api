@@ -853,11 +853,17 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
                 f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-festive-sales",
                 headers=headers,
             )
+            additional_response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-additional-sales",
+                headers=headers,
+            )
         response.raise_for_status()
         scheme_response.raise_for_status()
+        additional_response.raise_for_status()
         live_rows = (response.json() or {}).get("retailers") or []
         scheme_payload = scheme_response.json() or {}
         scheme_rows = scheme_payload.get("retailers") or []
+        additional_payload = additional_response.json() or {}
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Live performance data unavailable: {exc}") from exc
 
@@ -869,6 +875,22 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     scheme_by_code = {
         str(x.get("retailer_code") or "").strip().upper(): x
         for x in scheme_rows if x.get("retailer_code")
+    }
+
+    focus_by_code = {
+        str(x.get("retailer_code") or "").strip().upper(): x
+        for x in ((additional_payload.get("focus_model") or {}).get("retailers") or [])
+        if x.get("retailer_code")
+    }
+    v80_by_code = {
+        str(x.get("retailer_code") or "").strip().upper(): x
+        for x in ((additional_payload.get("v80_npl") or {}).get("retailers") or [])
+        if x.get("retailer_code")
+    }
+    back_by_code = {
+        str(x.get("retailer_code") or "").strip().upper(): x
+        for x in ((additional_payload.get("back_support") or {}).get("retailers") or [])
+        if x.get("retailer_code")
     }
 
     month_days = calendar.monthrange(today.year, today.month)[1]
@@ -883,6 +905,9 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         dos = live.get("dos")
         target = int(row.get("target_volume") or 0)
         scheme = _festive_scheme_payout(row.get("club"), scheme_by_code.get(code, {}))
+        focus_scheme = _focus_model_payout(focus_by_code.get(code, {}))
+        v80_scheme = _v80_npl_payout(v80_by_code.get(code, {}))
+        back_support = _back_support_estimate(row.get("club"), row.get("target_value"), back_by_code.get(code, {}))
         gap = max(target - sales, 0)
         ach = round((sales / target) * 100, 1) if target > 0 else 0
         req = round(gap / days_remaining, 1) if target > 0 else 0
@@ -931,6 +956,18 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "scheme_payout": scheme.get("payout"),
             "scheme_unknown_price_units": scheme.get("unknown_price_units"),
             "scheme_segments": scheme.get("segments"),
+            "focus_scheme_units": focus_scheme.get("eligible_units"),
+            "focus_scheme_payout": focus_scheme.get("payout"),
+            "focus_scheme_detail": focus_scheme.get("detail"),
+            "v80_units": v80_scheme.get("units"),
+            "v80_slab": v80_scheme.get("slab"),
+            "v80_normal_sales_payout": v80_scheme.get("normal_sales_payout"),
+            "v80_max_total_payout": v80_scheme.get("max_total_payout"),
+            "back_support_base_margin": back_support.get("base_margin"),
+            "back_support_payable": back_support.get("provisional_payable"),
+            "back_support_achievement_pct": back_support.get("achievement_pct_value"),
+            "back_support_eligibility": back_support.get("eligibility"),
+            "back_support_unknown_value_units": back_support.get("unknown_value_units"),
         })
 
     total_target = sum(x["target"] for x in retailer_rows)
@@ -941,6 +978,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     active_sales = [x for x in retailer_rows if x["sales"] > 0]
     total_scheme_payout = sum(int(x.get("scheme_payout") or 0) for x in retailer_rows)
     total_scheme_units = sum(int(x.get("scheme_eligible_units") or 0) for x in retailer_rows)
+    total_focus_payout = sum(int(x.get("focus_scheme_payout") or 0) for x in retailer_rows)
+    total_v80_normal = sum(int(x.get("v80_normal_sales_payout") or 0) for x in retailer_rows)
+    total_v80_max = sum(int(x.get("v80_max_total_payout") or 0) for x in retailer_rows)
+    total_back_base = sum(int(x.get("back_support_base_margin") or 0) for x in retailer_rows)
+    total_back_payable = sum(int(x.get("back_support_payable") or 0) for x in retailer_rows if x.get("back_support_payable") is not None)
 
     hierarchy = {}
     for field in ("tl", "ss", "rds"):
@@ -987,6 +1029,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "zero_sales_retailers": len(retailer_rows) - len(active_sales),
             "scheme_payout": total_scheme_payout,
             "scheme_eligible_units": total_scheme_units,
+            "focus_scheme_payout": total_focus_payout,
+            "v80_normal_sales_payout": total_v80_normal,
+            "v80_max_total_payout": total_v80_max,
+            "back_support_base_margin": total_back_base,
+            "back_support_payable_known": total_back_payable,
         },
         "scheme": {
             "name": "Festive Booster Scheme - October 2026",
