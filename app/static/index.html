@@ -806,7 +806,7 @@ async function retailers(){master=await api('/retailers');renderRetailerMenu('')
 function renderRetailerMenu(query=''){
   let q=String(query||'').trim().toLowerCase();
   let rows=master.filter(r=>!q || String(r.name||'').toLowerCase().includes(q)).slice(0,150);
-  $('retailerMenu').innerHTML=rows.length?rows.map(r=>`<button type="button" class="retailerOption" data-retailer-code="${esc(r.code||'')}"><b>${esc(r.name||'')}</b><small>${esc(r.tl||'—')} · ${esc(r.rds||'—')} · ${esc(r.club||'—')}</small></button>`).join(''):'<div class="retailerEmpty">No matching retailer found.</div>';
+  $('retailerMenu').innerHTML=rows.length?rows.map(r=>`<button type="button" class="retailerOption" data-retailer-code="${esc(r.code||'')}"><b>${esc(r.name||'')}</b><small>${esc(r.town_name||'—')} · ${esc(r.district_name||'—')} · ${esc(r.tl||'—')} · ${esc(r.rds||'—')} · ${esc(r.club||'—')}</small></button>`).join(''):'<div class="retailerEmpty">No matching retailer found.</div>';
   $('retailerMenu').querySelectorAll('.retailerOption').forEach(btn=>btn.onclick=()=>{
     let r=master.find(x=>String(x.code||'')===String(btn.dataset.retailerCode||''));
     if(!r)return;
