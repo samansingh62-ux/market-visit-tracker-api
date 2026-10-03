@@ -708,7 +708,7 @@ function renderPerfTables(){
   let visitRows=[...rows].sort((a,b)=>(Number(b.days_since_visit??9999)-Number(a.days_since_visit??9999)));
   $('perfVisitRows').innerHTML=visitRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.last_visit||'Never')}</td><td>${r.days_since_visit==null?'—':r.days_since_visit}</td><td>${r.visit_count}</td><td>${r.sales}</td><td><span class="perfStatus ${r.days_since_visit==null||r.days_since_visit>14?'behind':'track'}">${r.days_since_visit==null?'Never Visited':r.days_since_visit>14?'Overdue':'Covered'}</span></td></tr>`).join('');
 
-  const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td></tr>`).join('')||'<tr><td colspan="4">No data</td></tr>'};
+  const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td><td><b>${inr(x.total_known_payout||0)}</b></td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'};
   renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
   renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
   renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);
