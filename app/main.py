@@ -64,6 +64,86 @@ BACK_SUPPORT_RATES = {
 FESTIVE_SCHEME_START = date(2026, 10, 5)
 FESTIVE_SCHEME_END = date(2026, 10, 20)
 
+def _rate_for_units(units, slabs):
+    for lo, hi, rate in slabs:
+        if units >= lo and (hi is None or units <= hi):
+            label = f"{lo}+" if hi is None else (f"{lo} Unit" if lo == hi == 1 else f"{lo}-{hi} Units")
+            return rate, label
+    return 0, None
+
+
+def _focus_model_payout(sales_row):
+    series = (sales_row or {}).get("series") or {}
+    detail, total, total_units = [], 0, 0
+    for name, slabs in FOCUS_MODEL_RATES.items():
+        units = int(series.get(name) or 0)
+        if units <= 0:
+            continue
+        rate, slab = _rate_for_units(units, slabs)
+        payout = units * rate
+        total += payout
+        total_units += units
+        detail.append({"series": name, "units": units, "slab": slab, "rate_per_unit": rate, "payout": payout})
+    return {"eligible_units": total_units, "payout": total, "detail": detail}
+
+
+def _v80_npl_payout(sales_row):
+    units = int((sales_row or {}).get("v80_units") or 0)
+    if units <= 0:
+        return {"units": 0, "slab": None, "normal_sales_payout": 0, "max_total_payout": 0}
+    if units == 1:
+        slab, normal, total = "1 Unit", 800, 1300
+    elif units <= 4:
+        slab, normal, total = "2-4 Units", 1000, 1600
+    elif units <= 8:
+        slab, normal, total = "5-8 Units", 1200, 1900
+    elif units <= 12:
+        slab, normal, total = "9-12 Units", 1500, 2300
+    else:
+        slab, normal, total = "13 Units & Above", 2000, 3000
+    return {
+        "units": units,
+        "slab": slab,
+        "normal_rate_per_unit": normal,
+        "total_rate_per_unit": total,
+        "normal_sales_payout": units * normal,
+        "max_total_payout": units * total,
+    }
+
+
+def _back_support_estimate(club_value, target_value, sales_row):
+    club = str(club_value or "Non-Club").strip()
+    rates = BACK_SUPPORT_RATES.get(club, [0.0,0.0,0.0,0.0])
+    buckets = (sales_row or {}).get("margin_buckets") or {}
+    keys = ["20K-25K","25K-30K","30K-50K","50K+"]
+    base_margin = sum(float(buckets.get(k) or 0) * rate for k, rate in zip(keys, rates))
+    non_t = float((sales_row or {}).get("non_t_value") or 0)
+    t_val = float((sales_row or {}).get("t_series_value") or 0)
+    counted_t = min(t_val, non_t / 9) if non_t > 0 else 0
+    counted_value = non_t + counted_t
+    target_value = float(target_value or 0)
+    ach_pct = round(counted_value * 100 / target_value, 1) if target_value > 0 else 0
+    if target_value <= 0:
+        eligibility, payable = "Target value unavailable", None
+    elif ach_pct >= 100:
+        eligibility, payable = "100%+ target achieved", round(base_margin)
+    elif ach_pct >= 90:
+        eligibility, payable = "90-99.9%: proration rule requires confirmation", None
+    else:
+        eligibility, payable = "Below 90% target achievement", 0
+    return {
+        "club": club,
+        "estimated_sales_value": round(float((sales_row or {}).get("sales_value_estimate") or 0)),
+        "counted_achievement_value": round(counted_value),
+        "achievement_pct_value": ach_pct,
+        "base_margin": round(base_margin),
+        "provisional_payable": payable,
+        "eligibility": eligibility,
+        "unknown_value_units": int((sales_row or {}).get("unknown_value_units") or 0),
+        "buckets": {k: round(float(buckets.get(k) or 0)) for k in keys},
+    }
+
+
 def _festive_scheme_payout(club_value, scheme_sales):
     """Provisional Oct-2026 festive booster payout from eligible sales buckets."""
     club_text = str(club_value or "").strip()
