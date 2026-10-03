@@ -43,6 +43,9 @@ def init_db():
             )
         """)
 
+        conn.execute("ALTER TABLE retailers ADD COLUMN IF NOT EXISTS town_name TEXT")
+        conn.execute("ALTER TABLE retailers ADD COLUMN IF NOT EXISTS district_name TEXT")
+
         conn.execute("""
             CREATE TABLE IF NOT EXISTS visits (
                 id BIGSERIAL PRIMARY KEY,
