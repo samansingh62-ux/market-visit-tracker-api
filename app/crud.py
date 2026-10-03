@@ -79,7 +79,7 @@ def get_performance_scope_rows(
     with database.get_conn() as conn:
         rows = conn.execute(f"""
             SELECT
-                r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club,
+                r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club, r.town_name, r.district_name,
                 COALESCE(t.target_volume, 0) AS target_volume,
                 COALESCE(t.target_value, 0) AS target_value,
                 v.last_visit,
