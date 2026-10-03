@@ -541,7 +541,7 @@ button{min-height:44px}
   </div>
   <div id="retailerMenu" class="retailerMenu hidden"></div>
 </div>
-</label><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
+</label><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Town / Market<input id="market" placeholder="Auto-filled from retailer master" required></label><label>District<input id="district" placeholder="Auto-filled from retailer master" readonly></label></div><div class="formgrid"><label>Visit Date<input id="date" type="date" required></label><div></div></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
 <div class="photoActions">
 <label class="photoAction">📷 Take Photo<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label>
 </div>
@@ -833,8 +833,9 @@ async function loadRetailer360(r){
     let d=await api('/retailers/'+encodeURIComponent(r.code)+'/360');
     let sales=d.sales||{},inv=d.inventory||{},perf=d.performance||{},mv=d.market_visit||{},target=d.target||{};
     let liveRetailer=d.retailer||{};
-    let marketLocation=liveRetailer.town_name||liveRetailer.city||liveRetailer.province||'';
+    let marketLocation=r.town_name||liveRetailer.town_name||liveRetailer.city||liveRetailer.province||'';
     if(marketLocation)$('market').value=marketLocation;
+    if(r.district_name)$('district').value=r.district_name;
     let allIntel=perf.model_intelligence||[];
     let priorityIntel=allIntel.filter(x=>['Out of Stock','Low Stock','High Stock'].includes(x.status));
     let activationIntel=allIntel.filter(x=>x.status==='No MTD Sell-out' && Number(x.stock||0)>=5);
@@ -886,7 +887,14 @@ $('retailerDropBtn').onclick=()=>{renderRetailerMenu('');$('retailerMenu').class
 $('retailer').addEventListener('blur',closeRetailerMenuLater);
 $('retailer').oninput=()=>{renderRetailerMenu($('retailer').value);$('retailerMenu').classList.remove('hidden');
   let r=master.find(x=>x.name===$('retailer').value.trim());
-  $('meta').innerHTML=r?`<b>TL:</b> ${esc(r.tl||'—')} &nbsp; <b>SS:</b> ${esc(r.ss||'—')} &nbsp; <b>RDS:</b> ${esc(r.rds||'—')} &nbsp; <b>Zone:</b> ${esc(r.zone||'—')} &nbsp; <b>Club:</b> ${esc(r.club||'—')}`:'Select a retailer from your assigned list.';
+  $('meta').innerHTML=r?`<b>TL:</b> ${esc(r.tl||'—')} &nbsp; <b>SS:</b> ${esc(r.ss||'—')} &nbsp; <b>RDS:</b> ${esc(r.rds||'—')} &nbsp; <b>Zone:</b> ${esc(r.zone||'—')} &nbsp; <b>Club:</b> ${esc(r.club||'—')} &nbsp; <b>Town:</b> ${esc(r.town_name||'—')} &nbsp; <b>District:</b> ${esc(r.district_name||'—')}`:'Select a retailer from your assigned list.';
+  if(r){
+    if(r.town_name)$('market').value=r.town_name;
+    $('district').value=r.district_name||'';
+  }else{
+    $('market').value='';
+    $('district').value='';
+  }
   clearTimeout(retailer360Timer);
   retailer360Timer=setTimeout(()=>loadRetailer360(r),350);
 }
