@@ -991,15 +991,23 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             name = item.get(field) or "Unassigned"
             g = groups.setdefault(name, {
                 "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
+                "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
+                "back_support_known": 0,
             })
             g["retailers"] += 1
             g["target"] += item["target"]
             g["sales"] += item["sales"]
             g["stock"] += item["stock"]
+            g["festive_payout"] += int(item.get("scheme_payout") or 0)
+            g["focus_payout"] += int(item.get("focus_scheme_payout") or 0)
+            g["v80_normal_payout"] += int(item.get("v80_normal_sales_payout") or 0)
+            if item.get("back_support_payable") is not None:
+                g["back_support_known"] += int(item.get("back_support_payable") or 0)
         out = []
         for g in groups.values():
             g["achievement_pct"] = round((g["sales"] / g["target"]) * 100, 1) if g["target"] > 0 else 0
             g["gap"] = max(g["target"] - g["sales"], 0)
+            g["total_known_payout"] = g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
             out.append(g)
         hierarchy[field] = sorted(out, key=lambda x: x["sales"], reverse=True)
 
