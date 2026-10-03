@@ -560,9 +560,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
     finish(ws)
 
     ws = wb.create_sheet("Retailer Performance")
-    ws.append(["Retailer Code","Retailer","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Festive Type","Festive Slab","Festive Eligible Units","Festive Payout","Focus Eligible Units","Focus Payout","V80 Units","V80 Slab","V80 Normal Payout","V80 Max Conditional Payout","Back Support Base Margin","Back Support Payable","Back Support Achievement %","Back Support Eligibility","Last Visit","Days Since Visit","Visit Count","Status"])
+    ws.append(["Retailer Code","Retailer","Town","District","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Festive Type","Festive Slab","Festive Eligible Units","Festive Payout","Focus Eligible Units","Focus Payout","V80 Units","V80 Slab","V80 Normal Payout","V80 Max Conditional Payout","Back Support Base Margin","Back Support Payable","Back Support Achievement %","Back Support Eligibility","Last Visit","Days Since Visit","Visit Count","Status"])
     for x in perf.get("retailers", []):
-        ws.append([x.get("code"),x.get("name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("focus_scheme_units"),x.get("focus_scheme_payout"),x.get("v80_units"),x.get("v80_slab"),x.get("v80_normal_sales_payout"),x.get("v80_max_total_payout"),x.get("back_support_base_margin"),x.get("back_support_payable"),x.get("back_support_achievement_pct"),x.get("back_support_eligibility"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
+        ws.append([x.get("code"),x.get("name"),x.get("town_name"),x.get("district_name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("focus_scheme_units"),x.get("focus_scheme_payout"),x.get("v80_units"),x.get("v80_slab"),x.get("v80_normal_sales_payout"),x.get("v80_max_total_payout"),x.get("back_support_base_margin"),x.get("back_support_payable"),x.get("back_support_achievement_pct"),x.get("back_support_eligibility"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
     finish(ws)
 
     ws = wb.create_sheet("Visit History")
@@ -943,6 +943,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "rds": row.get("rds"),
             "zone": row.get("zone"),
             "club": row.get("club"),
+            "town_name": row.get("town_name"),
+            "district_name": row.get("district_name"),
             "target": target,
             "sales": sales,
             "achievement_pct": ach,
