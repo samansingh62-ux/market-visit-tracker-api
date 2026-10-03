@@ -332,6 +332,18 @@ button{min-height:44px}
 .schemeBannerMeta{font-size:11px;color:#667085;margin-top:3px}
 .schemeBannerValue{text-align:right;white-space:nowrap}.schemeBannerValue b{display:block;font-size:20px;color:#0f5cab}.schemeBannerValue span{font-size:10px;color:#667085}
 @media(max-width:700px){.schemeBanner{align-items:flex-start;flex-direction:column}.schemeBannerValue{text-align:left}}
+
+.retailerPicker{position:relative}
+.retailerPickerRow{display:flex;gap:6px;align-items:stretch}
+.retailerPickerRow input{flex:1;min-width:0}
+.retailerDropBtn{width:46px;min-width:46px;padding:0;border:1px solid #9fc2f4;background:#f5f9ff;color:#1f5fae;border-radius:10px;font-size:16px;box-shadow:0 3px 10px rgba(47,125,211,.08)}
+.retailerMenu{position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:120;background:#fff;border:1px solid #9fc2f4;border-radius:11px;box-shadow:0 10px 28px rgba(31,95,174,.16);max-height:260px;overflow:auto;padding:5px}
+.retailerMenu.hidden{display:none}
+.retailerOption{width:100%;text-align:left;background:#fff;border:0;border-radius:8px;padding:10px 11px;min-height:40px;color:#24324a;display:block}
+.retailerOption:hover,.retailerOption:focus{background:#eef5ff;outline:none}
+.retailerOption small{display:block;color:#71809a;font-weight:500;margin-top:2px}
+.retailerEmpty{padding:12px;color:#71809a;font-size:12px}
+@media(max-width:700px){.retailerMenu{max-height:45vh}.retailerOption{padding:12px 10px}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA ZONE A</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -521,7 +533,15 @@ button{min-height:44px}
 <section id="fieldProfileCard" class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
 <div id="visitMetrics" class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
 <div id="visitWorkGrid" class="grid" style="margin-top:17px">
-<section id="visitEntry" class="card"><h2>Log Market Visit</h2><form id="form"><label>Retailer<input id="retailer" list="retailers" placeholder="Search retailer..." required></label><datalist id="retailers"></datalist><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
+<section id="visitEntry" class="card"><h2>Log Market Visit</h2><form id="form"><label>Retailer
+<div class="retailerPicker" id="retailerPicker">
+  <div class="retailerPickerRow">
+    <input id="retailer" placeholder="Search or select retailer..." autocomplete="off" required>
+    <button id="retailerDropBtn" class="retailerDropBtn" type="button" aria-label="Show retailer list">⌄</button>
+  </div>
+  <div id="retailerMenu" class="retailerMenu hidden"></div>
+</div>
+</label><div id="meta" class="meta">Select a retailer from the master list.</div><div id="retailer360" class="r360 hidden"><div class="r360Head"><b>Retailer 360</b><span id="r360Status">Live V-Work + visit history</span></div><div id="r360Body"></div></div><div class="formgrid"><label>Market<input id="market" placeholder="e.g. Guwahati" required></label><label>Visit Date<input id="date" type="date" required></label></div><label>Feedback<textarea id="feedback" rows="3" placeholder="Retailer feedback"></textarea></label><label>Suggestions / Follow-up<textarea id="suggestions" rows="3" placeholder="Action or requirement"></textarea></label><label>Available Stock Photos <span style="font-weight:500;color:#667085">(up to 5)</span>
 <div class="photoActions">
 <label class="photoAction">📷 Take Photo<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label>
 </div>
@@ -782,7 +802,27 @@ async function performanceDashboard(){
 }
 
 async function stats(){let x=await api('/stats');$('mv').textContent=x.total_visits;$('mr').textContent=x.unique_retailers_visited;$('mm').textContent=x.unique_markets;$('mt').textContent=x.total_retailers_in_master;$('dkVisits').textContent=x.total_visits;$('dkRetailers').textContent=x.unique_retailers_visited;$('dkMarkets').textContent=x.unique_markets;let total=x.total_retailers_in_master||0,visited=x.unique_retailers_visited||0;$('dkCoverage').textContent=(total?Math.round(visited*100/total):0)+'%';$('dkMaster').textContent=x.total_retailers_in_master;}
-async function retailers(){master=await api('/retailers');$('retailers').innerHTML=master.map(r=>`<option value="${esc(r.name)}"></option>`).join('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
+async function retailers(){master=await api('/retailers');renderRetailerMenu('');$('healthZone').innerHTML='<option value="">All zones</option>'+[...new Set(master.map(r=>r.zone).filter(Boolean))].sort().map(z=>`<option>${esc(z)}</option>`).join('')}
+function renderRetailerMenu(query=''){
+  let q=String(query||'').trim().toLowerCase();
+  let rows=master.filter(r=>!q || String(r.name||'').toLowerCase().includes(q)).slice(0,150);
+  $('retailerMenu').innerHTML=rows.length?rows.map(r=>`<button type="button" class="retailerOption" data-retailer-code="${esc(r.code||'')}"><b>${esc(r.name||'')}</b><small>${esc(r.tl||'—')} · ${esc(r.rds||'—')} · ${esc(r.club||'—')}</small></button>`).join(''):'<div class="retailerEmpty">No matching retailer found.</div>';
+  $('retailerMenu').querySelectorAll('.retailerOption').forEach(btn=>btn.onclick=()=>{
+    let r=master.find(x=>String(x.code||'')===String(btn.dataset.retailerCode||''));
+    if(!r)return;
+    $('retailer').value=r.name;
+    $('retailerMenu').classList.add('hidden');
+    $('retailer').dispatchEvent(new Event('input',{bubbles:true}));
+  });
+}
+function openRetailerMenu(){
+  renderRetailerMenu($('retailer').value);
+  $('retailerMenu').classList.remove('hidden');
+}
+function closeRetailerMenuLater(){
+  setTimeout(()=>$('retailerMenu').classList.add('hidden'),180);
+}
+
 let retailer360Timer=null;
 async function loadRetailer360(r){
   if(!r){$('retailer360').classList.add('hidden');$('r360Body').innerHTML='';return}
@@ -840,7 +880,11 @@ async function loadRetailer360(r){
     $('r360Body').innerHTML='<div class="msg err">'+esc(e.message)+'</div>';
   }
 }
-$('retailer').oninput=()=>{
+$('retailer').onfocus=openRetailerMenu;
+$('retailer').onclick=openRetailerMenu;
+$('retailerDropBtn').onclick=()=>{renderRetailerMenu('');$('retailerMenu').classList.remove('hidden');$('retailer').focus()};
+$('retailer').addEventListener('blur',closeRetailerMenuLater);
+$('retailer').oninput=()=>{renderRetailerMenu($('retailer').value);$('retailerMenu').classList.remove('hidden');
   let r=master.find(x=>x.name===$('retailer').value.trim());
   $('meta').innerHTML=r?`<b>TL:</b> ${esc(r.tl||'—')} &nbsp; <b>SS:</b> ${esc(r.ss||'—')} &nbsp; <b>RDS:</b> ${esc(r.rds||'—')} &nbsp; <b>Zone:</b> ${esc(r.zone||'—')} &nbsp; <b>Club:</b> ${esc(r.club||'—')}`:'Select a retailer from your assigned list.';
   clearTimeout(retailer360Timer);
