@@ -26,6 +26,32 @@ def lookup_retailer_by_code(code: str):
         return dict(row) if row else None
 
 
+def get_explicit_hierarchy_target(month: str, level: str, name: str) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT month, level, name, target_volume, target_value
+            FROM hierarchy_targets
+            WHERE month = %s AND UPPER(level) = UPPER(%s) AND name = %s
+            """,
+            (month, level, name),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def list_explicit_hierarchy_targets(month: str, level: str) -> dict:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT name, target_volume, target_value
+            FROM hierarchy_targets
+            WHERE month = %s AND UPPER(level) = UPPER(%s)
+            """,
+            (month, level),
+        ).fetchall()
+    return {str(r["name"]): dict(r) for r in rows}
+
+
 def get_hierarchy_target_summary(month: str, tl: Optional[str] = None, ss: Optional[str] = None) -> dict:
     clauses = ["t.month = %s"]
     params = [month]
