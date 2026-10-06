@@ -791,21 +791,149 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         "",
         "Final payout remains subject to scheme eligibility and compliance conditions.",
     ]
+    template_parameters = [
+        str(target_user.get("role") or ""),
+        str(target_user.get("name") or ""),
+        f"{target:,}",
+        f"{sales:,}",
+        f"{ach:.1f}",
+        f"{gap:,}",
+        str(round(float(req), 1)),
+        _format_inr(festive),
+        _format_inr(focus),
+        _format_inr(v80),
+        _format_inr(back),
+        _format_inr(total_known),
+    ]
     return {
         "user_id": target_user.get("id"),
         "name": target_user.get("name"),
         "role": target_user.get("role"),
         "whatsapp_number": target_user.get("whatsapp_number"),
         "message": "\n".join(lines),
-        "connected": False,
-        "send_status": "WhatsApp Business integration not connected yet.",
+        "template_parameters": template_parameters,
+        "template_name": WHATSAPP_TEMPLATE_NAME,
+        "template_language": WHATSAPP_TEMPLATE_LANGUAGE,
+        "connected": _whatsapp_configured(),
+        "send_status": "WhatsApp Cloud API configured." if _whatsapp_configured() else "WhatsApp Business integration not connected yet.",
     }
+
+
+@app.get("/admin/whatsapp/status", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_status():
+    configured = _whatsapp_configured()
+    template_status = "UNKNOWN"
+    template_error = None
+    if configured and WHATSAPP_WABA_ID:
+        try:
+            url = f"https://graph.facebook.com/{WHATSAPP_GRAPH_VERSION}/{WHATSAPP_WABA_ID}/message_templates"
+            with httpx.Client(timeout=httpx.Timeout(30.0, connect=10.0)) as client:
+                response = client.get(
+                    url,
+                    params={"name": WHATSAPP_TEMPLATE_NAME, "limit": 10},
+                    headers=_whatsapp_headers(),
+                )
+            response.raise_for_status()
+            rows = (response.json() or {}).get("data") or []
+            match = next((x for x in rows if x.get("name") == WHATSAPP_TEMPLATE_NAME), None)
+            template_status = str((match or {}).get("status") or "NOT_FOUND")
+        except Exception as exc:
+            template_status = "CHECK_FAILED"
+            template_error = str(exc)[:240]
+    elif not WHATSAPP_WABA_ID:
+        template_status = "WABA_ID_MISSING"
+
+    return {
+        "configured": configured,
+        "phone_number_id_configured": bool(WHATSAPP_PHONE_NUMBER_ID),
+        "access_token_configured": bool(WHATSAPP_ACCESS_TOKEN),
+        "waba_id_configured": bool(WHATSAPP_WABA_ID),
+        "template_name": WHATSAPP_TEMPLATE_NAME,
+        "template_language": WHATSAPP_TEMPLATE_LANGUAGE,
+        "template_status": template_status,
+        "template_error": template_error,
+        "can_send": bool(configured and template_status in ("APPROVED", "ACTIVE")),
+    }
+
+
+@app.post("/admin/whatsapp/send", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
+    if not _whatsapp_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="WhatsApp Cloud API credentials are not configured in Render.",
+        )
+
+    preview = admin_whatsapp_preview(user_id)
+    number = _normalize_whatsapp_number(preview.get("whatsapp_number"))
+    if not number:
+        raise HTTPException(status_code=400, detail="Recipient WhatsApp number is missing.")
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": number.lstrip("+"),
+        "type": "template",
+        "template": {
+            "name": WHATSAPP_TEMPLATE_NAME,
+            "language": {"code": WHATSAPP_TEMPLATE_LANGUAGE},
+            "components": [{
+                "type": "body",
+                "parameters": [
+                    {"type": "text", "text": str(value)}
+                    for value in (preview.get("template_parameters") or [])
+                ],
+            }],
+        },
+    }
+    url = f"https://graph.facebook.com/{WHATSAPP_GRAPH_VERSION}/{WHATSAPP_PHONE_NUMBER_ID}/messages"
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(45.0, connect=10.0)) as client:
+            response = client.post(url, json=payload, headers=_whatsapp_headers())
+        data = response.json() if response.content else {}
+        if response.status_code >= 400:
+            detail = ((data or {}).get("error") or {}).get("message") or f"Meta API error {response.status_code}"
+            crud.create_whatsapp_notification_log(
+                user_id,
+                preview.get("message") or "",
+                "FAILED",
+                error_detail=detail,
+            )
+            raise HTTPException(status_code=502, detail=detail)
+
+        messages = (data or {}).get("messages") or []
+        message_id = messages[0].get("id") if messages else None
+        log = crud.create_whatsapp_notification_log(
+            user_id,
+            preview.get("message") or "",
+            "SUBMITTED",
+            provider_message_id=message_id,
+        )
+        return {
+            "sent": True,
+            "status": "SUBMITTED",
+            "provider_message_id": message_id,
+            "recipient": preview.get("name"),
+            "whatsapp_number": number,
+            "log": log,
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        detail = str(exc)[:400]
+        crud.create_whatsapp_notification_log(
+            user_id,
+            preview.get("message") or "",
+            "FAILED",
+            error_detail=detail,
+        )
+        raise HTTPException(status_code=502, detail=f"WhatsApp send failed: {detail}") from exc
 
 
 @app.post("/admin/whatsapp/log", dependencies=[Depends(require_admin_key)])
 def admin_whatsapp_log(payload: WhatsappNotificationLogCreate):
     status = str(payload.status or "PREVIEWED").upper()
-    if status not in ("PREVIEWED", "READY", "NOT_CONNECTED"):
+    if status not in ("PREVIEWED", "READY", "NOT_CONNECTED", "SUBMITTED", "FAILED"):
         raise HTTPException(status_code=400, detail="Unsupported notification status.")
     row = crud.create_whatsapp_notification_log(payload.user_id, payload.preview_text, status)
     if not row:
