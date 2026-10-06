@@ -12,6 +12,7 @@ RETAILERS_SEED_PATH = APP_DIR / "retailers_seed.json"
 RETAILER_TARGETS_SEP26_PATH = APP_DIR / "retailer_targets_2026-09.json"
 RETAILER_TARGETS_OCT26_PATH = APP_DIR / "retailer_targets_2026-10.json"
 HIERARCHY_TARGETS_OCT26_PATH = APP_DIR / "hierarchy_targets_2026-10.json"
+TL_CONTACTS_OCT26_PATH = APP_DIR / "tl_contacts_2026-10.json"
 RETAILER_LOCATION_SEED_GLOB = "retailer_locations_*.json"
 
 if not DATABASE_URL:
@@ -198,6 +199,7 @@ def init_db():
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT")
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT")
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_hash TEXT")
+        conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS whatsapp_number TEXT")
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)")
 
         for column in ("retailer", "tl", "ss", "rds", "visit_date"):
