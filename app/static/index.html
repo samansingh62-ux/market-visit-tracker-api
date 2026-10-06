@@ -344,6 +344,13 @@ button{min-height:44px}
 .retailerOption small{display:block;color:#71809a;font-weight:500;margin-top:2px}
 .retailerEmpty{padding:12px;color:#71809a;font-size:12px}
 @media(max-width:700px){.retailerMenu{max-height:45vh}.retailerOption{padding:12px 10px}}
+
+.waPanel{margin:16px 0;padding:16px;border:1px solid #c9ddfb;border-radius:14px;background:#f8fbff;box-shadow:0 6px 18px rgba(47,125,211,.08)}
+.waPanel h3{margin:0 0 5px;color:#17365d}.waGrid{display:grid;grid-template-columns:140px 1fr 1fr;gap:10px;align-items:end}
+.waPreview{width:100%;min-height:260px;resize:vertical;font-family:inherit;line-height:1.5;background:#fff}
+.waActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.waStatus{font-size:12px;color:#667085;margin-top:7px}
+.waNumberInput{min-width:160px}
+@media(max-width:700px){.waGrid{grid-template-columns:1fr}.waPreview{min-height:300px}.waNumberInput{min-width:130px}}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA ZONE A</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -384,13 +391,32 @@ button{min-height:44px}
   <button id="targetUpload" class="secondary" type="button">Upload Targets</button>
   <div id="targetMsg" class="msg"></div>
 </div>
+<div class="waPanel">
+  <h3>WhatsApp Incentive Notifications</h3>
+  <div class="sub" style="margin-bottom:12px">Prepare hierarchy incentive updates for TL, SS and RDS. Live WhatsApp sending will remain disabled until the WhatsApp Business connection and approved template are configured.</div>
+  <div class="waGrid">
+    <label>Role<select id="waRole"><option>TL</option><option>SS</option><option>RDS</option></select></label>
+    <label>Recipient<select id="waRecipient"><option value="">Select recipient</option></select></label>
+    <label>WhatsApp Number<input id="waNumber" class="waNumberInput" placeholder="+919876543210" inputmode="tel"></label>
+  </div>
+  <div class="waActions">
+    <button id="waSaveNumber" class="secondary" type="button">Save Number</button>
+    <button id="waPreviewBtn" class="secondary" type="button">Preview Incentive Message</button>
+    <button id="waSavePreview" class="ghost" type="button">Save Preview Log</button>
+    <button id="waSend" class="primary" type="button" disabled title="Connect WhatsApp Business to enable sending">Send WhatsApp</button>
+  </div>
+  <div id="waMsg" class="msg"></div>
+  <label style="display:block;margin-top:12px">Message Preview<textarea id="waPreview" class="waPreview" readonly placeholder="Select a recipient and preview the message."></textarea></label>
+  <div class="waStatus">Connection status: <b>Not connected</b> · Phase 1 stores contacts, previews hierarchy incentive messages and maintains an audit log.</div>
+  <div class="wrap" style="margin-top:12px"><table><thead><tr><th>Time</th><th>Recipient</th><th>Role</th><th>Number</th><th>Status</th></tr></thead><tbody id="waLogs"><tr><td colspan="5">No notification activity yet.</td></tr></tbody></table></div>
+</div>
 <div class="filters">
 <input id="adminSearch" placeholder="Search name or username">
 <select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select>
 <select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
 <button id="adminRefresh" class="secondary">Refresh</button>
 </div>
-<div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
+<div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
 </section>
 <div id="welcomeModal" class="welcome hidden"><div class="welcomeBox"><div class="welcomeIcon">✓</div><h2>Welcome back <span id="welcomeName"></span>!</h2><p>Let’s visit the Market.</p><button id="welcomeClose" class="primary">Let’s Go</button></div></div>
 <section id="app" class="hidden">
@@ -1043,6 +1069,8 @@ async function loadAdminUsers(){
     $('userMeta').innerHTML='<b>Manager</b> · Management &nbsp; <span class="muted">Full NESA dashboard access is enabled in management mode.</span>';
     setStatus(true,'Manager');
     renderAdminUsers();
+    renderWaRecipients();
+    loadWaLogs().catch(()=>{});
     msg('adminMsg','Management access enabled. Dashboard data is loading.',true);
     load().catch(e=>msg('adminMsg','Dashboard refresh failed: '+e.message));
   }catch(e){msg('adminMsg',e.message)}
@@ -1061,8 +1089,85 @@ function renderAdminUsers(){
   $('adminRDS').textContent=adminUsers.filter(u=>u.role==='RDS').length;
   $('adminUsers').innerHTML=rows.length?rows.map(u=>{
     let hierarchy=u.role==='TL'?u.tl||'—':u.role==='SS'?u.ss||'—':u.rds||'—';
-    return `<tr><td><b>${esc(u.name)}</b></td><td><span class="tag">${esc(u.role)}</span></td><td><code>${esc(u.username)}</code></td><td>${esc(hierarchy)}</td><td>${u.assigned_retailers}</td><td><span class="tag ${u.active?'ok':'danger'}">${u.active?'Active':'Inactive'}</span></td><td><div class="actions"><button class="secondary" onclick="resetAdminPassword(${u.id})">Reset Password</button><button class="ghost" onclick="toggleAdminUser(${u.id},${u.active})">${u.active?'Deactivate':'Activate'}</button></div></td></tr>`
-  }).join(''):'<tr><td colspan="7">No users found.</td></tr>';
+    return `<tr><td><b>${esc(u.name)}</b></td><td><span class="tag">${esc(u.role)}</span></td><td><code>${esc(u.username)}</code></td><td>${esc(hierarchy)}</td><td>${u.assigned_retailers}</td><td><input class="waNumberInput" id="wa-user-${u.id}" value="${esc(u.whatsapp_number||'')}" placeholder="+91..." inputmode="tel"><button class="ghost" type="button" onclick="saveAdminWhatsApp(${u.id})">Save</button></td><td><span class="tag ${u.active?'ok':'danger'}">${u.active?'Active':'Inactive'}</span></td><td><div class="actions"><button class="secondary" onclick="resetAdminPassword(${u.id})">Reset Password</button><button class="ghost" onclick="toggleAdminUser(${u.id},${u.active})">${u.active?'Deactivate':'Activate'}</button></div></td></tr>`
+  }).join(''):'<tr><td colspan="8">No users found.</td></tr>';
+}
+
+function renderWaRecipients(){
+  if(!$('waRole')||!$('waRecipient'))return;
+  let role=$('waRole').value||'TL';
+  let current=$('waRecipient').value;
+  let rows=adminUsers.filter(u=>u.role===role&&u.active);
+  $('waRecipient').innerHTML='<option value="">Select recipient</option>'+rows.map(u=>`<option value="${u.id}">${esc(u.name)}${u.whatsapp_number?' · '+esc(u.whatsapp_number):' · No number'}</option>`).join('');
+  if(rows.some(u=>String(u.id)===String(current)))$('waRecipient').value=current;
+  syncWaRecipient();
+}
+function syncWaRecipient(){
+  let id=Number($('waRecipient')?.value||0),u=adminUsers.find(x=>x.id===id);
+  if($('waNumber'))$('waNumber').value=u?.whatsapp_number||'';
+  if($('waPreview'))$('waPreview').value='';
+  msg('waMsg','');
+}
+async function updateWhatsAppNumber(id,number){
+  let r=await fetch('/admin/users/'+id+'/whatsapp',{
+    method:'PATCH',
+    headers:{...adminHeaders(),'Content-Type':'application/json'},
+    body:JSON.stringify({whatsapp_number:number||null})
+  });
+  let d=await r.json();
+  if(!r.ok)throw Error(d.detail||'Unable to save WhatsApp number.');
+  let u=adminUsers.find(x=>x.id===id);
+  if(u)u.whatsapp_number=d.whatsapp_number||'';
+  return d;
+}
+async function saveAdminWhatsApp(id){
+  try{
+    let number=$('wa-user-'+id)?.value.trim()||'';
+    await updateWhatsAppNumber(id,number);
+    renderWaRecipients();
+    msg('adminMsg','WhatsApp number saved.',true);
+  }catch(e){msg('adminMsg',e.message)}
+}
+async function saveSelectedWaNumber(){
+  let id=Number($('waRecipient').value||0);
+  if(!id)return msg('waMsg','Select a recipient.');
+  try{
+    let d=await updateWhatsAppNumber(id,$('waNumber').value.trim());
+    $('waNumber').value=d.whatsapp_number||'';
+    renderAdminUsers();renderWaRecipients();$('waRecipient').value=String(id);syncWaRecipient();
+    msg('waMsg','WhatsApp number saved for '+d.name+'.',true);
+  }catch(e){msg('waMsg',e.message)}
+}
+async function previewWhatsApp(){
+  let id=Number($('waRecipient').value||0);
+  if(!id)return msg('waMsg','Select a TL, SS or RDS recipient.');
+  try{
+    let r=await fetch('/admin/whatsapp/preview?user_id='+id,{headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to prepare WhatsApp preview.');
+    $('waPreview').value=d.message||'';
+    $('waNumber').value=d.whatsapp_number||$('waNumber').value;
+    msg('waMsg',d.whatsapp_number?'Preview ready. Sending remains disabled until WhatsApp Business is connected.':'Preview ready, but this recipient has no WhatsApp number saved.',true);
+  }catch(e){msg('waMsg',e.message)}
+}
+async function saveWaPreviewLog(){
+  let id=Number($('waRecipient').value||0),preview=$('waPreview').value.trim();
+  if(!id||!preview)return msg('waMsg','Preview a message first.');
+  try{
+    let r=await fetch('/admin/whatsapp/log',{
+      method:'POST',
+      headers:{...adminHeaders(),'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:id,preview_text:preview,status:'PREVIEWED'})
+    }),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to save preview log.');
+    msg('waMsg','Preview logged for '+d.recipient_name+'.',true);
+    await loadWaLogs();
+  }catch(e){msg('waMsg',e.message)}
+}
+async function loadWaLogs(){
+  if(!adminKey||!$('waLogs'))return;
+  let r=await fetch('/admin/whatsapp/logs?limit=20',{headers:adminHeaders()}),d=await r.json();
+  if(!r.ok)throw Error(d.detail||'Unable to load WhatsApp logs.');
+  $('waLogs').innerHTML=d.length?d.map(x=>`<tr><td>${esc(String(x.created_at||'').replace('T',' ').slice(0,19))}</td><td><b>${esc(x.recipient_name)}</b></td><td>${esc(x.recipient_role)}</td><td>${esc(x.whatsapp_number||'—')}</td><td><span class="tag">${esc(x.status)}</span></td></tr>`).join(''):'<tr><td colspan="5">No notification activity yet.</td></tr>';
 }
 
 async function resetAdminPassword(id){
@@ -1137,6 +1242,11 @@ $('adminRole').onchange=renderAdminUsers;
 $('adminStatus').onchange=renderAdminUsers;
 $('adminSearch').oninput=renderAdminUsers;
 $('targetUpload').onclick=uploadTargets;
+$('waRole').onchange=renderWaRecipients;
+$('waRecipient').onchange=syncWaRecipient;
+$('waSaveNumber').onclick=saveSelectedWaNumber;
+$('waPreviewBtn').onclick=previewWhatsApp;
+$('waSavePreview').onclick=saveWaPreviewLog;
 
 let selectedPhotos=[];
 
