@@ -402,6 +402,7 @@ button{min-height:44px}
   <div class="waActions">
     <button id="waSaveNumber" class="secondary" type="button">Save Number</button>
     <button id="waPreviewBtn" class="secondary" type="button">Preview Incentive Message</button>
+    <button id="waSubmitTemplate" class="ghost" type="button">Submit Template to Meta</button>
     <button id="waSavePreview" class="ghost" type="button">Save Preview Log</button>
     <button id="waSend" class="primary" type="button" disabled>Send WhatsApp</button>
   </div>
@@ -1180,6 +1181,22 @@ async function loadWaStatus(){
     $('waSend').disabled=true;
   }
 }
+async function submitWaTemplate(){
+  if(!confirm('Submit the WhatsApp incentive template to Meta for approval?'))return;
+  let btn=$('waSubmitTemplate'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Submitting…';
+    let r=await fetch('/admin/whatsapp/template/submit',{method:'POST',headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Template submission failed.');
+    msg('waMsg',d.message||'Template submitted to Meta.',true);
+    await loadWaStatus();
+  }catch(e){
+    msg('waMsg','Template submission failed: '+e.message);
+  }finally{
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+
 async function sendWhatsApp(){
   let id=Number($('waRecipient').value||0);
   if(!id)return msg('waMsg','Select a recipient first.');
@@ -1283,6 +1300,7 @@ $('waRole').onchange=renderWaRecipients;
 $('waRecipient').onchange=syncWaRecipient;
 $('waSaveNumber').onclick=saveSelectedWaNumber;
 $('waPreviewBtn').onclick=previewWhatsApp;
+$('waSubmitTemplate').onclick=submitWaTemplate;
 $('waSavePreview').onclick=saveWaPreviewLog;
 $('waSend').onclick=sendWhatsApp;
 
