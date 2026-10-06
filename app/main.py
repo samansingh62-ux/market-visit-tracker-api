@@ -39,6 +39,12 @@ app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits
 
 VWORK_LIVE_API_URL = os.getenv("VWORK_LIVE_API_URL", "http://127.0.0.1:8000").rstrip("/")
 VWORK_LIVE_API_KEY = os.getenv("VWORK_LIVE_API_KEY", "").strip()
+WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
+WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
+WHATSAPP_WABA_ID = os.getenv("WHATSAPP_WABA_ID", "").strip()
+WHATSAPP_GRAPH_VERSION = os.getenv("WHATSAPP_GRAPH_VERSION", "v26.0").strip() or "v26.0"
+WHATSAPP_TEMPLATE_NAME = os.getenv("WHATSAPP_TEMPLATE_NAME", "zone_a_incentive_update_v1").strip() or "zone_a_incentive_update_v1"
+WHATSAPP_TEMPLATE_LANGUAGE = os.getenv("WHATSAPP_TEMPLATE_LANGUAGE", "en").strip() or "en"
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -62,6 +68,17 @@ def _format_inr(value) -> str:
         return "₹" + format(int(round(float(value or 0))), ",")
     except Exception:
         return "₹0"
+
+
+def _whatsapp_configured() -> bool:
+    return bool(WHATSAPP_ACCESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID)
+
+
+def _whatsapp_headers() -> dict:
+    return {
+        "Authorization": f"Bearer {WHATSAPP_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+    }
 
 
 
