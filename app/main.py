@@ -979,6 +979,17 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
 
     total_target = sum(x["target"] for x in retailer_rows)
     total_sales = sum(x["sales"] for x in retailer_rows)
+
+    explicit_summary_target = None
+    role = str(user.get("role") or "MANAGER").upper()
+    if role == "MANAGER":
+        explicit_summary_target = crud.get_explicit_hierarchy_target(month, "ZONE", "Zone A")
+    elif role in ("TL", "SS", "RDS"):
+        explicit_summary_target = crud.get_explicit_hierarchy_target(
+            month, role, str(user.get("name") or "")
+        )
+    if explicit_summary_target:
+        total_target = int(explicit_summary_target.get("target_volume") or 0)
     total_stock = sum(x["stock"] for x in retailer_rows)
     total_gap = max(total_target - total_sales, 0)
     total_ach = round((total_sales / total_target) * 100, 1) if total_target > 0 else 0
@@ -993,6 +1004,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
 
     hierarchy = {}
     for field in ("tl", "ss", "rds"):
+        explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper())
         groups = {}
         for item in retailer_rows:
             name = item.get(field) or "Unassigned"
@@ -1012,6 +1024,10 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
                 g["back_support_known"] += int(item.get("back_support_payable") or 0)
         out = []
         for g in groups.values():
+            explicit = explicit_targets.get(g["name"])
+            if explicit:
+                g["target"] = int(explicit.get("target_volume") or 0)
+                g["target_value"] = int(explicit.get("target_value") or 0)
             g["achievement_pct"] = round((g["sales"] / g["target"]) * 100, 1) if g["target"] > 0 else 0
             g["gap"] = max(g["target"] - g["sales"], 0)
             g["total_known_payout"] = g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
@@ -1066,12 +1082,12 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
 def my_target_performance(user: dict = Depends(get_dashboard_user)):
     """TL/SS monthly target vs achievement using assigned retailer targets and live V-Work MTD sales."""
     role = user.get("role")
-    if role not in ("TL", "SS"):
+    if role not in ("TL", "SS", "RDS"):
         return {
             "available": False,
             "role": role,
             "name": user.get("name"),
-            "message": "Target performance is available for TL and SS users.",
+            "message": "Target performance is available for TL, SS and RDS users.",
         }
 
     today = date.today()
@@ -1083,6 +1099,7 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
         ss=scope.get("ss"),
     )
     retailer_codes = set(target.get("retailer_codes") or [])
+    explicit_target = crud.get_explicit_hierarchy_target(month, role, str(user.get("name") or ""))
 
     params = {
         "startDate": today.replace(day=1).isoformat(),
@@ -1112,7 +1129,11 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
         for row in live_rows
         if str(row.get("retailer_code") or "").strip().upper() in retailer_codes
     )
-    target_volume = int(target.get("target_volume") or 0)
+    target_volume = int(
+        (explicit_target or {}).get("target_volume")
+        if explicit_target is not None
+        else target.get("target_volume") or 0
+    )
     achievement_pct = round((achievement_units / target_volume) * 100, 1) if target_volume > 0 else 0
     gap = max(target_volume - achievement_units, 0)
     month_days = calendar.monthrange(today.year, today.month)[1]
