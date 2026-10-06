@@ -403,11 +403,11 @@ button{min-height:44px}
     <button id="waSaveNumber" class="secondary" type="button">Save Number</button>
     <button id="waPreviewBtn" class="secondary" type="button">Preview Incentive Message</button>
     <button id="waSavePreview" class="ghost" type="button">Save Preview Log</button>
-    <button id="waSend" class="primary" type="button" disabled title="Connect WhatsApp Business to enable sending">Send WhatsApp</button>
+    <button id="waSend" class="primary" type="button" disabled>Send WhatsApp</button>
   </div>
   <div id="waMsg" class="msg"></div>
   <label style="display:block;margin-top:12px">Message Preview<textarea id="waPreview" class="waPreview" readonly placeholder="Select a recipient and preview the message."></textarea></label>
-  <div class="waStatus">Connection status: <b>Not connected</b> · Phase 1 stores contacts, previews hierarchy incentive messages and maintains an audit log.</div>
+  <div class="waStatus">Connection status: <b id="waConnectionStatus">Checking…</b> · Template: <b id="waTemplateStatus">—</b></div>
   <div class="wrap" style="margin-top:12px"><table><thead><tr><th>Time</th><th>Recipient</th><th>Role</th><th>Number</th><th>Status</th></tr></thead><tbody id="waLogs"><tr><td colspan="5">No notification activity yet.</td></tr></tbody></table></div>
 </div>
 <div class="filters">
@@ -1071,6 +1071,7 @@ async function loadAdminUsers(){
     renderAdminUsers();
     renderWaRecipients();
     loadWaLogs().catch(()=>{});
+    loadWaStatus().catch(()=>{});
     msg('adminMsg','Management access enabled. Dashboard data is loading.',true);
     load().catch(e=>msg('adminMsg','Dashboard refresh failed: '+e.message));
   }catch(e){msg('adminMsg',e.message)}
@@ -1163,6 +1164,42 @@ async function saveWaPreviewLog(){
     await loadWaLogs();
   }catch(e){msg('waMsg',e.message)}
 }
+async function loadWaStatus(){
+  if(!adminKey||!$('waConnectionStatus'))return;
+  try{
+    let r=await fetch('/admin/whatsapp/status',{headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to check WhatsApp status.');
+    $('waConnectionStatus').textContent=d.configured?'Connected':'Not connected';
+    $('waTemplateStatus').textContent=d.template_status||'UNKNOWN';
+    $('waSend').disabled=!d.can_send;
+    $('waSend').title=d.can_send?'Send approved WhatsApp template':'Sending requires configured credentials and an approved template.';
+    if(d.template_error)msg('waMsg','WhatsApp status check: '+d.template_error);
+  }catch(e){
+    $('waConnectionStatus').textContent='Check failed';
+    $('waTemplateStatus').textContent='—';
+    $('waSend').disabled=true;
+  }
+}
+async function sendWhatsApp(){
+  let id=Number($('waRecipient').value||0);
+  if(!id)return msg('waMsg','Select a recipient first.');
+  if(!$('waPreview').value.trim())return msg('waMsg','Preview the incentive message before sending.');
+  if(!confirm('Send this WhatsApp incentive update now?'))return;
+  let btn=$('waSend'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Sending…';
+    let r=await fetch('/admin/whatsapp/send?user_id='+id,{method:'POST',headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'WhatsApp send failed.');
+    msg('waMsg','WhatsApp submitted successfully to '+d.recipient+'.',true);
+    await loadWaLogs();
+  }catch(e){
+    msg('waMsg','WhatsApp send failed: '+e.message);
+  }finally{
+    btn.textContent=old;
+    await loadWaStatus();
+  }
+}
+
 async function loadWaLogs(){
   if(!adminKey||!$('waLogs'))return;
   let r=await fetch('/admin/whatsapp/logs?limit=20',{headers:adminHeaders()}),d=await r.json();
@@ -1247,6 +1284,7 @@ $('waRecipient').onchange=syncWaRecipient;
 $('waSaveNumber').onclick=saveSelectedWaNumber;
 $('waPreviewBtn').onclick=previewWhatsApp;
 $('waSavePreview').onclick=saveWaPreviewLog;
+$('waSend').onclick=sendWhatsApp;
 
 let selectedPhotos=[];
 
