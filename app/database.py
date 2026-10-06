@@ -285,6 +285,24 @@ def init_db():
                     active = TRUE
             """, rows)
 
+        # Seed TL WhatsApp contacts supplied by management.
+        if TL_CONTACTS_OCT26_PATH.exists():
+            try:
+                with open(TL_CONTACTS_OCT26_PATH, "r", encoding="utf-8") as f:
+                    contact_seed = json.load(f)
+                with conn.cursor() as cur:
+                    cur.executemany("""
+                        UPDATE users
+                        SET whatsapp_number = COALESCE(NULLIF(whatsapp_number, ''), %(number)s)
+                        WHERE role = 'TL' AND name = %(name)s
+                    """, [
+                        {"name": str(row[0]).strip(), "number": str(row[1]).strip()}
+                        for row in contact_seed
+                        if isinstance(row, list) and len(row) >= 2 and row[0] and row[1]
+                    ])
+            except Exception:
+                pass
+
         # Zone A TL/SS PINs. Only PBKDF2 hashes are stored in the application.
         pin_seeds = {
     "V. Lalbiakdika":["TL","xYMtXqly1hZzsi62HVHcVg==$tNX3Ov9-m86C92YXDWo60t7ZN-U60JplsSvPWATXwrc="],
