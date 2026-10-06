@@ -336,7 +336,7 @@ def get_user_admin(user_id: int) -> Optional[dict]:
         return dict(row) if row else None
 
 
-def create_whatsapp_notification_log(user_id: int, preview_text: str, status: str = "PREVIEWED") -> Optional[dict]:
+def create_whatsapp_notification_log(user_id: int, preview_text: str, status: str = "PREVIEWED", provider_message_id: Optional[str] = None, error_detail: Optional[str] = None) -> Optional[dict]:
     from datetime import datetime, timezone
     with database.get_conn() as conn:
         user = conn.execute(
@@ -348,13 +348,13 @@ def create_whatsapp_notification_log(user_id: int, preview_text: str, status: st
         row = conn.execute(
             """
             INSERT INTO whatsapp_notification_log
-                (user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, created_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id, user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, created_at
+                (user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, provider_message_id, error_detail, created_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id, user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, provider_message_id, error_detail, created_at
             """,
             (
                 user["id"], user["name"], user["role"], user["whatsapp_number"],
-                preview_text, status, datetime.now(timezone.utc).isoformat(),
+                preview_text, status, provider_message_id, error_detail, datetime.now(timezone.utc).isoformat(),
             ),
         ).fetchone()
         return dict(row)
@@ -365,7 +365,7 @@ def list_whatsapp_notification_logs(limit: int = 50) -> list[dict]:
         rows = conn.execute(
             """
             SELECT id, user_id, recipient_name, recipient_role, whatsapp_number,
-                   preview_text, status, created_at
+                   preview_text, status, provider_message_id, error_detail, created_at
             FROM whatsapp_notification_log
             ORDER BY id DESC
             LIMIT %s
