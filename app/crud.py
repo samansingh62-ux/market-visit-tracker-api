@@ -282,6 +282,7 @@ def list_users_admin() -> list:
                 u.rds,
                 u.username,
                 u.active,
+                u.whatsapp_number,
                 COUNT(r.code) AS assigned_retailers
             FROM users u
             LEFT JOIN retailers r
@@ -300,11 +301,78 @@ def list_users_admin() -> list:
                 u.ss,
                 u.rds,
                 u.username,
-                u.active
+                u.active,
+                u.whatsapp_number
             ORDER BY u.role, u.name
         """).fetchall()
 
         return [dict(row) for row in rows]
+
+
+def update_user_whatsapp_number(user_id: int, whatsapp_number: Optional[str]) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            UPDATE users
+            SET whatsapp_number = %s
+            WHERE id = %s
+            RETURNING id, name, role, username, whatsapp_number, active
+            """,
+            (whatsapp_number or None, user_id),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def get_user_admin(user_id: int) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT id, name, role, tl, ss, rds, username, whatsapp_number, active
+            FROM users
+            WHERE id = %s
+            """,
+            (user_id,),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def create_whatsapp_notification_log(user_id: int, preview_text: str, status: str = "PREVIEWED") -> Optional[dict]:
+    from datetime import datetime, timezone
+    with database.get_conn() as conn:
+        user = conn.execute(
+            "SELECT id, name, role, whatsapp_number FROM users WHERE id = %s",
+            (user_id,),
+        ).fetchone()
+        if not user:
+            return None
+        row = conn.execute(
+            """
+            INSERT INTO whatsapp_notification_log
+                (user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, created_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id, user_id, recipient_name, recipient_role, whatsapp_number, preview_text, status, created_at
+            """,
+            (
+                user["id"], user["name"], user["role"], user["whatsapp_number"],
+                preview_text, status, datetime.now(timezone.utc).isoformat(),
+            ),
+        ).fetchone()
+        return dict(row)
+
+
+def list_whatsapp_notification_logs(limit: int = 50) -> list[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, user_id, recipient_name, recipient_role, whatsapp_number,
+                   preview_text, status, created_at
+            FROM whatsapp_notification_log
+            ORDER BY id DESC
+            LIMIT %s
+            """,
+            (limit,),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def reset_user_password(user_id: int) -> Optional[dict]:
