@@ -81,6 +81,24 @@ def _whatsapp_headers() -> dict:
     }
 
 
+def _whatsapp_template_body_text() -> str:
+    return (
+        "vivo NESA Zone A - October 2026 Update\n"
+        "{{1}}: {{2}}\n"
+        "Target: {{3}} units\n"
+        "MTD Achievement: {{4}} units ({{5}}%)\n"
+        "Gap: {{6}} units\n"
+        "Required / Day: {{7}}\n\n"
+        "Provisional Incentive Summary\n"
+        "Festive Booster: {{8}}\n"
+        "Focus Model: {{9}}\n"
+        "V80 Normal: {{10}}\n"
+        "Back Support (known): {{11}}\n"
+        "Total Known / Provisional: {{12}}\n\n"
+        "Final payout remains subject to scheme eligibility and compliance conditions."
+    )
+
+
 
 
 FOCUS_MODEL_RATES = {
@@ -854,6 +872,48 @@ def admin_whatsapp_status():
         "template_error": template_error,
         "can_send": bool(configured and template_status in ("APPROVED", "ACTIVE")),
     }
+
+
+@app.post("/admin/whatsapp/template/submit", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_template_submit():
+    if not WHATSAPP_ACCESS_TOKEN or not WHATSAPP_WABA_ID:
+        raise HTTPException(
+            status_code=503,
+            detail="WHATSAPP_ACCESS_TOKEN and WHATSAPP_WABA_ID must be configured in Render.",
+        )
+    payload = {
+        "name": WHATSAPP_TEMPLATE_NAME,
+        "language": WHATSAPP_TEMPLATE_LANGUAGE,
+        "category": "UTILITY",
+        "components": [{
+            "type": "BODY",
+            "text": _whatsapp_template_body_text(),
+            "example": {
+                "body_text": [[
+                    "TL", "Example Name", "1,000", "450", "45.0", "550", "22.0",
+                    "₹12,000", "₹8,000", "₹3,000", "₹4,500", "₹27,500"
+                ]]
+            },
+        }],
+    }
+    url = f"https://graph.facebook.com/{WHATSAPP_GRAPH_VERSION}/{WHATSAPP_WABA_ID}/message_templates"
+    try:
+        with httpx.Client(timeout=httpx.Timeout(45.0, connect=10.0)) as client:
+            response = client.post(url, json=payload, headers=_whatsapp_headers())
+        data = response.json() if response.content else {}
+        if response.status_code >= 400:
+            detail = ((data or {}).get("error") or {}).get("message") or f"Meta API error {response.status_code}"
+            raise HTTPException(status_code=502, detail=detail)
+        return {
+            "submitted": True,
+            "template_name": WHATSAPP_TEMPLATE_NAME,
+            "meta_response": data,
+            "message": "Template submitted to Meta for review.",
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Template submission failed: {exc}") from exc
 
 
 @app.post("/admin/whatsapp/send", dependencies=[Depends(require_admin_key)])
