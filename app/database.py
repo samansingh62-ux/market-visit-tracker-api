@@ -213,6 +213,8 @@ def init_db():
                 created_at TEXT NOT NULL
             )
         """)
+        conn.execute("ALTER TABLE whatsapp_notification_log ADD COLUMN IF NOT EXISTS provider_message_id TEXT")
+        conn.execute("ALTER TABLE whatsapp_notification_log ADD COLUMN IF NOT EXISTS error_detail TEXT")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_whatsapp_log_created_at ON whatsapp_notification_log(created_at)")
 
         for column in ("retailer", "tl", "ss", "rds", "visit_date"):
