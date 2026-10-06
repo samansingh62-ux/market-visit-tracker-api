@@ -10,6 +10,8 @@ APP_DIR = Path(__file__).resolve().parent
 DATABASE_URL = os.environ.get("DATABASE_URL")
 RETAILERS_SEED_PATH = APP_DIR / "retailers_seed.json"
 RETAILER_TARGETS_SEP26_PATH = APP_DIR / "retailer_targets_2026-09.json"
+RETAILER_TARGETS_OCT26_PATH = APP_DIR / "retailer_targets_2026-10.json"
+HIERARCHY_TARGETS_OCT26_PATH = APP_DIR / "hierarchy_targets_2026-10.json"
 RETAILER_LOCATION_SEED_GLOB = "retailer_locations_*.json"
 
 if not DATABASE_URL:
@@ -98,6 +100,19 @@ def init_db():
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_retailer_targets_month ON retailer_targets(month)")
 
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS hierarchy_targets (
+                month TEXT NOT NULL,
+                level TEXT NOT NULL,
+                name TEXT NOT NULL,
+                target_volume INTEGER NOT NULL DEFAULT 0,
+                target_value BIGINT NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (month, level, name)
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_hierarchy_targets_month ON hierarchy_targets(month)")
+
         # September 2026 targets supplied by management. Seed only when that month
         # has not already been imported, so a later manager upload is preserved.
         seed_month = "2026-09"
@@ -121,6 +136,48 @@ def init_db():
                     (seed_month, row[0], row[0], int(row[1] or 0), int(row[2] or 0))
                     for row in target_seed
                     if isinstance(row, list) and len(row) >= 3 and row[0]
+                ])
+
+        oct_seed_month = "2026-10"
+        oct_target_count = conn.execute(
+            "SELECT COUNT(*) AS c FROM retailer_targets WHERE month = %s",
+            (oct_seed_month,),
+        ).fetchone()["c"]
+        if oct_target_count == 0 and RETAILER_TARGETS_OCT26_PATH.exists():
+            with open(RETAILER_TARGETS_OCT26_PATH, "r", encoding="utf-8") as f:
+                oct_seed = json.load(f)
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    INSERT INTO retailer_targets
+                        (month, retailer_code, retailer_name, target_volume, target_value, updated_at)
+                    VALUES
+                        (%s, %s,
+                         COALESCE((SELECT name FROM retailers WHERE UPPER(code) = UPPER(%s)), ''),
+                         %s, %s, CURRENT_TIMESTAMP::text)
+                    ON CONFLICT (month, retailer_code) DO NOTHING
+                """, [
+                    (oct_seed_month, row[0], row[0], int(row[1] or 0), int(row[2] or 0))
+                    for row in oct_seed
+                    if isinstance(row, list) and len(row) >= 3 and row[0]
+                ])
+
+        hierarchy_target_count = conn.execute(
+            "SELECT COUNT(*) AS c FROM hierarchy_targets WHERE month = %s",
+            (oct_seed_month,),
+        ).fetchone()["c"]
+        if hierarchy_target_count == 0 and HIERARCHY_TARGETS_OCT26_PATH.exists():
+            with open(HIERARCHY_TARGETS_OCT26_PATH, "r", encoding="utf-8") as f:
+                hierarchy_seed = json.load(f)
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    INSERT INTO hierarchy_targets
+                        (month, level, name, target_volume, target_value, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP::text)
+                    ON CONFLICT (month, level, name) DO NOTHING
+                """, [
+                    (oct_seed_month, str(row[0]).upper(), str(row[1]).strip(), int(row[2] or 0), int(row[3] or 0))
+                    for row in hierarchy_seed
+                    if isinstance(row, list) and len(row) >= 4 and row[1]
                 ])
 
         conn.execute("""
