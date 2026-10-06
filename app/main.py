@@ -30,6 +30,8 @@ from .schemas import (
     StatsOut,
     UserOut,
     UserStatusOut,
+    WhatsappNumberUpdate,
+    WhatsappNotificationLogCreate,
     VisitCreate,
     VisitOut, PhotoOut,
 )
@@ -40,6 +42,28 @@ VWORK_LIVE_API_KEY = os.getenv("VWORK_LIVE_API_KEY", "").strip()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+def _normalize_whatsapp_number(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    raw = str(value).strip()
+    if not raw:
+        return None
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    if len(digits) == 10:
+        digits = "91" + digits
+    if len(digits) != 12 or not digits.startswith("91"):
+        raise HTTPException(status_code=400, detail="Use a valid Indian WhatsApp number, e.g. +919876543210.")
+    return "+" + digits
+
+
+def _format_inr(value) -> str:
+    try:
+        return "₹" + format(int(round(float(value or 0))), ",")
+    except Exception:
+        return "₹0"
+
+
 
 
 FOCUS_MODEL_RATES = {
@@ -692,6 +716,89 @@ async def admin_upload_targets(
 )
 def admin_users():
     return crud.list_users_admin()
+
+
+@app.patch("/admin/users/{user_id}/whatsapp", dependencies=[Depends(require_admin_key)])
+def admin_update_whatsapp(user_id: int, payload: WhatsappNumberUpdate):
+    number = _normalize_whatsapp_number(payload.whatsapp_number)
+    result = crud.update_user_whatsapp_number(user_id, number)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return result
+
+
+@app.get("/admin/whatsapp/preview", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
+    target_user = crud.get_user_admin(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if target_user.get("role") not in ("TL", "SS", "RDS"):
+        raise HTTPException(status_code=400, detail="WhatsApp preview is limited to TL, SS and RDS.")
+
+    scoped_user = {
+        "name": target_user.get("name"),
+        "role": target_user.get("role"),
+        "tl": target_user.get("tl"),
+        "ss": target_user.get("ss"),
+        "rds": target_user.get("rds"),
+        "active": target_user.get("active", True),
+    }
+    perf = performance_dashboard(scoped_user)
+    summary = perf.get("summary") or {}
+    target = int(summary.get("target") or 0)
+    sales = int(summary.get("sales") or 0)
+    ach = float(summary.get("achievement_pct") or 0)
+    gap = int(summary.get("gap") or 0)
+    req = summary.get("required_per_day") or 0
+    festive = int(summary.get("scheme_payout") or 0)
+    focus = int(summary.get("focus_scheme_payout") or 0)
+    v80 = int(summary.get("v80_normal_sales_payout") or 0)
+    back = int(summary.get("back_support_payable_known") or 0)
+    total_known = festive + focus + v80 + back
+
+    lines = [
+        "vivo NESA Zone A - October 2026 Update",
+        f"{target_user.get('role')}: {target_user.get('name')}",
+        "",
+        f"Target: {target:,} units",
+        f"MTD Achievement: {sales:,} units ({ach:.1f}%)",
+        f"Gap: {gap:,} units",
+        f"Required / Day: {round(float(req),1)}",
+        "",
+        "Provisional Incentive Summary",
+        f"Festive Booster: {_format_inr(festive)}",
+        f"Focus Model: {_format_inr(focus)}",
+        f"V80 Normal: {_format_inr(v80)}",
+        f"Back Support (known): {_format_inr(back)}",
+        f"Total Known / Provisional: {_format_inr(total_known)}",
+        "",
+        "Final payout remains subject to scheme eligibility and compliance conditions.",
+    ]
+    return {
+        "user_id": target_user.get("id"),
+        "name": target_user.get("name"),
+        "role": target_user.get("role"),
+        "whatsapp_number": target_user.get("whatsapp_number"),
+        "message": "\n".join(lines),
+        "connected": False,
+        "send_status": "WhatsApp Business integration not connected yet.",
+    }
+
+
+@app.post("/admin/whatsapp/log", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_log(payload: WhatsappNotificationLogCreate):
+    status = str(payload.status or "PREVIEWED").upper()
+    if status not in ("PREVIEWED", "READY", "NOT_CONNECTED"):
+        raise HTTPException(status_code=400, detail="Unsupported notification status.")
+    row = crud.create_whatsapp_notification_log(payload.user_id, payload.preview_text, status)
+    if not row:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return row
+
+
+@app.get("/admin/whatsapp/logs", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_logs(limit: int = Query(default=25, ge=1, le=100)):
+    return crud.list_whatsapp_notification_logs(limit=limit)
 
 
 @app.post(
