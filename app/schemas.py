@@ -86,6 +86,17 @@ class AdminUserOut(BaseModel):
     username: str
     active: bool
     assigned_retailers: int
+    whatsapp_number: Optional[str] = None
+
+
+class WhatsappNumberUpdate(BaseModel):
+    whatsapp_number: Optional[str] = None
+
+
+class WhatsappNotificationLogCreate(BaseModel):
+    user_id: int
+    preview_text: str
+    status: str = "PREVIEWED"
 
 
 class PasswordResetOut(BaseModel):
