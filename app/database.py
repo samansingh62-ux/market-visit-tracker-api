@@ -201,6 +201,19 @@ def init_db():
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_hash TEXT")
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS whatsapp_number TEXT")
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)")
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS whatsapp_notification_log (
+                id BIGSERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                recipient_name TEXT NOT NULL,
+                recipient_role TEXT NOT NULL,
+                whatsapp_number TEXT,
+                preview_text TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'PREVIEWED',
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_whatsapp_log_created_at ON whatsapp_notification_log(created_at)")
 
         for column in ("retailer", "tl", "ss", "rds", "visit_date"):
             conn.execute(f"CREATE INDEX IF NOT EXISTS idx_visits_{column} ON visits({column})")
