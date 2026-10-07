@@ -155,3 +155,8 @@ class PhotoOut(BaseModel):
     size_bytes: int
     created_at: str
     url: str
+
+
+class DailyRetailerRemarkCreate(BaseModel):
+    retailer_code: str = Field(..., min_length=1)
+    remark: str = Field(..., min_length=3, max_length=1000)
