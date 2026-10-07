@@ -1041,6 +1041,74 @@ def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
         raise HTTPException(status_code=502, detail=f"WhatsApp send failed: {detail}") from exc
 
 
+@app.get("/kam/management/users")
+def kam_management_users(user: dict = Depends(get_current_user)):
+    _require_kam(user)
+    return crud.list_kam_area_users(str(user.get("name") or ""))
+
+
+@app.patch("/kam/management/users/{user_id}/whatsapp")
+def kam_management_update_whatsapp(
+    user_id: int,
+    payload: WhatsappNumberUpdate,
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_manage_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This user is outside your KAM hierarchy.")
+    number = _normalize_whatsapp_number(payload.whatsapp_number)
+    result = crud.update_user_whatsapp_number(user_id, number)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return result
+
+
+@app.post("/kam/management/users/{user_id}/reset-password")
+def kam_management_reset_password(
+    user_id: int,
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_manage_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This user is outside your KAM hierarchy.")
+    result = crud.reset_user_password(user_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return result
+
+
+@app.post("/kam/management/users/{user_id}/activate")
+def kam_management_activate_user(
+    user_id: int,
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_manage_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This user is outside your KAM hierarchy.")
+    result = crud.set_user_status(user_id, True)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return result
+
+
+@app.post("/kam/management/users/{user_id}/deactivate")
+def kam_management_deactivate_user(
+    user_id: int,
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_manage_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This user is outside your KAM hierarchy.")
+    result = crud.set_user_status(user_id, False)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return result
+
+
 @app.get("/kam/whatsapp/recipients")
 def kam_whatsapp_recipients(
     role: Optional[str] = Query(default=None, pattern="^(TL|SS)$"),
