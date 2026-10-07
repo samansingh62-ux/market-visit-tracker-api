@@ -433,6 +433,7 @@ button{min-height:44px}
 <button class="sideBtn" data-target="retailerIntelligence">▥ &nbsp; Market Intelligence</button>
 <button class="sideBtn" data-target="visitHistory">▤ &nbsp; Reports</button>
 <button id="kamWhatsappNav" class="sideBtn hidden" data-target="kamWhatsappPanel">◉ &nbsp; WhatsApp TL/SS</button>
+<button id="kamManagementNav" class="sideBtn hidden" data-target="kamManagementPanel">⚙ &nbsp; Area Management</button>
 <button id="managerNav" class="sideBtn hidden" data-target="managerPanel">⚙ &nbsp; Management</button>
 </nav>
 <div class="sideBottom">
@@ -606,6 +607,32 @@ button{min-height:44px}
   </label>
   <div class="sub" style="margin-top:10px">Message includes Target, MTD Achievement, Achievement %, Gap, Required / Day, Zero Sales Retailers and the provisional incentive summary.</div>
 </section>
+<section id="kamManagementPanel" class="card hidden">
+  <div class="head">
+    <div>
+      <h2>KAM Area Management</h2>
+      <div class="sub">Management access restricted to TL, SS and RDS users mapped under your assigned KAM area.</div>
+    </div>
+  </div>
+  <div class="admin-summary">
+    <div class="admin-stat"><span>Total Users</span><b id="kamAdminTotal">—</b></div>
+    <div class="admin-stat"><span>TL</span><b id="kamAdminTL">—</b></div>
+    <div class="admin-stat"><span>SS</span><b id="kamAdminSS">—</b></div>
+    <div class="admin-stat"><span>RDS</span><b id="kamAdminRDS">—</b></div>
+  </div>
+  <div class="filters">
+    <input id="kamAdminSearch" placeholder="Search name or username">
+    <select id="kamAdminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select>
+    <select id="kamAdminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
+    <button id="kamAdminRefresh" class="secondary">Refresh</button>
+  </div>
+  <div id="kamAdminMsg" class="msg"></div>
+  <div class="wrap"><table>
+    <thead><tr><th>Name</th><th>Role</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody id="kamAdminUsers"><tr><td colspan="7">Loading…</td></tr></tbody>
+  </table></div>
+  <div class="sub" style="margin-top:10px">KAM access cannot manage other KAMs, upload Zone targets, or change Meta/WhatsApp template configuration.</div>
+</section>
 <section id="profileSection" class="profileCard"></section>
 <section id="fieldProfileCard" class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
 <div id="visitMetrics" class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
@@ -725,7 +752,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   setPerfTabLayout('visits');
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
-function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
@@ -1135,6 +1162,80 @@ async function priorities(){
 }
 async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(user.role!=='MANAGER')$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));let recent=a.filter(r=>r.priority==='Recently Visited').length,due=a.filter(r=>r.priority==='Due 8–14 Days').length,overdue=a.filter(r=>r.priority==='Overdue 15+ Days'||r.priority==='Never Visited').length;$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('dkNever').textContent=$('mn').textContent;$('covRecent').textContent=recent;$('covDue').textContent=due;$('covOverdue').textContent=overdue;let totalH=Math.max(1,recent+due+overdue);$('barRecent').style.width=(recent*100/totalH)+'%';$('barDue').style.width=(due*100/totalH)+'%';$('barOverdue').style.width=(overdue*100/totalH)+'%';$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
+let kamAreaUsers=[];
+
+async function loadKamManagement(){
+  if(!user||user.role!=='KAM'||!$('kamAdminUsers'))return;
+  kamAreaUsers=await api('/kam/management/users');
+  renderKamManagement();
+  msg('kamAdminMsg','Area management loaded for your assigned hierarchy.',true);
+}
+
+function renderKamManagement(){
+  let role=$('kamAdminRole')?.value||'';
+  let status=$('kamAdminStatus')?.value||'';
+  let s=($('kamAdminSearch')?.value||'').trim().toLowerCase();
+  let rows=kamAreaUsers.filter(u=>
+    (!role||u.role===role)&&
+    (!status||String(u.active)===status)&&
+    (!s||(u.name||'').toLowerCase().includes(s)||(u.username||'').toLowerCase().includes(s))
+  );
+  $('kamAdminTotal').textContent=kamAreaUsers.length;
+  $('kamAdminTL').textContent=kamAreaUsers.filter(u=>u.role==='TL').length;
+  $('kamAdminSS').textContent=kamAreaUsers.filter(u=>u.role==='SS').length;
+  $('kamAdminRDS').textContent=kamAreaUsers.filter(u=>u.role==='RDS').length;
+  $('kamAdminUsers').innerHTML=rows.length?rows.map(u=>{
+    let hierarchy=u.role==='TL'?(u.tl||u.name):u.role==='SS'?(u.ss||u.name):(u.rds||u.name);
+    return `<tr>
+      <td><b>${esc(u.name)}</b><div class="priorityReason">${esc(u.username||'')}</div></td>
+      <td><span class="tag">${esc(u.role)}</span></td>
+      <td>${esc(hierarchy||'—')}</td>
+      <td>${Number(u.assigned_retailers||0)}</td>
+      <td><input class="waNumberInput" id="kam-wa-user-${u.id}" value="${esc(u.whatsapp_number||'')}" placeholder="+91..." inputmode="tel"><button class="ghost" onclick="saveKamAreaWhatsApp(${u.id})">Save</button></td>
+      <td><span class="tag ${u.active?'ok':'danger'}">${u.active?'Active':'Inactive'}</span></td>
+      <td><div class="actions"><button class="secondary" onclick="resetKamAreaPassword(${u.id})">Reset Password</button><button class="ghost" onclick="toggleKamAreaUser(${u.id},${u.active})">${u.active?'Deactivate':'Activate'}</button></div></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7">No users match the selected filters.</td></tr>';
+}
+
+async function saveKamAreaWhatsApp(id){
+  try{
+    let number=$('kam-wa-user-'+id)?.value.trim()||'';
+    let d=await api('/kam/management/users/'+id+'/whatsapp',{
+      method:'PATCH',
+      body:JSON.stringify({whatsapp_number:number||null})
+    });
+    let u=kamAreaUsers.find(x=>x.id===id); if(u)u.whatsapp_number=d.whatsapp_number||'';
+    msg('kamAdminMsg','WhatsApp number saved for '+d.name+'.',true);
+    renderKamManagement();
+    loadKamWaRecipients().catch(()=>{});
+  }catch(e){msg('kamAdminMsg',e.message)}
+}
+
+async function resetKamAreaPassword(id){
+  let u=kamAreaUsers.find(x=>x.id===id);
+  if(!u||!confirm('Reset password for '+u.name+'?'))return;
+  try{
+    let d=await api('/kam/management/users/'+id+'/reset-password',{method:'POST'});
+    alert('Temporary password for '+d.name+': '+d.temporary_password);
+    msg('kamAdminMsg','Password reset completed for '+d.name+'.',true);
+  }catch(e){msg('kamAdminMsg',e.message)}
+}
+
+async function toggleKamAreaUser(id,isActive){
+  let u=kamAreaUsers.find(x=>x.id===id);
+  if(!u)return;
+  let action=isActive?'deactivate':'activate';
+  if(!confirm((isActive?'Deactivate ':'Activate ')+u.name+'?'))return;
+  try{
+    let d=await api('/kam/management/users/'+id+'/'+action,{method:'POST'});
+    u.active=d.active;
+    renderKamManagement();
+    loadKamWaRecipients().catch(()=>{});
+    msg('kamAdminMsg',d.name+' is now '+(d.active?'active':'inactive')+'.',true);
+  }catch(e){msg('kamAdminMsg',e.message)}
+}
+
 let kamWaRecipients=[];
 
 async function loadKamWhatsapp(){
@@ -1494,6 +1595,10 @@ $('kamWaRecipient').onchange=()=>{$('kamWaPreview').value='';$('kamWaSendBtn').d
 $('kamWaPreviewBtn').onclick=previewKamWa;
 $('kamWaSendBtn').onclick=sendKamWa;
 $('kamWaSendAllBtn').onclick=sendKamWaAll;
+$('kamAdminRefresh').onclick=()=>loadKamManagement().catch(e=>msg('kamAdminMsg',e.message));
+$('kamAdminSearch').oninput=renderKamManagement;
+$('kamAdminRole').onchange=renderKamManagement;
+$('kamAdminStatus').onchange=renderKamManagement;
 $('waRole').onchange=renderWaRecipients;
 $('waRecipient').onchange=syncWaRecipient;
 $('waSaveNumber').onclick=saveSelectedWaNumber;
