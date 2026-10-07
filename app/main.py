@@ -332,13 +332,32 @@ def _scope(user: dict) -> dict:
 
     return {}
 
+
+def _record_matches_scope(record: dict, scope: dict) -> bool:
+    if not scope:
+        return True
+    for key, value in scope.items():
+        if key == "kam":
+            if record.get("kam") == value:
+                continue
+            retailer_name = record.get("retailer") or record.get("name")
+            if not retailer_name:
+                return False
+            retailer = crud.lookup_retailer_by_name(str(retailer_name))
+            if not retailer or retailer.get("kam") != value:
+                return False
+        elif record.get(key) != value:
+            return False
+    return True
+
+
 @app.post("/visits", response_model=VisitOut)
 def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
     scope = _scope(user)
     retailer = crud.lookup_retailer_by_name(payload.retailer)
     if not retailer:
         raise HTTPException(status_code=400, detail="Retailer is not in the master list.")
-    if scope and any(retailer.get(k) != v for k, v in scope.items()):
+    if scope and not _record_matches_scope(retailer, scope):
         raise HTTPException(status_code=403, detail="You can only log visits for retailers assigned to you.")
     payload.submitted_by = user.get("name", "Manager")
     payload.submitted_role = user.get("role", "MANAGER")
@@ -512,7 +531,7 @@ def get_visit(visit_id: int, user: dict = Depends(get_dashboard_user)):
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
     scope = _scope(user)
-    if scope and any(visit.get(k) != v for k, v in scope.items()):
+    if scope and not _record_matches_scope(visit, scope):
         raise HTTPException(status_code=403, detail="You cannot access this visit.")
     return visit
 
