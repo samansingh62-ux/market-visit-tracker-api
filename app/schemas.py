@@ -42,6 +42,7 @@ class RetailerOut(BaseModel):
     tl: str
     ss: str
     rds: str
+    kam: Optional[str] = None
     zone: str
     club: str
     status: str
@@ -73,6 +74,7 @@ class UserOut(BaseModel):
     tl: Optional[str] = None
     ss: Optional[str] = None
     rds: Optional[str] = None
+    kam: Optional[str] = None
     active: bool
 
 
@@ -83,6 +85,7 @@ class AdminUserOut(BaseModel):
     tl: Optional[str] = None
     ss: Optional[str] = None
     rds: Optional[str] = None
+    kam: Optional[str] = None
     username: str
     active: bool
     assigned_retailers: int
@@ -121,6 +124,7 @@ class RetailerHealthOut(BaseModel):
     tl: str
     ss: str
     rds: str
+    kam: Optional[str] = None
     zone: str
     club: str
     status: str
