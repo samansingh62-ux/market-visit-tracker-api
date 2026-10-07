@@ -89,6 +89,7 @@ def get_performance_scope_rows(
     tl: Optional[str] = None,
     ss: Optional[str] = None,
     rds: Optional[str] = None,
+    kam: Optional[str] = None,
 ) -> list[dict]:
     clauses = ["1=1"]
     params = []
@@ -101,11 +102,14 @@ def get_performance_scope_rows(
     if rds:
         clauses.append("r.rds = %s")
         params.append(rds)
+    if kam:
+        clauses.append("r.kam = %s")
+        params.append(kam)
     where = " AND ".join(clauses)
     with database.get_conn() as conn:
         rows = conn.execute(f"""
             SELECT
-                r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club, r.town_name, r.district_name,
+                r.code, r.name, r.tl, r.ss, r.rds, r.kam, r.zone, r.club, r.town_name, r.district_name,
                 COALESCE(t.target_volume, 0) AS target_volume,
                 COALESCE(t.target_value, 0) AS target_value,
                 v.last_visit,
@@ -209,7 +213,7 @@ def create_visit(payload) -> dict:
 
 
 def list_visits(retailer: Optional[str] = None, tl: Optional[str] = None,
-                ss: Optional[str] = None, rds: Optional[str] = None,
+                ss: Optional[str] = None, rds: Optional[str] = None, kam: Optional[str] = None,
                 submitted_by: Optional[str] = None,
                 submitted_role: Optional[str] = None,
                 date_from: Optional[str] = None, date_to: Optional[str] = None,
@@ -221,6 +225,9 @@ def list_visits(retailer: Optional[str] = None, tl: Optional[str] = None,
         if value:
             clauses.append(f"{col} = %s")
             params.append(value)
+    if kam:
+        clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND rk.kam = %s)")
+        params.append(kam)
     if date_from:
         clauses.append("visit_date >= %s")
         params.append(date_from)
@@ -256,9 +263,9 @@ def delete_visit(visit_id: int) -> bool:
 
 
 def list_retailers(tl: Optional[str] = None, ss: Optional[str] = None,
-                   rds: Optional[str] = None, search: Optional[str] = None) -> list:
+                   rds: Optional[str] = None, kam: Optional[str] = None, search: Optional[str] = None) -> list:
     clauses, params = [], []
-    for col, value in (("tl", tl), ("ss", ss), ("rds", rds)):
+    for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam)):
         if value:
             clauses.append(f"{col} = %s")
             params.append(value)
@@ -280,6 +287,7 @@ def list_users_admin() -> list:
                 u.tl,
                 u.ss,
                 u.rds,
+                u.kam,
                 u.username,
                 u.active,
                 u.whatsapp_number,
@@ -292,6 +300,8 @@ def list_users_admin() -> list:
                     (u.role = 'SS' AND r.ss = u.name)
                     OR
                     (u.role = 'RDS' AND r.rds = u.name)
+                    OR
+                    (u.role = 'KAM' AND r.kam = u.name)
                 )
             GROUP BY
                 u.id,
@@ -300,6 +310,7 @@ def list_users_admin() -> list:
                 u.tl,
                 u.ss,
                 u.rds,
+                u.kam,
                 u.username,
                 u.active,
                 u.whatsapp_number
@@ -327,7 +338,7 @@ def get_user_admin(user_id: int) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute(
             """
-            SELECT id, name, role, tl, ss, rds, username, whatsapp_number, active
+            SELECT id, name, role, tl, ss, rds, kam, username, whatsapp_number, active
             FROM users
             WHERE id = %s
             """,
@@ -428,52 +439,74 @@ def set_user_status(user_id: int, active: bool) -> Optional[dict]:
         return dict(row) if row else None
 
 
-def get_stats(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None) -> dict:
+def get_stats(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None, kam: Optional[str] = None) -> dict:
     with database.get_conn() as conn:
-        clauses, params = [], []
+        retailer_clauses, retailer_params = [], []
+        for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam)):
+            if value:
+                retailer_clauses.append(f"r.{col} = %s")
+                retailer_params.append(value)
+        retailer_where = f"WHERE {' AND '.join(retailer_clauses)}" if retailer_clauses else ""
+
+        visit_clauses, visit_params = [], []
         for col, value in (("tl", tl), ("ss", ss), ("rds", rds)):
             if value:
-                clauses.append(f"{col} = %s"); params.append(value)
-        vwhere = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+                visit_clauses.append(f"v.{col} = %s")
+                visit_params.append(value)
+        if kam:
+            visit_clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND rk.kam = %s)")
+            visit_params.append(kam)
+        visit_where = f"WHERE {' AND '.join(visit_clauses)}" if visit_clauses else ""
+
         return {
-            "total_visits": conn.execute(f"SELECT COUNT(*) AS c FROM visits {vwhere}", params).fetchone()["c"],
-            "unique_retailers_visited": conn.execute(f"SELECT COUNT(DISTINCT retailer) AS c FROM visits {vwhere}", params).fetchone()["c"],
-            "unique_markets": conn.execute(f"SELECT COUNT(DISTINCT market) AS c FROM visits {vwhere}", params).fetchone()["c"],
-            "total_retailers_in_master": conn.execute(f"SELECT COUNT(*) AS c FROM retailers {vwhere}", params).fetchone()["c"],
+            "total_visits": conn.execute(f"SELECT COUNT(*) AS c FROM visits v {visit_where}", visit_params).fetchone()["c"],
+            "unique_retailers_visited": conn.execute(f"SELECT COUNT(DISTINCT v.retailer) AS c FROM visits v {visit_where}", visit_params).fetchone()["c"],
+            "unique_markets": conn.execute(f"SELECT COUNT(DISTINCT v.market) AS c FROM visits v {visit_where}", visit_params).fetchone()["c"],
+            "total_retailers_in_master": conn.execute(f"SELECT COUNT(*) AS c FROM retailers r {retailer_where}", retailer_params).fetchone()["c"],
         }
 
-
-def get_coverage(group_by: str) -> list:
+def get_coverage(group_by: str, kam: Optional[str] = None) -> list:
     if group_by not in ("tl", "ss", "rds"):
         raise ValueError("group_by must be one of: tl, ss, rds")
     with database.get_conn() as conn:
+        scope_sql = " AND kam = %s" if kam else ""
+        scope_params = [kam] if kam else []
         assigned_rows = conn.execute(
-            f"SELECT {group_by} AS grp, COUNT(*) AS assigned FROM retailers WHERE {group_by} IS NOT NULL AND {group_by} != '' GROUP BY {group_by}"
+            f"SELECT {group_by} AS grp, COUNT(*) AS assigned FROM retailers WHERE {group_by} IS NOT NULL AND {group_by} != ''{scope_sql} GROUP BY {group_by}",
+            scope_params,
         ).fetchall()
         result = []
         for row in assigned_rows:
             grp, assigned = row["grp"], row["assigned"]
+            visited_params = [grp]
+            visited_scope = ""
+            if kam:
+                visited_scope = " AND r.kam = %s"
+                visited_params.append(kam)
             visited = conn.execute(
-                f"SELECT COUNT(DISTINCT v.retailer) AS c FROM visits v JOIN retailers r ON r.name = v.retailer WHERE r.{group_by} = %s", (grp,)
+                f"SELECT COUNT(DISTINCT v.retailer) AS c FROM visits v JOIN retailers r ON r.name = v.retailer WHERE r.{group_by} = %s{visited_scope}",
+                visited_params,
             ).fetchone()["c"]
-            total_visits = conn.execute(f"SELECT COUNT(*) AS c FROM visits WHERE {group_by} = %s", (grp,)).fetchone()["c"]
+            total_visits = conn.execute(
+                f"SELECT COUNT(*) AS c FROM visits v JOIN retailers r ON r.name = v.retailer WHERE r.{group_by} = %s{visited_scope}",
+                visited_params,
+            ).fetchone()["c"]
             result.append({"name": grp, "assigned": assigned, "visited": visited,
                            "coverage_pct": round((visited / assigned) * 100, 1) if assigned else 0.0,
                            "total_visits": total_visits})
         return sorted(result, key=lambda r: r["name"])
 
-
 def get_retailer_health(tl: Optional[str] = None, ss: Optional[str] = None,
-                        rds: Optional[str] = None, zone: Optional[str] = None,
+                        rds: Optional[str] = None, kam: Optional[str] = None, zone: Optional[str] = None,
                         priority: Optional[str] = None, limit: int = 500) -> list:
     clauses, params = [], []
-    for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("zone", zone)):
+    for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam), ("zone", zone)):
         if value:
             clauses.append(f"r.{col} = %s")
             params.append(value)
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
     query = f"""
-        SELECT r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club, r.status,
+        SELECT r.code, r.name, r.tl, r.ss, r.rds, r.kam, r.zone, r.club, r.status,
                COUNT(v.id) AS visit_count,
                MAX(v.visit_date) AS last_visit,
                CASE WHEN MAX(v.visit_date) IS NULL THEN NULL
@@ -481,7 +514,7 @@ def get_retailer_health(tl: Optional[str] = None, ss: Optional[str] = None,
         FROM retailers r
         LEFT JOIN visits v ON v.retailer = r.name
         {where}
-        GROUP BY r.code, r.name, r.tl, r.ss, r.rds, r.zone, r.club, r.status
+        GROUP BY r.code, r.name, r.tl, r.ss, r.rds, r.kam, r.zone, r.club, r.status
         ORDER BY CASE WHEN MAX(v.visit_date) IS NULL THEN 0 ELSE 1 END,
                  MAX(v.visit_date) ASC NULLS FIRST, r.name
         LIMIT %s
