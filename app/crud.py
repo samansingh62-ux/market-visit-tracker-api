@@ -835,3 +835,151 @@ def kam_can_manage_user(kam_name: str, user_id: int) -> bool:
             (user_id, kam_name, kam_name, kam_name),
         ).fetchone()
         return row is not None
+
+
+def get_whatsapp_broadcast_config() -> dict:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT id, enabled, send_hour, send_minute, audience, updated_at
+            FROM whatsapp_broadcast_config
+            WHERE id = 1
+            """
+        ).fetchone()
+        return dict(row) if row else {
+            "id": 1,
+            "enabled": True,
+            "send_hour": 19,
+            "send_minute": 0,
+            "audience": "TL",
+            "updated_at": None,
+        }
+
+
+def update_whatsapp_broadcast_config(
+    enabled: bool,
+    send_hour: int,
+    send_minute: int,
+    audience: str = "TL",
+) -> dict:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            INSERT INTO whatsapp_broadcast_config
+                (id, enabled, send_hour, send_minute, audience, updated_at)
+            VALUES (1, %s, %s, %s, %s, %s)
+            ON CONFLICT (id) DO UPDATE SET
+                enabled = EXCLUDED.enabled,
+                send_hour = EXCLUDED.send_hour,
+                send_minute = EXCLUDED.send_minute,
+                audience = EXCLUDED.audience,
+                updated_at = EXCLUDED.updated_at
+            RETURNING id, enabled, send_hour, send_minute, audience, updated_at
+            """,
+            (bool(enabled), int(send_hour), int(send_minute), str(audience), now),
+        ).fetchone()
+        return dict(row)
+
+
+def list_active_users_by_role(role: str) -> list[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, name, role, tl, ss, rds, kam, username, whatsapp_number, active
+            FROM users
+            WHERE active = TRUE AND role = %s
+            ORDER BY name
+            """,
+            (role,),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+
+def claim_whatsapp_broadcast_run(
+    run_key: str,
+    run_date: str,
+    scope_key: str,
+    audience: str,
+    trigger: str,
+) -> Optional[dict]:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            INSERT INTO whatsapp_broadcast_runs
+                (run_key, run_date, scope_key, audience, trigger, started_at, status)
+            VALUES (%s,%s,%s,%s,%s,%s,'RUNNING')
+            ON CONFLICT (run_key) DO NOTHING
+            RETURNING *
+            """,
+            (run_key, run_date, scope_key, audience, trigger, now),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def finish_whatsapp_broadcast_run(
+    run_id: int,
+    status: str,
+    total_recipients: int,
+    submitted: int,
+    skipped_no_number: int,
+    skipped_no_data: int,
+    failed: int,
+    detail: Optional[str] = None,
+) -> Optional[dict]:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            UPDATE whatsapp_broadcast_runs
+            SET finished_at = %s,
+                status = %s,
+                total_recipients = %s,
+                submitted = %s,
+                skipped_no_number = %s,
+                skipped_no_data = %s,
+                failed = %s,
+                detail = %s
+            WHERE id = %s
+            RETURNING *
+            """,
+            (
+                now,
+                status,
+                int(total_recipients),
+                int(submitted),
+                int(skipped_no_number),
+                int(skipped_no_data),
+                int(failed),
+                detail,
+                run_id,
+            ),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def get_whatsapp_broadcast_run(run_id: int) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            "SELECT * FROM whatsapp_broadcast_runs WHERE id = %s",
+            (run_id,),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def list_whatsapp_broadcast_runs(limit: int = 20) -> list[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT *
+            FROM whatsapp_broadcast_runs
+            ORDER BY id DESC
+            LIMIT %s
+            """,
+            (limit,),
+        ).fetchall()
+        return [dict(row) for row in rows]
