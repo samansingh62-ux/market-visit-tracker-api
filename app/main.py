@@ -318,6 +318,7 @@ def pin_users():
         "TL": sorted([r["name"] for r in rows if r["role"] == "TL"]),
         "SS": sorted([r["name"] for r in rows if r["role"] == "SS"]),
         "KAM": sorted([r["name"] for r in rows if r["role"] == "KAM"]),
+        "RDS": sorted([r["name"] for r in rows if r["role"] == "RDS"]),
     }
 
 
@@ -1418,6 +1419,28 @@ def admin_whatsapp_log(payload: WhatsappNotificationLogCreate):
 @app.get("/admin/whatsapp/logs", dependencies=[Depends(require_admin_key)])
 def admin_whatsapp_logs(limit: int = Query(default=25, ge=1, le=100)):
     return crud.list_whatsapp_notification_logs(limit=limit)
+
+
+@app.post("/admin/users/rds/create-missing-pins", dependencies=[Depends(require_admin_key)])
+def admin_create_missing_rds_pins():
+    rows = crud.create_missing_rds_pins()
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["RDS", "Username", "PIN"])
+    for row in rows:
+        # Prevent spreadsheet formulas in account labels.
+        name = str(row["name"])
+        username = str(row["username"])
+        writer.writerow([("'" + name) if name.startswith(("=", "+", "-", "@")) else name,
+                         ("'" + username) if username.startswith(("=", "+", "-", "@")) else username,
+                         row["pin"]])
+    return Response(
+        content=buffer.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="new-rds-pins.csv"',
+                 "Cache-Control": "no-store",
+                 "X-PINs-Created": str(len(rows))},
+    )
 
 
 @app.post(
