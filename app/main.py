@@ -21,6 +21,7 @@ from .auth import get_current_user, get_dashboard_user, hash_password, require_a
 from .schemas import (
     AdminUserOut,
     CoverageRow,
+    DailyRetailerRemarkCreate,
     LoginOut,
     PinLoginRequest,
     LoginRequest,
@@ -1483,6 +1484,93 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
         "days_remaining": days_remaining,
         "retailers": len(retailer_codes),
     }
+
+
+@app.get("/eod-remarks/retailers")
+def eod_remark_retailers(user: dict = Depends(get_current_user)):
+    role = str(user.get("role") or "").upper()
+    if role not in ("TL", "SS", "RDS"):
+        raise HTTPException(status_code=403, detail="EOD remarks are available to TL, SS and RDS users.")
+
+    perf = performance_dashboard(user)
+    today = date.today().isoformat()
+    existing = {
+        str(row.get("retailer_code") or "").strip().upper(): row
+        for row in crud.list_daily_retailer_remarks(
+            today,
+            submitted_by=str(user.get("name") or ""),
+            submitted_role=role,
+        )
+    }
+
+    rows = []
+    for row in (perf.get("retailers") or []):
+        sales = int(row.get("sales") or 0)
+        ach = float(row.get("achievement_pct") or 0)
+        target = int(row.get("target") or 0)
+        if sales == 0 or (target > 0 and ach < 50):
+            code = str(row.get("code") or "").strip().upper()
+            saved = existing.get(code) or {}
+            rows.append({
+                "code": code,
+                "name": row.get("name"),
+                "sales": sales,
+                "target": target,
+                "achievement_pct": ach,
+                "remark": saved.get("remark") or "",
+                "updated_at": saved.get("updated_at"),
+            })
+
+    rows.sort(key=lambda x: (x["sales"], x["achievement_pct"], str(x["name"] or "")))
+    return {
+        "date": today,
+        "role": role,
+        "name": user.get("name"),
+        "count": len(rows),
+        "retailers": rows,
+    }
+
+
+@app.post("/eod-remarks")
+def save_eod_remark(payload: DailyRetailerRemarkCreate, user: dict = Depends(get_current_user)):
+    role = str(user.get("role") or "").upper()
+    if role not in ("TL", "SS", "RDS"):
+        raise HTTPException(status_code=403, detail="EOD remarks are available to TL, SS and RDS users.")
+
+    code = str(payload.retailer_code or "").strip().upper()
+    retailer = crud.lookup_retailer_by_code(code)
+    if not retailer:
+        raise HTTPException(status_code=404, detail="Retailer not found.")
+
+    scope = _scope(user)
+    if scope and any(retailer.get(k) != v for k, v in scope.items()):
+        raise HTTPException(status_code=403, detail="Retailer is outside your hierarchy.")
+
+    perf = performance_dashboard(user)
+    perf_row = next(
+        (
+            row for row in (perf.get("retailers") or [])
+            if str(row.get("code") or "").strip().upper() == code
+        ),
+        None,
+    )
+    if not perf_row:
+        raise HTTPException(status_code=404, detail="Retailer performance is unavailable.")
+
+    sales = int(perf_row.get("sales") or 0)
+    target = int(perf_row.get("target") or 0)
+    ach = float(perf_row.get("achievement_pct") or 0)
+    if not (sales == 0 or (target > 0 and ach < 50)):
+        raise HTTPException(status_code=400, detail="Remarks can only be submitted for low-sale retailers.")
+
+    return crud.upsert_daily_retailer_remark(
+        remark_date=date.today().isoformat(),
+        retailer_code=code,
+        retailer_name=str(retailer.get("name") or perf_row.get("name") or ""),
+        submitted_by=str(user.get("name") or ""),
+        submitted_role=role,
+        remark=str(payload.remark).strip(),
+    )
 
 
 @app.get("/visit-priorities")
