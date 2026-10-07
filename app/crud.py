@@ -749,3 +749,89 @@ def kam_can_message_user(kam_name: str, user_id: int) -> bool:
             (user_id, kam_name, kam_name),
         ).fetchone()
         return row is not None
+
+
+def list_kam_area_users(kam_name: str) -> list[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                u.id,
+                u.name,
+                u.role,
+                u.tl,
+                u.ss,
+                u.rds,
+                u.kam,
+                u.username,
+                u.active,
+                u.whatsapp_number,
+                CASE
+                    WHEN u.role = 'TL' THEN (
+                        SELECT COUNT(*) FROM retailers r
+                        WHERE r.kam = %s AND r.tl = u.name
+                    )
+                    WHEN u.role = 'SS' THEN (
+                        SELECT COUNT(*) FROM retailers r
+                        WHERE r.kam = %s AND r.ss = u.name
+                    )
+                    WHEN u.role = 'RDS' THEN (
+                        SELECT COUNT(*) FROM retailers r
+                        WHERE r.kam = %s AND r.rds = u.name
+                    )
+                    ELSE 0
+                END AS assigned_retailers
+            FROM users u
+            WHERE u.role IN ('TL','SS','RDS')
+              AND (
+                    (u.role = 'TL' AND EXISTS (
+                        SELECT 1 FROM retailers r1
+                        WHERE r1.kam = %s AND r1.tl = u.name
+                    ))
+                    OR
+                    (u.role = 'SS' AND EXISTS (
+                        SELECT 1 FROM retailers r2
+                        WHERE r2.kam = %s AND r2.ss = u.name
+                    ))
+                    OR
+                    (u.role = 'RDS' AND EXISTS (
+                        SELECT 1 FROM retailers r3
+                        WHERE r3.kam = %s AND r3.rds = u.name
+                    ))
+              )
+            ORDER BY u.role, u.name
+            """,
+            (kam_name, kam_name, kam_name, kam_name, kam_name, kam_name),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+
+def kam_can_manage_user(kam_name: str, user_id: int) -> bool:
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT 1
+            FROM users u
+            WHERE u.id = %s
+              AND u.role IN ('TL','SS','RDS')
+              AND (
+                    (u.role = 'TL' AND EXISTS (
+                        SELECT 1 FROM retailers r
+                        WHERE r.kam = %s AND r.tl = u.name
+                    ))
+                    OR
+                    (u.role = 'SS' AND EXISTS (
+                        SELECT 1 FROM retailers r
+                        WHERE r.kam = %s AND r.ss = u.name
+                    ))
+                    OR
+                    (u.role = 'RDS' AND EXISTS (
+                        SELECT 1 FROM retailers r
+                        WHERE r.kam = %s AND r.rds = u.name
+                    ))
+              )
+            LIMIT 1
+            """,
+            (user_id, kam_name, kam_name, kam_name),
+        ).fetchone()
+        return row is not None
