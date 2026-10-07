@@ -43,7 +43,7 @@ WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
 WHATSAPP_WABA_ID = os.getenv("WHATSAPP_WABA_ID", "").strip()
 WHATSAPP_GRAPH_VERSION = os.getenv("WHATSAPP_GRAPH_VERSION", "v26.0").strip() or "v26.0"
-WHATSAPP_TEMPLATE_NAME = os.getenv("WHATSAPP_TEMPLATE_NAME", "zone_a_incentive_update_v1").strip() or "zone_a_incentive_update_v1"
+WHATSAPP_TEMPLATE_NAME = os.getenv("WHATSAPP_TEMPLATE_NAME", "zone_a_incentive_update_v2").strip() or "zone_a_incentive_update_v2"
 WHATSAPP_TEMPLATE_LANGUAGE = os.getenv("WHATSAPP_TEMPLATE_LANGUAGE", "en").strip() or "en"
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
@@ -88,7 +88,8 @@ def _whatsapp_template_body_text() -> str:
         "Target: {{3}} units\n"
         "MTD Achievement: {{4}} units ({{5}}%)\n"
         "Gap: {{6}} units\n"
-        "Required / Day: {{7}}\n\n"
+        "Required / Day: {{7}}\n"
+        "{{13}}\n\n"
         "Provisional Incentive Summary\n"
         "Festive Booster: {{8}}\n"
         "Focus Model: {{9}}\n"
@@ -791,6 +792,19 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
     back = int(summary.get("back_support_payable_known") or 0)
     total_known = festive + focus + v80 + back
 
+    zero_sales_rows = [
+        row for row in (perf.get("retailers") or [])
+        if int(row.get("sales") or 0) == 0
+    ]
+    zero_sales_count = len(zero_sales_rows)
+    zero_sales_names = [str(row.get("name") or "").strip() for row in zero_sales_rows if row.get("name")]
+    if target_user.get("role") in ("TL", "SS"):
+        zero_sales_line = f"Zero Sales Retailers: {zero_sales_count}"
+        zero_sales_detail = ", ".join(zero_sales_names) if zero_sales_names else "None"
+    else:
+        zero_sales_line = "Zero Sales Retailers: Not applicable"
+        zero_sales_detail = ""
+
     lines = [
         "vivo NESA Zone A - October 2026 Update",
         f"{target_user.get('role')}: {target_user.get('name')}",
@@ -799,6 +813,8 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         f"MTD Achievement: {sales:,} units ({ach:.1f}%)",
         f"Gap: {gap:,} units",
         f"Required / Day: {round(float(req),1)}",
+        zero_sales_line,
+        *([f"Zero Sales Retailer List: {zero_sales_detail}"] if zero_sales_detail else []),
         "",
         "Provisional Incentive Summary",
         f"Festive Booster: {_format_inr(festive)}",
@@ -822,6 +838,7 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         _format_inr(v80),
         _format_inr(back),
         _format_inr(total_known),
+        zero_sales_line if not zero_sales_detail else f"{zero_sales_line} | {zero_sales_detail}",
     ]
     return {
         "user_id": target_user.get("id"),
@@ -891,7 +908,8 @@ def admin_whatsapp_template_submit():
             "example": {
                 "body_text": [[
                     "TL", "Example Name", "1,000", "450", "45.0", "550", "22.0",
-                    "₹12,000", "₹8,000", "₹3,000", "₹4,500", "₹27,500"
+                    "₹12,000", "₹8,000", "₹3,000", "₹4,500", "₹27,500",
+                    "Zero Sales Retailers: 3 | Retailer A, Retailer B, Retailer C"
                 ]]
             },
         }],
