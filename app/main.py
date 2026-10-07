@@ -352,6 +352,13 @@ def _record_matches_scope(record: dict, scope: dict) -> bool:
     return True
 
 
+
+def _require_kam(user: dict) -> dict:
+    if str(user.get("role") or "").upper() != "KAM":
+        raise HTTPException(status_code=403, detail="KAM access required.")
+    return user
+
+
 @app.post("/visits", response_model=VisitOut)
 def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
     scope = _scope(user)
@@ -1032,6 +1039,100 @@ def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
             error_detail=detail,
         )
         raise HTTPException(status_code=502, detail=f"WhatsApp send failed: {detail}") from exc
+
+
+@app.get("/kam/whatsapp/recipients")
+def kam_whatsapp_recipients(
+    role: Optional[str] = Query(default=None, pattern="^(TL|SS)$"),
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    return crud.list_kam_whatsapp_recipients(str(user.get("name") or ""), role=role)
+
+
+@app.get("/kam/whatsapp/preview")
+def kam_whatsapp_preview(
+    user_id: int = Query(..., ge=1),
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_message_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This TL/SS is outside your KAM hierarchy.")
+    return admin_whatsapp_preview(user_id)
+
+
+@app.get("/kam/whatsapp/status")
+def kam_whatsapp_status(user: dict = Depends(get_current_user)):
+    _require_kam(user)
+    return admin_whatsapp_status()
+
+
+@app.post("/kam/whatsapp/send")
+def kam_whatsapp_send(
+    user_id: int = Query(..., ge=1),
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    if not crud.kam_can_message_user(kam_name, user_id):
+        raise HTTPException(status_code=403, detail="This TL/SS is outside your KAM hierarchy.")
+    return admin_whatsapp_send(user_id)
+
+
+@app.post("/kam/whatsapp/send-all")
+def kam_whatsapp_send_all(
+    role: str = Query(default="ALL", pattern="^(ALL|TL|SS)$"),
+    user: dict = Depends(get_current_user),
+):
+    _require_kam(user)
+    kam_name = str(user.get("name") or "")
+    role_filter = None if role == "ALL" else role
+    recipients = crud.list_kam_whatsapp_recipients(kam_name, role=role_filter)
+
+    results = []
+    sent = 0
+    skipped = 0
+    failed = 0
+    for recipient in recipients:
+        if not recipient.get("whatsapp_number"):
+            skipped += 1
+            results.append({
+                "user_id": recipient.get("id"),
+                "name": recipient.get("name"),
+                "role": recipient.get("role"),
+                "status": "SKIPPED_NO_NUMBER",
+            })
+            continue
+        try:
+            result = admin_whatsapp_send(int(recipient["id"]))
+            sent += 1
+            results.append({
+                "user_id": recipient.get("id"),
+                "name": recipient.get("name"),
+                "role": recipient.get("role"),
+                "status": result.get("status") or "SUBMITTED",
+                "provider_message_id": result.get("provider_message_id"),
+            })
+        except HTTPException as exc:
+            failed += 1
+            results.append({
+                "user_id": recipient.get("id"),
+                "name": recipient.get("name"),
+                "role": recipient.get("role"),
+                "status": "FAILED",
+                "detail": str(exc.detail),
+            })
+
+    return {
+        "kam": kam_name,
+        "role_filter": role,
+        "total_recipients": len(recipients),
+        "submitted": sent,
+        "skipped_no_number": skipped,
+        "failed": failed,
+        "results": results,
+    }
 
 
 @app.post("/admin/whatsapp/log", dependencies=[Depends(require_admin_key)])
