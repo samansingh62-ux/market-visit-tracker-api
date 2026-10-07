@@ -1885,6 +1885,28 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
     }
 
 
+
+@app.get("/exports/eod-remarks.xlsx")
+def export_eod_remarks_xlsx(
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    user: dict = Depends(get_dashboard_user),
+):
+    require_manager(user)
+    start = date_from or datetime.now(IST).date()
+    end = date_to or start
+    if end < start:
+        raise HTTPException(status_code=400, detail="End date must be on or after start date.")
+    from .eod_export import build_eod_workbook
+    rows = crud.list_management_eod_remarks(start.isoformat(), end.isoformat())
+    out = build_eod_workbook(rows, start, end)
+    filename = f"eod-remarks-tl-ss-{start.isoformat()}-to-{end.isoformat()}.xlsx"
+    return StreamingResponse(
+        out,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
 @app.get("/eod-remarks/retailers")
 def eod_remark_retailers(user: dict = Depends(get_current_user)):
     role = str(user.get("role") or "").upper()
