@@ -164,3 +164,10 @@ class PhotoOut(BaseModel):
 class DailyRetailerRemarkCreate(BaseModel):
     retailer_code: str = Field(..., min_length=1)
     remark: str = Field(..., min_length=3, max_length=1000)
+
+
+class WhatsappBroadcastConfigUpdate(BaseModel):
+    enabled: bool = True
+    send_hour: int = Field(default=19, ge=0, le=23)
+    send_minute: int = Field(default=0, ge=0, le=59)
+    audience: str = Field(default="TL", pattern="^TL$")
