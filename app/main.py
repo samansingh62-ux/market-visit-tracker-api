@@ -284,7 +284,7 @@ def login(payload: LoginRequest):
     if not user or not user.get("password_hash") or not verify_password(payload.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
     token = create_token(user)
-    safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "active")}
+    safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "kam", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
 
 
@@ -327,6 +327,8 @@ def _scope(user: dict) -> dict:
         return {"ss": name}
     if role == "RDS":
         return {"rds": name}
+    if role == "KAM":
+        return {"kam": name}
 
     return {}
 
@@ -351,10 +353,11 @@ def get_visits(retailer: Optional[str] = None, tl: Optional[str] = None, ss: Opt
                limit: int = Query(default=500, ge=1, le=2000), offset: int = Query(default=0, ge=0),
                user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
+    kam = scope.get("kam") if scope else None
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
         submitted_by = None
-    return crud.list_visits(retailer=retailer, tl=tl, ss=ss, rds=rds, submitted_by=submitted_by,
+    return crud.list_visits(retailer=retailer, tl=tl, ss=ss, rds=rds, kam=kam, submitted_by=submitted_by,
                             submitted_role=submitted_role, date_from=date_from, date_to=date_to,
                             search=search, limit=limit, offset=offset)
 
@@ -363,9 +366,10 @@ def get_visits(retailer: Optional[str] = None, tl: Optional[str] = None, ss: Opt
 def get_retailers(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
                   search: Optional[str] = None, user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
+    kam = scope.get("kam") if scope else None
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
-    return crud.list_retailers(tl=tl, ss=ss, rds=rds, search=search)
+    return crud.list_retailers(tl=tl, ss=ss, rds=rds, kam=kam, search=search)
 
 
 @app.get("/retailers/{retailer_code}/360")
@@ -570,7 +574,7 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
     perf = performance_dashboard(user)
     visits = crud.list_visits(
-        tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), limit=10000
+        tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), kam=scope.get("kam"), limit=10000
     )
 
     wb = Workbook()
@@ -657,8 +661,9 @@ def export_visits_csv(tl: Optional[str] = None, ss: Optional[str] = None, rds: O
                       date_from: Optional[str] = None, date_to: Optional[str] = None,
                       user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
+    kam = scope.get("kam") if scope else None
     if scope: tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
-    rows = crud.list_visits(tl=tl, ss=ss, rds=rds, date_from=date_from, date_to=date_to, limit=2000)
+    rows = crud.list_visits(tl=tl, ss=ss, rds=rds, kam=kam, date_from=date_from, date_to=date_to, limit=2000)
     buffer = io.StringIO(); writer = csv.writer(buffer)
     writer.writerow(["id", "visit_date", "retailer", "tl", "ss", "rds", "market", "feedback", "suggestions", "submitted_by", "submitted_role", "created_at"])
     for r in rows:
@@ -668,7 +673,7 @@ def export_visits_csv(tl: Optional[str] = None, ss: Optional[str] = None, rds: O
 
 
 @app.get("/users", response_model=List[UserOut])
-def get_users(role: Optional[str] = Query(default=None, pattern="^(TL|SS|RDS)$"), user: dict = Depends(get_current_user)):
+def get_users(role: Optional[str] = Query(default=None, pattern="^(TL|SS|RDS|KAM)$"), user: dict = Depends(get_current_user)):
     require_manager(user)
     return crud.list_users(role=role)
 
@@ -1097,7 +1102,8 @@ def get_coverage(
     if role in ("TL", "SS", "RDS"):
         group_by = role.lower()
 
-    rows = crud.get_coverage(group_by)
+    scope = _scope(user)
+    rows = crud.get_coverage(group_by, kam=scope.get("kam"))
 
     if role in ("TL", "SS", "RDS"):
         name = user.get("name")
@@ -1117,6 +1123,7 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
         tl=scope.get("tl"),
         ss=scope.get("ss"),
         rds=scope.get("rds"),
+        kam=scope.get("kam"),
     )
     codes = [str(r.get("code") or "").strip().upper() for r in scope_rows if r.get("code")]
 
@@ -1156,7 +1163,7 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
 
 @app.get("/performance-dashboard")
 def performance_dashboard(user: dict = Depends(get_dashboard_user)):
-    """Hierarchy-aware retailer performance for TL, SS, RDS and management."""
+    """Hierarchy-aware retailer performance for TL, SS, RDS, KAM and management."""
     today = date.today()
     month = today.strftime("%Y-%m")
     scope = _scope(user)
@@ -1165,6 +1172,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         tl=scope.get("tl"),
         ss=scope.get("ss"),
         rds=scope.get("rds"),
+        kam=scope.get("kam"),
     )
 
     params = {
@@ -1272,6 +1280,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "tl": row.get("tl"),
             "ss": row.get("ss"),
             "rds": row.get("rds"),
+            "kam": row.get("kam"),
             "zone": row.get("zone"),
             "club": row.get("club"),
             "town_name": row.get("town_name"),
@@ -1584,6 +1593,7 @@ def visit_priorities(
         tl=scope.get("tl"),
         ss=scope.get("ss"),
         rds=scope.get("rds"),
+        kam=scope.get("kam"),
         limit=2000,
     )
 
@@ -1704,5 +1714,6 @@ def retailer_health(tl: Optional[str] = None, ss: Optional[str] = None, rds: Opt
                     zone: Optional[str] = None, priority: Optional[str] = None,
                     limit: int = Query(default=500, ge=1, le=2000), user: dict = Depends(get_dashboard_user)):
     scope = _scope(user)
+    kam = scope.get("kam") if scope else None
     if scope: tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
-    return crud.get_retailer_health(tl=tl, ss=ss, rds=rds, zone=zone, priority=priority, limit=limit)
+    return crud.get_retailer_health(tl=tl, ss=ss, rds=rds, kam=kam, zone=zone, priority=priority, limit=limit)
