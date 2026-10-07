@@ -533,7 +533,15 @@ button{min-height:44px}
   <div id="perfEodView" class="perfView hidden perfPanel">
     <h3>End of Day Retailer Remarks</h3>
     <div class="perfSub">Only low-sale retailers in your hierarchy are shown. Low sale means zero MTD sales or below 50% target achievement.</div>
-    <div class="formgrid" style="margin-top:14px">
+    <div id="eodManagementExport" class="hidden" style="margin-top:14px">
+      <p>Download all submitted TL and SS remarks for the selected dates.</p>
+      <div class="formgrid">
+        <label>From date<input id="eodExportFrom" type="date"></label>
+        <label>To date<input id="eodExportTo" type="date"></label>
+      </div>
+      <button id="eodExportExcel" class="primary" type="button">Download EOD Remarks (Excel)</button>
+    </div>
+    <div id="eodEntryFields" class="formgrid" style="margin-top:14px">
       <label>Retailer
         <select id="eodRetailer"><option value="">Select low-sale retailer</option></select>
       </label>
@@ -865,6 +873,16 @@ let eodRetailers=[];
 
 async function loadEodRetailers(){
   if(!$('eodRetailer'))return;
+  const management=user?.role==='MANAGER';
+  $('eodManagementExport').classList.toggle('hidden',!management);
+  $('eodEntryFields').classList.toggle('hidden',management);
+  $('eodSave').classList.toggle('hidden',management);
+  if(management){
+    const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    if(!$('eodExportFrom').value)$('eodExportFrom').value=today;
+    if(!$('eodExportTo').value)$('eodExportTo').value=today;
+    return msg('eodMsg','Management can download remarks from every TL and SS.',true);
+  }
   if(!user || !['TL','SS','RDS'].includes(user.role)){
     $('eodRetailer').innerHTML='<option value="">Not available for this role</option>';
     $('eodRemark').value='';
@@ -884,6 +902,26 @@ async function loadEodRetailers(){
     $('eodRetailer').innerHTML='<option value="">Unable to load retailers</option>';
     msg('eodMsg',e.message);
   }
+}
+
+
+async function downloadEodRemarks(){
+  const from=$('eodExportFrom').value,to=$('eodExportTo').value;
+  if(!from||!to)return msg('eodMsg','Choose both dates.');
+  if(to<from)return msg('eodMsg','End date must be on or after start date.');
+  const btn=$('eodExportExcel'),old=btn.textContent;
+  let url;
+  try{
+    btn.disabled=true;btn.textContent='Preparing Excel…';
+    const response=await api('/exports/eod-remarks.xlsx?'+new URLSearchParams({date_from:from,date_to:to}));
+    const blob=await response.blob();
+    url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;link.download='eod-remarks-tl-ss-'+from+'-to-'+to+'.xlsx';
+    document.body.appendChild(link);link.click();link.remove();
+    msg('eodMsg','Excel download ready: all saved TL and SS remarks for '+from+' to '+to+'.',true);
+  }catch(e){msg('eodMsg',e.message)}
+  finally{if(url)URL.revokeObjectURL(url);btn.disabled=false;btn.textContent=old}
 }
 
 function syncEodRemark(){
@@ -1695,6 +1733,7 @@ $('perfHierarchyFilter').onchange=renderPerfTables;
 $('perfReset').onclick=()=>{$('perfSearch').value='';$('perfStatusFilter').value='';$('perfHierarchyFilter').value='';renderPerfTables()};
 $('eodRetailer').onchange=syncEodRemark;
 $('eodSave').onclick=saveEodRemark;
+$('eodExportExcel').onclick=downloadEodRemarks;
 
 $('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUsers()};
 $('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(managerMode)$('app').classList.remove('hidden');else if(token)$('app').classList.remove('hidden')};
