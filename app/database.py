@@ -217,6 +217,23 @@ def init_db():
         conn.execute("ALTER TABLE whatsapp_notification_log ADD COLUMN IF NOT EXISTS error_detail TEXT")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_whatsapp_log_created_at ON whatsapp_notification_log(created_at)")
 
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS daily_retailer_remarks (
+                id BIGSERIAL PRIMARY KEY,
+                remark_date TEXT NOT NULL,
+                retailer_code TEXT NOT NULL,
+                retailer_name TEXT NOT NULL,
+                submitted_by TEXT NOT NULL,
+                submitted_role TEXT NOT NULL,
+                remark TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(remark_date, retailer_code, submitted_by, submitted_role)
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_date ON daily_retailer_remarks(remark_date)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_retailer ON daily_retailer_remarks(retailer_code)")
+
         for column in ("retailer", "tl", "ss", "rds", "visit_date"):
             conn.execute(f"CREATE INDEX IF NOT EXISTS idx_visits_{column} ON visits({column})")
 
