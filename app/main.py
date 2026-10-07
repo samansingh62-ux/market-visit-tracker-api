@@ -1,18 +1,21 @@
 """Market Visit Tracker API with GTM hierarchy and retailer intelligence."""
 
+import asyncio
 import calendar
 import csv
 import io
 import os
-from datetime import date
+import uuid
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import List, Optional
+from zoneinfo import ZoneInfo
 
 import httpx
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from fastapi import Depends, FastAPI, HTTPException, Query, File, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
@@ -32,6 +35,7 @@ from .schemas import (
     UserOut,
     UserStatusOut,
     WhatsappNumberUpdate,
+    WhatsappBroadcastConfigUpdate,
     WhatsappNotificationLogCreate,
     VisitCreate,
     VisitOut, PhotoOut,
@@ -49,6 +53,7 @@ WHATSAPP_TEMPLATE_LANGUAGE = os.getenv("WHATSAPP_TEMPLATE_LANGUAGE", "en").strip
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+IST = ZoneInfo("Asia/Kolkata")
 
 def _normalize_whatsapp_number(value: Optional[str]) -> Optional[str]:
     if value is None:
@@ -266,6 +271,22 @@ def _festive_scheme_payout(club_value, scheme_sales):
 @app.on_event("startup")
 def on_startup():
     database.init_db()
+
+
+@app.on_event("startup")
+async def start_whatsapp_broadcast_scheduler():
+    app.state.whatsapp_broadcast_task = asyncio.create_task(_whatsapp_broadcast_scheduler())
+
+
+@app.on_event("shutdown")
+async def stop_whatsapp_broadcast_scheduler():
+    task = getattr(app.state, "whatsapp_broadcast_task", None)
+    if task:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
 
 @app.get("/health")
@@ -884,6 +905,14 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         "template_language": WHATSAPP_TEMPLATE_LANGUAGE,
         "connected": _whatsapp_configured(),
         "send_status": "WhatsApp Cloud API configured." if _whatsapp_configured() else "WhatsApp Business integration not connected yet.",
+        "performance": {
+            "target": target,
+            "sales": sales,
+            "achievement_pct": ach,
+            "gap": gap,
+            "required_per_day": round(float(req), 1),
+            "zero_sales_retailers": zero_sales_count,
+        },
     }
 
 
@@ -967,15 +996,14 @@ def admin_whatsapp_template_submit():
         raise HTTPException(status_code=502, detail=f"Template submission failed: {exc}") from exc
 
 
-@app.post("/admin/whatsapp/send", dependencies=[Depends(require_admin_key)])
-def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
+def _send_whatsapp_preview(preview: dict):
     if not _whatsapp_configured():
         raise HTTPException(
             status_code=503,
             detail="WhatsApp Cloud API credentials are not configured in Render.",
         )
 
-    preview = admin_whatsapp_preview(user_id)
+    user_id = int(preview.get("user_id") or 0)
     number = _normalize_whatsapp_number(preview.get("whatsapp_number"))
     if not number:
         raise HTTPException(status_code=400, detail="Recipient WhatsApp number is missing.")
@@ -1039,6 +1067,172 @@ def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
             error_detail=detail,
         )
         raise HTTPException(status_code=502, detail=f"WhatsApp send failed: {detail}") from exc
+
+
+@app.post("/admin/whatsapp/send", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_send(user_id: int = Query(..., ge=1)):
+    preview = admin_whatsapp_preview(user_id)
+    return _send_whatsapp_preview(preview)
+
+def _next_broadcast_at(config: dict) -> str:
+    now = datetime.now(IST)
+    scheduled = now.replace(
+        hour=int(config.get("send_hour") or 19),
+        minute=int(config.get("send_minute") or 0),
+        second=0,
+        microsecond=0,
+    )
+    if scheduled <= now:
+        scheduled += timedelta(days=1)
+    return scheduled.isoformat()
+
+
+def _execute_zone_tl_broadcast(run_id: int):
+    recipients = crud.list_active_users_by_role("TL")
+    total = len(recipients)
+    submitted = 0
+    skipped_no_number = 0
+    skipped_no_data = 0
+    failed = 0
+    errors = []
+
+    try:
+        status = admin_whatsapp_status()
+        if not status.get("can_send"):
+            detail = (
+                f"WhatsApp broadcast blocked. Connection/template status: "
+                f"{status.get('template_status') or 'UNKNOWN'}."
+            )
+            crud.finish_whatsapp_broadcast_run(
+                run_id, "BLOCKED", total, 0, 0, 0, 0, detail
+            )
+            return
+
+        for recipient in recipients:
+            if not recipient.get("whatsapp_number"):
+                skipped_no_number += 1
+                continue
+            try:
+                preview = admin_whatsapp_preview(int(recipient["id"]))
+                perf = preview.get("performance") or {}
+                if int(perf.get("target") or 0) <= 0:
+                    skipped_no_data += 1
+                    continue
+                _send_whatsapp_preview(preview)
+                submitted += 1
+            except Exception as exc:
+                failed += 1
+                if len(errors) < 10:
+                    detail = getattr(exc, "detail", None) or str(exc)
+                    errors.append(f"{recipient.get('name')}: {str(detail)[:160]}")
+
+        final_status = "COMPLETED" if failed == 0 else "COMPLETED_WITH_ERRORS"
+        detail = " | ".join(errors) if errors else None
+        crud.finish_whatsapp_broadcast_run(
+            run_id,
+            final_status,
+            total,
+            submitted,
+            skipped_no_number,
+            skipped_no_data,
+            failed,
+            detail,
+        )
+    except Exception as exc:
+        crud.finish_whatsapp_broadcast_run(
+            run_id,
+            "FAILED",
+            total,
+            submitted,
+            skipped_no_number,
+            skipped_no_data,
+            failed + 1,
+            str(exc)[:800],
+        )
+
+
+def _claim_zone_broadcast(trigger: str = "MANUAL") -> Optional[dict]:
+    now = datetime.now(IST)
+    if trigger == "SCHEDULED":
+        run_key = f"scheduled:{now.date().isoformat()}:ZONE_A:TL"
+    else:
+        run_key = f"manual:{now.date().isoformat()}:ZONE_A:TL:{uuid.uuid4().hex}"
+    return crud.claim_whatsapp_broadcast_run(
+        run_key=run_key,
+        run_date=now.date().isoformat(),
+        scope_key="ZONE_A",
+        audience="TL",
+        trigger=trigger,
+    )
+
+
+async def _whatsapp_broadcast_scheduler():
+    while True:
+        try:
+            config = crud.get_whatsapp_broadcast_config()
+            if config.get("enabled"):
+                now = datetime.now(IST)
+                scheduled_minutes = int(config.get("send_hour") or 19) * 60 + int(config.get("send_minute") or 0)
+                now_minutes = now.hour * 60 + now.minute
+                if now_minutes >= scheduled_minutes:
+                    run = _claim_zone_broadcast("SCHEDULED")
+                    if run:
+                        await asyncio.to_thread(_execute_zone_tl_broadcast, int(run["id"]))
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            pass
+        await asyncio.sleep(60)
+
+
+@app.get("/admin/whatsapp/broadcast/config", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_broadcast_config():
+    config = crud.get_whatsapp_broadcast_config()
+    runs = crud.list_whatsapp_broadcast_runs(limit=10)
+    return {
+        **config,
+        "timezone": "Asia/Kolkata",
+        "next_run": _next_broadcast_at(config) if config.get("enabled") else None,
+        "last_run": runs[0] if runs else None,
+        "recent_runs": runs,
+    }
+
+
+@app.patch("/admin/whatsapp/broadcast/config", dependencies=[Depends(require_admin_key)])
+def admin_update_whatsapp_broadcast_config(payload: WhatsappBroadcastConfigUpdate):
+    config = crud.update_whatsapp_broadcast_config(
+        enabled=payload.enabled,
+        send_hour=payload.send_hour,
+        send_minute=payload.send_minute,
+        audience=payload.audience,
+    )
+    return {
+        **config,
+        "timezone": "Asia/Kolkata",
+        "next_run": _next_broadcast_at(config) if config.get("enabled") else None,
+    }
+
+
+@app.post("/admin/whatsapp/broadcast/send-now", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_broadcast_send_now(background_tasks: BackgroundTasks):
+    run = _claim_zone_broadcast("MANUAL")
+    if not run:
+        raise HTTPException(status_code=409, detail="Unable to start broadcast run.")
+    background_tasks.add_task(_execute_zone_tl_broadcast, int(run["id"]))
+    return {
+        "started": True,
+        "run_id": run["id"],
+        "status": run["status"],
+        "message": "Zone A TL WhatsApp broadcast started.",
+    }
+
+
+@app.get("/admin/whatsapp/broadcast/runs/{run_id}", dependencies=[Depends(require_admin_key)])
+def admin_whatsapp_broadcast_run(run_id: int):
+    row = crud.get_whatsapp_broadcast_run(run_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Broadcast run not found.")
+    return row
 
 
 @app.get("/kam/management/users")
