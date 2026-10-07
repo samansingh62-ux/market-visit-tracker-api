@@ -1,4 +1,6 @@
 import io
+import os
+os.environ.setdefault('DATABASE_URL', 'postgresql://test:test@localhost:5432/test')
 from datetime import date
 from openpyxl import load_workbook
 from fastapi.testclient import TestClient
