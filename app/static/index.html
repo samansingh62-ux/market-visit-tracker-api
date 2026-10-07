@@ -373,13 +373,14 @@ button{min-height:44px}
 </div>
 </div></section>
 <section id="managerPanel" class="card hidden">
-<div class="head"><div><h2>Manager User Management</h2><div class="sub">Admin-only account management for TL, SS and RDS users.</div></div><button id="closeManager" class="ghost">Close</button></div>
+<div class="head"><div><h2>Manager User Management</h2><div class="sub">Admin-only account management for TL, SS, RDS and KAM users.</div></div><button id="closeManager" class="ghost">Close</button></div>
 <div id="adminMsg" class="msg"></div>
 <div class="admin-summary">
 <div class="admin-stat"><span>Total Users</span><b id="adminTotal">—</b></div>
 <div class="admin-stat"><span>TL</span><b id="adminTL">—</b></div>
 <div class="admin-stat"><span>SS</span><b id="adminSS">—</b></div>
 <div class="admin-stat"><span>RDS</span><b id="adminRDS">—</b></div>
+<div class="admin-stat"><span>KAM</span><b id="adminKAM">—</b></div>
 </div>
 <div class="meta" style="margin:12px 0 16px">
   <b style="color:#172033">Monthly Retailer Targets</b>
@@ -413,7 +414,7 @@ button{min-height:44px}
 </div>
 <div class="filters">
 <input id="adminSearch" placeholder="Search name or username">
-<select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option></select>
+<select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option><option>KAM</option></select>
 <select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
 <button id="adminRefresh" class="secondary">Refresh</button>
 </div>
@@ -1157,8 +1158,9 @@ function renderAdminUsers(){
   $('adminTL').textContent=adminUsers.filter(u=>u.role==='TL').length;
   $('adminSS').textContent=adminUsers.filter(u=>u.role==='SS').length;
   $('adminRDS').textContent=adminUsers.filter(u=>u.role==='RDS').length;
+  if($('adminKAM'))$('adminKAM').textContent=adminUsers.filter(u=>u.role==='KAM').length;
   $('adminUsers').innerHTML=rows.length?rows.map(u=>{
-    let hierarchy=u.role==='TL'?u.tl||'—':u.role==='SS'?u.ss||'—':u.rds||'—';
+    let hierarchy=u.role==='TL'?u.tl||'—':u.role==='SS'?u.ss||'—':u.role==='RDS'?u.rds||'—':u.role==='KAM'?u.kam||u.name||'—':'—';
     return `<tr><td><b>${esc(u.name)}</b></td><td><span class="tag">${esc(u.role)}</span></td><td><code>${esc(u.username)}</code></td><td>${esc(hierarchy)}</td><td>${u.assigned_retailers}</td><td><input class="waNumberInput" id="wa-user-${u.id}" value="${esc(u.whatsapp_number||'')}" placeholder="+91..." inputmode="tel"><button class="ghost" type="button" onclick="saveAdminWhatsApp(${u.id})">Save</button></td><td><span class="tag ${u.active?'ok':'danger'}">${u.active?'Active':'Inactive'}</span></td><td><div class="actions"><button class="secondary" onclick="resetAdminPassword(${u.id})">Reset Password</button><button class="ghost" onclick="toggleAdminUser(${u.id},${u.active})">${u.active?'Deactivate':'Activate'}</button></div></td></tr>`
   }).join(''):'<tr><td colspan="8">No users found.</td></tr>';
 }
