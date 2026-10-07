@@ -603,7 +603,7 @@ def get_user_by_name_role(name: str, role: str) -> Optional[dict]:
 def get_user_by_pin(pin: str) -> Optional[dict]:
     with database.get_conn() as conn:
         rows = conn.execute(
-            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS','KAM') AND pin_hash IS NOT NULL"
+            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS') AND pin_hash IS NOT NULL"
         ).fetchall()
         matches = []
         for row in rows:
@@ -1003,3 +1003,33 @@ def list_management_eod_remarks(date_from: str, date_to: str) -> list[dict]:
             (date_from, date_to),
         ).fetchall()
         return [dict(row) for row in rows]
+
+
+def create_missing_rds_pins() -> list[dict]:
+    """Provision only missing RDS PINs; return plaintext once to the admin."""
+    import secrets
+    from .auth import hash_password
+    created = []
+    with database.get_conn() as conn:
+        conn.execute("SELECT pg_advisory_xact_lock(724091)")
+        users = [dict(row) for row in conn.execute(
+            "SELECT id, name, username, role, pin_hash FROM users "
+            "WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS') FOR UPDATE"
+        ).fetchall()]
+        hashes = [u["pin_hash"] for u in users if u.get("pin_hash")]
+        issued = set()
+        for user in users:
+            if user["role"] != "RDS" or user.get("pin_hash"):
+                continue
+            for _ in range(1000):
+                pin = str(secrets.randbelow(9000) + 1000)
+                if pin in issued or any(verify_password(pin, saved) for saved in hashes):
+                    continue
+                break
+            else:
+                raise RuntimeError("Unable to allocate a unique PIN.")
+            conn.execute("UPDATE users SET pin_hash = %s WHERE id = %s",
+                         (hash_password(pin), user["id"]))
+            issued.add(pin)
+            created.append({"name": user["name"], "username": user["username"], "pin": pin})
+    return created
