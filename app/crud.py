@@ -983,3 +983,23 @@ def list_whatsapp_broadcast_runs(limit: int = 20) -> list[dict]:
             (limit,),
         ).fetchall()
         return [dict(row) for row in rows]
+
+
+def list_management_eod_remarks(date_from: str, date_to: str) -> list[dict]:
+    """All saved TL/SS remarks in the inclusive reporting period."""
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT d.remark_date, d.submitted_by, d.submitted_role,
+                   d.retailer_code, d.retailer_name, d.remark,
+                   r.tl, r.ss, r.rds, d.created_at, d.updated_at
+            FROM daily_retailer_remarks d
+            LEFT JOIN retailers r ON r.code = d.retailer_code
+            WHERE d.remark_date >= %s AND d.remark_date <= %s
+              AND d.submitted_role IN ('TL', 'SS')
+            ORDER BY d.remark_date, d.submitted_role, d.submitted_by,
+                     d.retailer_name, d.retailer_code
+            """,
+            (date_from, date_to),
+        ).fetchall()
+        return [dict(row) for row in rows]
