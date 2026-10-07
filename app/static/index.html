@@ -445,6 +445,7 @@ button{min-height:44px}
   <div class="perfTabs">
     <button class="perfTab active" data-perf-tab="visits">Visit Status</button>
     <button class="perfTab" data-perf-tab="retailers">Retailer Wise Status</button>
+    <button class="perfTab" data-perf-tab="eod">EOD Remarks</button>
     <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
   </div>
   <div class="perfFilterBar">
@@ -501,6 +502,21 @@ button{min-height:44px}
       <div class="perfSub" id="modelTargetNote">Actual sales, stock and DOS are live. Model targets will appear once a model-target source is connected.</div>
       <div class="wrap"><table class="perfTable"><thead><tr><th>Model</th><th>MTD Sales</th><th>Avg/Day</th><th>Stock</th><th>DOS</th><th>Signal</th></tr></thead><tbody id="modelPerfRows"></tbody></table></div>
     </div>
+  </div>
+
+  <div id="perfEodView" class="perfView hidden perfPanel">
+    <h3>End of Day Retailer Remarks</h3>
+    <div class="perfSub">Only low-sale retailers in your hierarchy are shown. Low sale means zero MTD sales or below 50% target achievement.</div>
+    <div class="formgrid" style="margin-top:14px">
+      <label>Retailer
+        <select id="eodRetailer"><option value="">Select low-sale retailer</option></select>
+      </label>
+      <label>Remarks
+        <textarea id="eodRemark" rows="5" placeholder="Enter reason for low sale, retailer feedback and action required."></textarea>
+      </label>
+    </div>
+    <button id="eodSave" class="primary" type="button">Submit Remark</button>
+    <div id="eodMsg" class="msg"></div>
   </div>
 
   <div id="perfHierarchyView" class="perfView hidden">
@@ -758,6 +774,59 @@ function renderPerfTables(){
   renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
   renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
   renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);
+}
+
+let eodRetailers=[];
+
+async function loadEodRetailers(){
+  if(!$('eodRetailer'))return;
+  if(!user || !['TL','SS','RDS'].includes(user.role)){
+    $('eodRetailer').innerHTML='<option value="">Not available for this role</option>';
+    $('eodRemark').value='';
+    return msg('eodMsg','EOD remarks are available for TL, SS and RDS users.');
+  }
+  try{
+    msg('eodMsg','Loading low-sale retailers…',true);
+    let d=await api('/eod-remarks/retailers');
+    eodRetailers=d.retailers||[];
+    $('eodRetailer').innerHTML='<option value="">Select low-sale retailer</option>'+eodRetailers.map(r=>{
+      let label=r.name+' · '+Math.round(Number(r.sales||0))+' sales · '+Math.round(Number(r.achievement_pct||0))+'%';
+      return '<option value="'+esc(r.code)+'">'+esc(label)+'</option>';
+    }).join('');
+    $('eodRemark').value='';
+    msg('eodMsg',eodRetailers.length?eodRetailers.length+' low-sale retailers available.':'No low-sale retailers in your hierarchy today.',true);
+  }catch(e){
+    $('eodRetailer').innerHTML='<option value="">Unable to load retailers</option>';
+    msg('eodMsg',e.message);
+  }
+}
+
+function syncEodRemark(){
+  let code=$('eodRetailer').value;
+  let r=eodRetailers.find(x=>String(x.code)===String(code));
+  $('eodRemark').value=r?.remark||'';
+  msg('eodMsg',r?.remark?'Existing remark loaded. Update it and submit again if required.':'');
+}
+
+async function saveEodRemark(){
+  let code=$('eodRetailer').value,remark=$('eodRemark').value.trim();
+  if(!code)return msg('eodMsg','Select a low-sale retailer.');
+  if(remark.length<3)return msg('eodMsg','Enter the retailer remark.');
+  let btn=$('eodSave'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Submitting…';
+    let d=await api('/eod-remarks',{
+      method:'POST',
+      body:JSON.stringify({retailer_code:code,remark})
+    });
+    let r=eodRetailers.find(x=>String(x.code)===String(code));
+    if(r)r.remark=d.remark||remark;
+    msg('eodMsg','Remark saved for '+(d.retailer_name||r?.name||'retailer')+'.',true);
+  }catch(e){
+    msg('eodMsg',e.message);
+  }finally{
+    btn.disabled=false;btn.textContent=old;
+  }
 }
 
 let perfTrendData=null;
@@ -1247,10 +1316,12 @@ async function toggleAdminUser(id,active){
 
 function setPerfTabLayout(tab){
   const isVisit=tab==='visits';
+  const isEod=tab==='eod';
+  const isSimple=isVisit||isEod;
   const filter=$('performanceDashboard').querySelector('.perfFilterBar');
   const kpis=$('performanceDashboard').querySelector('.perfKpis');
-  if(filter)filter.classList.toggle('hidden',isVisit);
-  if(kpis)kpis.classList.toggle('hidden',isVisit);
+  if(filter)filter.classList.toggle('hidden',isSimple);
+  if(kpis)kpis.classList.toggle('hidden',isSimple);
 
   const mainKpis=document.querySelector('#dashboardHome > .kpiGrid');
   const mainPanels=document.querySelector('#dashboardHome > .panelGrid');
@@ -1265,11 +1336,14 @@ function setPerfTabLayout(tab){
 
   if(!isVisit){
     $('perfRetailerView').classList.toggle('hidden',tab!=='retailers');
-    $('perfStockView').classList.toggle('hidden',tab!=='stock');
+    $('perfStockView').classList.add('hidden');
+    $('perfEodView').classList.toggle('hidden',tab!=='eod');
     $('perfHierarchyView').classList.toggle('hidden',tab!=='hierarchy');
+    if(tab==='eod')loadEodRetailers();
   }else{
     $('perfRetailerView').classList.add('hidden');
     $('perfStockView').classList.add('hidden');
+    $('perfEodView').classList.add('hidden');
     $('perfHierarchyView').classList.add('hidden');
   }
 
@@ -1287,6 +1361,8 @@ $('perfSearch').oninput=renderPerfTables;
 $('perfStatusFilter').onchange=renderPerfTables;
 $('perfHierarchyFilter').onchange=renderPerfTables;
 $('perfReset').onclick=()=>{$('perfSearch').value='';$('perfStatusFilter').value='';$('perfHierarchyFilter').value='';renderPerfTables()};
+$('eodRetailer').onchange=syncEodRemark;
+$('eodSave').onclick=saveEodRemark;
 
 $('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUsers()};
 $('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(managerMode)$('app').classList.remove('hidden');else if(token)$('app').classList.remove('hidden')};
