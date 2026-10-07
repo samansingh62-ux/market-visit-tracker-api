@@ -432,6 +432,7 @@ button{min-height:44px}
 <button class="sideBtn" data-target="retailerIntelligence">▣ &nbsp; My Retailers</button>
 <button class="sideBtn" data-target="retailerIntelligence">▥ &nbsp; Market Intelligence</button>
 <button class="sideBtn" data-target="visitHistory">▤ &nbsp; Reports</button>
+<button id="kamWhatsappNav" class="sideBtn hidden" data-target="kamWhatsappPanel">◉ &nbsp; WhatsApp TL/SS</button>
 <button id="managerNav" class="sideBtn hidden" data-target="managerPanel">⚙ &nbsp; Management</button>
 </nav>
 <div class="sideBottom">
@@ -572,6 +573,39 @@ button{min-height:44px}
   </div>
 </div>
 </div>
+<section id="kamWhatsappPanel" class="card hidden">
+  <div class="head">
+    <div>
+      <h2>KAM WhatsApp Updates</h2>
+      <div class="sub">Send current achievement and zero-sales retailer updates only to TLs and SSs mapped under your KAM hierarchy.</div>
+    </div>
+  </div>
+  <div class="formgrid">
+    <label>Recipient Type
+      <select id="kamWaRole">
+        <option value="ALL">All TL & SS</option>
+        <option value="TL">TL</option>
+        <option value="SS">SS</option>
+      </select>
+    </label>
+    <label>Recipient
+      <select id="kamWaRecipient"><option value="">Select TL / SS</option></select>
+    </label>
+  </div>
+  <div class="meta" style="margin:8px 0 12px">
+    Connection: <b id="kamWaConnection">Checking…</b> · Template: <b id="kamWaTemplate">—</b> · Eligible recipients: <b id="kamWaCount">0</b>
+  </div>
+  <div class="waActions">
+    <button id="kamWaPreviewBtn" class="secondary" type="button">Preview Selected</button>
+    <button id="kamWaSendBtn" class="primary" type="button" disabled>Send Selected</button>
+    <button id="kamWaSendAllBtn" class="secondary" type="button" disabled>Send to All TL & SS</button>
+  </div>
+  <div id="kamWaMsg" class="msg"></div>
+  <label style="display:block;margin-top:12px">Message Preview
+    <textarea id="kamWaPreview" class="waPreview" readonly placeholder="Select a TL or SS to preview the message."></textarea>
+  </label>
+  <div class="sub" style="margin-top:10px">Message includes Target, MTD Achievement, Achievement %, Gap, Required / Day, Zero Sales Retailers and the provisional incentive summary.</div>
+</section>
 <section id="profileSection" class="profileCard"></section>
 <section id="fieldProfileCard" class="card"><div class="head"><div><h2>Field User Profile</h2><div class="sub">Your account controls which retailers and visits you can access.</div></div><button id="logout" class="ghost">Logout</button></div><div id="userMeta" class="meta">—</div><div id="gpsStatus" class="meta">📍 GPS: Requesting location permission…</div></section>
 <div id="visitMetrics" class="metrics"><div class="metric"><span>Total Visits</span><b id="mv">—</b></div><div class="metric"><span>Retailers Visited</span><b id="mr">—</b></div><div class="metric"><span>Markets Covered</span><b id="mm">—</b></div><div class="metric"><span>Retailer Master</span><b id="mt">—</b></div><div class="metric"><span>Never Visited</span><b id="mn">—</b></div></div>
@@ -691,7 +725,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   setPerfTabLayout('visits');
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
-function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
@@ -1101,6 +1135,88 @@ async function priorities(){
 }
 async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(user.role!=='MANAGER')$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));let recent=a.filter(r=>r.priority==='Recently Visited').length,due=a.filter(r=>r.priority==='Due 8–14 Days').length,overdue=a.filter(r=>r.priority==='Overdue 15+ Days'||r.priority==='Never Visited').length;$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('dkNever').textContent=$('mn').textContent;$('covRecent').textContent=recent;$('covDue').textContent=due;$('covOverdue').textContent=overdue;let totalH=Math.max(1,recent+due+overdue);$('barRecent').style.width=(recent*100/totalH)+'%';$('barDue').style.width=(due*100/totalH)+'%';$('barOverdue').style.width=(overdue*100/totalH)+'%';$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
+let kamWaRecipients=[];
+
+async function loadKamWhatsapp(){
+  if(!user||user.role!=='KAM'||!$('kamWaRecipient'))return;
+  await Promise.all([loadKamWaRecipients(),loadKamWaStatus()]);
+}
+
+async function loadKamWaRecipients(){
+  let role=$('kamWaRole').value;
+  let path='/kam/whatsapp/recipients'+(role==='ALL'?'':'?role='+encodeURIComponent(role));
+  kamWaRecipients=await api(path);
+  $('kamWaCount').textContent=kamWaRecipients.length;
+  $('kamWaRecipient').innerHTML='<option value="">Select TL / SS</option>'+kamWaRecipients.map(r=>{
+    let num=r.whatsapp_number?' · '+r.whatsapp_number:' · No WhatsApp number';
+    return '<option value="'+r.id+'">'+esc(r.role+' · '+r.name+num)+'</option>';
+  }).join('');
+  $('kamWaPreview').value='';
+  $('kamWaSendBtn').disabled=true;
+  let withNumber=kamWaRecipients.filter(r=>r.whatsapp_number).length;
+  $('kamWaSendAllBtn').disabled=withNumber===0;
+  msg('kamWaMsg',kamWaRecipients.length?kamWaRecipients.length+' TL/SS recipients mapped to your hierarchy. '+withNumber+' have WhatsApp numbers.':'No TL/SS recipients found in your KAM hierarchy.',true);
+}
+
+async function loadKamWaStatus(){
+  try{
+    let d=await api('/kam/whatsapp/status');
+    $('kamWaConnection').textContent=d.configured?'Connected':'Not connected';
+    $('kamWaTemplate').textContent=d.template_status||'UNKNOWN';
+    let ready=!!d.can_send;
+    $('kamWaSendAllBtn').disabled=!ready||!kamWaRecipients.some(r=>r.whatsapp_number);
+    if(!ready)$('kamWaSendBtn').disabled=true;
+    return d;
+  }catch(e){
+    $('kamWaConnection').textContent='Check failed';
+    $('kamWaTemplate').textContent='—';
+    $('kamWaSendBtn').disabled=true;
+    $('kamWaSendAllBtn').disabled=true;
+    throw e;
+  }
+}
+
+async function previewKamWa(){
+  let id=Number($('kamWaRecipient').value||0);
+  if(!id)return msg('kamWaMsg','Select a TL or SS.');
+  try{
+    let d=await api('/kam/whatsapp/preview?user_id='+id);
+    $('kamWaPreview').value=d.message||'';
+    let recipient=kamWaRecipients.find(r=>Number(r.id)===id);
+    $('kamWaSendBtn').disabled=!(d.connected&&recipient?.whatsapp_number);
+    msg('kamWaMsg',recipient?.whatsapp_number?'Preview ready for '+recipient.name+'.':'Preview ready, but this recipient has no WhatsApp number.',true);
+  }catch(e){msg('kamWaMsg',e.message)}
+}
+
+async function sendKamWa(){
+  let id=Number($('kamWaRecipient').value||0);
+  let recipient=kamWaRecipients.find(r=>Number(r.id)===id);
+  if(!recipient)return msg('kamWaMsg','Select a TL or SS.');
+  if(!$('kamWaPreview').value.trim())return msg('kamWaMsg','Preview the message before sending.');
+  if(!confirm('Send WhatsApp update to '+recipient.name+' now?'))return;
+  let btn=$('kamWaSendBtn'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Sending…';
+    let d=await api('/kam/whatsapp/send?user_id='+id,{method:'POST'});
+    msg('kamWaMsg','WhatsApp submitted to '+(d.recipient||recipient.name)+'.',true);
+  }catch(e){msg('kamWaMsg','Send failed: '+e.message)}
+  finally{btn.textContent=old;await loadKamWaStatus().catch(()=>{})}
+}
+
+async function sendKamWaAll(){
+  let role=$('kamWaRole').value||'ALL';
+  let eligible=kamWaRecipients.filter(r=>r.whatsapp_number).length;
+  if(!eligible)return msg('kamWaMsg','No recipients with WhatsApp numbers in this selection.');
+  if(!confirm('Send individual performance WhatsApp updates to '+eligible+' '+(role==='ALL'?'TL/SS recipients':role+' recipients')+' now?'))return;
+  let btn=$('kamWaSendAllBtn'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Sending…';
+    let d=await api('/kam/whatsapp/send-all?role='+encodeURIComponent(role),{method:'POST'});
+    msg('kamWaMsg','Completed: '+d.submitted+' submitted · '+d.skipped_no_number+' skipped (no number) · '+d.failed+' failed.',d.failed===0);
+  }catch(e){msg('kamWaMsg','Bulk send failed: '+e.message)}
+  finally{btn.textContent=old;await loadKamWaStatus().catch(()=>{})}
+}
+
 let adminKey='';
 let adminUsers=[];
 
@@ -1373,6 +1489,11 @@ $('adminRole').onchange=renderAdminUsers;
 $('adminStatus').onchange=renderAdminUsers;
 $('adminSearch').oninput=renderAdminUsers;
 $('targetUpload').onclick=uploadTargets;
+$('kamWaRole').onchange=()=>loadKamWaRecipients().catch(e=>msg('kamWaMsg',e.message));
+$('kamWaRecipient').onchange=()=>{$('kamWaPreview').value='';$('kamWaSendBtn').disabled=true;};
+$('kamWaPreviewBtn').onclick=previewKamWa;
+$('kamWaSendBtn').onclick=sendKamWa;
+$('kamWaSendAllBtn').onclick=sendKamWaAll;
 $('waRole').onchange=renderWaRecipients;
 $('waRecipient').onchange=syncWaRecipient;
 $('waSaveNumber').onclick=saveSelectedWaNumber;
