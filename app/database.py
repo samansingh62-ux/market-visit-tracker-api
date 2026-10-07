@@ -49,6 +49,7 @@ def init_db():
 
         conn.execute("ALTER TABLE retailers ADD COLUMN IF NOT EXISTS town_name TEXT")
         conn.execute("ALTER TABLE retailers ADD COLUMN IF NOT EXISTS district_name TEXT")
+        conn.execute("ALTER TABLE retailers ADD COLUMN IF NOT EXISTS kam TEXT")
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS visits (
@@ -200,6 +201,7 @@ def init_db():
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT")
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_hash TEXT")
         conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS whatsapp_number TEXT")
+        conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS kam TEXT")
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS whatsapp_notification_log (
@@ -233,6 +235,14 @@ def init_db():
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_date ON daily_retailer_remarks(remark_date)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_retailer ON daily_retailer_remarks(retailer_code)")
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS kam_rds_assignments (
+                kam_name TEXT NOT NULL,
+                rds TEXT NOT NULL,
+                PRIMARY KEY (kam_name, rds)
+            )
+        """)
 
         for column in ("retailer", "tl", "ss", "rds", "visit_date"):
             conn.execute(f"CREATE INDEX IF NOT EXISTS idx_visits_{column} ON visits({column})")
@@ -278,6 +288,38 @@ def init_db():
                     WHERE UPPER(code) = UPPER(%(code)s)
                 """, location_rows)
 
+        kam_assignment_seed = [
+            ("Biswajit Bania", "Channel Infomatic"),
+            ("Prasanta Roy", "Net To Net"),
+            ("Prasanta Roy", "M/s Laxmi Stores"),
+            ("Prasanta Roy", "Himalayan Agencies"),
+            ("Sailen Das", "Rainbow Traders"),
+            ("Sailen Das", "Star Telecom"),
+            ("Sailen Das", "Amplified Communications Private Limited"),
+            ("Sailen Das", "Digital Infotech"),
+            ("Ireshwad Mehdi", "K M Enterprise (NHIN)"),
+            ("Ireshwad Mehdi", "M/S Ete Hi Choice"),
+            ("Ireshwad Mehdi", "Jyoti Cycle Stores and Agency (Zone A)"),
+            ("Ireshwad Mehdi", "Star Telecom(West Kameng)"),
+        ]
+        with conn.cursor() as cur:
+            cur.executemany(
+                """
+                INSERT INTO kam_rds_assignments (kam_name, rds)
+                VALUES (%s, %s)
+                ON CONFLICT (kam_name, rds) DO NOTHING
+                """,
+                kam_assignment_seed,
+            )
+
+        conn.execute("""
+            UPDATE retailers r
+            SET kam = k.kam_name
+            FROM kam_rds_assignments k
+            WHERE r.rds = k.rds
+              AND (r.kam IS DISTINCT FROM k.kam_name)
+        """)
+
         # User identity/hierarchy master. Credentials are only populated by admin provisioning.
         rows = conn.execute("""
             SELECT DISTINCT tl AS name, 'TL' AS role, tl, NULL AS ss, NULL AS rds
@@ -321,6 +363,23 @@ def init_db():
                     ])
             except Exception:
                 pass
+
+        kam_users = [
+            ("Biswajit Bania", "KAM", "biswajit.bania.kam", "Biswajit Bania", "a5kE8tNPPFwwalYqQDWa2w==$7qnKylwxhJkN0A2vp0tfIz-jVTLV92AKRYtoCb56dPk="),
+            ("Prasanta Roy", "KAM", "prasanta.roy.kam", "Prasanta Roy", "SpLLUQD-bPfoEg8cK25JgA==$vc9o2V_gBT7Rx8od9czJoqLAzH9r8_MFvresylgL6Tg="),
+            ("Sailen Das", "KAM", "sailen.das.kam", "Sailen Das", "8QdVpI1GbBXb-1GwZOP3Sg==$tlYyHs4UZgSE_KoMHvn5aVvL6KRdCT_SLB1J9mEk67E="),
+            ("Ireshwad Mehdi", "KAM", "ireshwad.mehdi.kam", "Ireshwad Mehdi", "2T3Z8Q7Yyzv7cG1Dz4hK5Q==$gyF6qBBxe15n2q4p80Fk1u_zBtyblMwWOfiraJEZCfQ="),
+        ]
+        with conn.cursor() as cur:
+            cur.executemany("""
+                INSERT INTO users (name, role, username, kam, password_hash)
+                VALUES (%s,%s,%s,%s,%s)
+                ON CONFLICT (name, role) DO UPDATE SET
+                    username = COALESCE(users.username, EXCLUDED.username),
+                    kam = EXCLUDED.kam,
+                    password_hash = COALESCE(users.password_hash, EXCLUDED.password_hash),
+                    active = TRUE
+            """, kam_users)
 
         # Zone A TL/SS PINs. Only PBKDF2 hashes are stored in the application.
         pin_seeds = {
