@@ -411,6 +411,29 @@ button{min-height:44px}
   <label style="display:block;margin-top:12px">Message Preview<textarea id="waPreview" class="waPreview" readonly placeholder="Select a recipient and preview the message."></textarea></label>
   <div class="waStatus">Connection status: <b id="waConnectionStatus">Checking…</b> · Template: <b id="waTemplateStatus">—</b></div>
   <div class="wrap" style="margin-top:12px"><table><thead><tr><th>Time</th><th>Recipient</th><th>Role</th><th>Number</th><th>Status</th></tr></thead><tbody id="waLogs"><tr><td colspan="5">No notification activity yet.</td></tr></tbody></table></div>
+
+  <div class="meta" style="margin-top:18px;padding-top:16px;border-top:1px solid #e6ebf2">
+    <b style="color:#172033">Automatic TL WhatsApp Broadcast</b>
+    <div class="sub" style="margin:5px 0 10px">Automatically sends each active TL their own current achievement, gap, required/day, zero-sales retailers and provisional incentive update.</div>
+    <div class="formgrid">
+      <label>Automatic Send
+        <select id="waAutoEnabled"><option value="true">Enabled</option><option value="false">Disabled</option></select>
+      </label>
+      <label>Daily Time (IST)
+        <input id="waAutoTime" type="time" value="19:00">
+      </label>
+    </div>
+    <div class="waActions">
+      <button id="waAutoSave" class="secondary" type="button">Save Schedule</button>
+      <button id="waAutoSendNow" class="primary" type="button">Send to All TLs Now</button>
+    </div>
+    <div id="waAutoMsg" class="msg"></div>
+    <div class="waStatus">Next run: <b id="waAutoNext">—</b> · Last run: <b id="waAutoLast">—</b></div>
+    <div class="wrap" style="margin-top:10px"><table>
+      <thead><tr><th>Started</th><th>Trigger</th><th>Status</th><th>Total</th><th>Sent</th><th>No Number</th><th>No Data</th><th>Failed</th></tr></thead>
+      <tbody id="waAutoRuns"><tr><td colspan="8">No broadcast runs yet.</td></tr></tbody>
+    </table></div>
+  </div>
 </div>
 <div class="filters">
 <input id="adminSearch" placeholder="Search name or username">
@@ -1359,6 +1382,7 @@ async function loadAdminUsers(){
     renderWaRecipients();
     loadWaLogs().catch(()=>{});
     loadWaStatus().catch(()=>{});
+    loadWaBroadcastConfig().catch(()=>{});
     msg('adminMsg','Management access enabled. Dashboard data is loading.',true);
     load().catch(e=>msg('adminMsg','Dashboard refresh failed: '+e.message));
   }catch(e){msg('adminMsg',e.message)}
@@ -1504,6 +1528,95 @@ async function sendWhatsApp(){
   }
 }
 
+function fmtIstDateTime(value){
+  if(!value)return '—';
+  try{
+    let d=new Date(value);
+    return d.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  }catch{return value}
+}
+
+function renderWaBroadcastRuns(runs){
+  if(!$('waAutoRuns'))return;
+  $('waAutoRuns').innerHTML=(runs||[]).length?(runs||[]).map(x=>`<tr>
+    <td>${esc(fmtIstDateTime(x.started_at))}</td>
+    <td>${esc(x.trigger||'—')}</td>
+    <td><span class="tag">${esc(x.status||'—')}</span></td>
+    <td>${Number(x.total_recipients||0)}</td>
+    <td><b>${Number(x.submitted||0)}</b></td>
+    <td>${Number(x.skipped_no_number||0)}</td>
+    <td>${Number(x.skipped_no_data||0)}</td>
+    <td>${Number(x.failed||0)}</td>
+  </tr>`).join(''):'<tr><td colspan="8">No broadcast runs yet.</td></tr>';
+}
+
+async function loadWaBroadcastConfig(){
+  if(!adminKey||!$('waAutoEnabled'))return;
+  try{
+    let r=await fetch('/admin/whatsapp/broadcast/config',{headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to load automatic broadcast settings.');
+    $('waAutoEnabled').value=String(!!d.enabled);
+    $('waAutoTime').value=String(d.send_hour??19).padStart(2,'0')+':'+String(d.send_minute??0).padStart(2,'0');
+    $('waAutoNext').textContent=d.next_run?fmtIstDateTime(d.next_run):'Disabled';
+    let last=d.last_run;
+    $('waAutoLast').textContent=last?(last.status+' · '+Number(last.submitted||0)+' sent'):'No runs yet';
+    renderWaBroadcastRuns(d.recent_runs||[]);
+    return d;
+  }catch(e){
+    msg('waAutoMsg',e.message);
+  }
+}
+
+async function saveWaBroadcastConfig(){
+  let enabled=$('waAutoEnabled').value==='true';
+  let parts=($('waAutoTime').value||'19:00').split(':');
+  let hour=Number(parts[0]||19),minute=Number(parts[1]||0);
+  let btn=$('waAutoSave'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Saving…';
+    let r=await fetch('/admin/whatsapp/broadcast/config',{
+      method:'PATCH',
+      headers:{...adminHeaders(),'Content-Type':'application/json'},
+      body:JSON.stringify({enabled,send_hour:hour,send_minute:minute,audience:'TL'})
+    }),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to save schedule.');
+    $('waAutoNext').textContent=d.next_run?fmtIstDateTime(d.next_run):'Disabled';
+    msg('waAutoMsg',enabled?'Automatic TL broadcast enabled for '+$('waAutoTime').value+' IST.':'Automatic TL broadcast disabled.',true);
+    await loadWaBroadcastConfig();
+  }catch(e){msg('waAutoMsg',e.message)}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+
+async function pollWaBroadcast(runId){
+  for(let i=0;i<90;i++){
+    await new Promise(resolve=>setTimeout(resolve,4000));
+    try{
+      let r=await fetch('/admin/whatsapp/broadcast/runs/'+runId,{headers:adminHeaders()}),d=await r.json();
+      if(!r.ok)throw Error(d.detail||'Unable to check broadcast.');
+      if(d.status!=='RUNNING'){
+        msg('waAutoMsg','Broadcast '+d.status+': '+Number(d.submitted||0)+' sent · '+Number(d.skipped_no_number||0)+' no number · '+Number(d.skipped_no_data||0)+' no data · '+Number(d.failed||0)+' failed.',d.failed===0);
+        await loadWaBroadcastConfig();
+        return;
+      }
+      msg('waAutoMsg','Broadcast running…');
+    }catch(e){msg('waAutoMsg',e.message);return}
+  }
+  msg('waAutoMsg','Broadcast is still running. Refresh the status shortly.');
+}
+
+async function sendWaBroadcastNow(){
+  if(!confirm('Send personalized WhatsApp achievement updates to all active TLs now?'))return;
+  let btn=$('waAutoSendNow'),old=btn.textContent;
+  try{
+    btn.disabled=true;btn.textContent='Starting…';
+    let r=await fetch('/admin/whatsapp/broadcast/send-now',{method:'POST',headers:adminHeaders()}),d=await r.json();
+    if(!r.ok)throw Error(d.detail||'Unable to start TL broadcast.');
+    msg('waAutoMsg','Broadcast started. Messages are being generated individually for each TL.',true);
+    pollWaBroadcast(d.run_id);
+  }catch(e){msg('waAutoMsg',e.message)}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+
 async function loadWaLogs(){
   if(!adminKey||!$('waLogs'))return;
   let r=await fetch('/admin/whatsapp/logs?limit=20',{headers:adminHeaders()}),d=await r.json();
@@ -1606,6 +1719,8 @@ $('waPreviewBtn').onclick=previewWhatsApp;
 $('waSubmitTemplate').onclick=submitWaTemplate;
 $('waSavePreview').onclick=saveWaPreviewLog;
 $('waSend').onclick=sendWhatsApp;
+$('waAutoSave').onclick=saveWaBroadcastConfig;
+$('waAutoSendNow').onclick=sendWaBroadcastNow;
 
 let selectedPhotos=[];
 
