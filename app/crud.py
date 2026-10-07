@@ -679,10 +679,10 @@ def list_daily_retailer_remarks(
 
 def list_kam_whatsapp_recipients(kam_name: str, role: Optional[str] = None) -> list[dict]:
     clauses = ["u.active = TRUE", "u.role IN ('TL','SS')"]
-    params = [kam_name, kam_name]
+    role_params = []
     if role in ("TL", "SS"):
         clauses.append("u.role = %s")
-        params.append(role)
+        role_params.append(role)
     where = " AND ".join(clauses)
     with database.get_conn() as conn:
         rows = conn.execute(
@@ -719,7 +719,7 @@ def list_kam_whatsapp_recipients(kam_name: str, role: Optional[str] = None) -> l
               )
             ORDER BY u.role, u.name
             """,
-            [kam_name, kam_name, *params],
+            [kam_name, kam_name, *role_params, kam_name, kam_name],
         ).fetchall()
         return [dict(row) for row in rows]
 
