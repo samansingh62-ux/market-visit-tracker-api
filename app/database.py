@@ -414,7 +414,11 @@ def init_db():
     "Abhishek Pradhan":["SS","NW1uZyc01YnwrvtsjaBssQ==$XiuEF44RezzONUVVuhwDapgG8sdTQuFhbR0w1xsuTNI="],
     "Sougaijam Kennedy":["SS","0TcY1e6Gtb-OzMU8w0UJVw==$IkIRGttNrfqo2F6VI3NKqyYmGluJX8Be5ycIFroaCpw="],
     "Naba Jyoti Bora":["SS","bcWRloNfPssMjzlc4j0lUQ==$bdgdEcrBpep644jNcw_8eVZP4JUlm3dwUMGD-bSLPoA="],
-    "Vacant-Zone A":["SS","oryim6X9mWzzbQU5pvoJ2w==$MoNp3nQEmF8j1fnaJDkNKUzIeGMOcDiJW6yzvARP_XY="]
+    "Vacant-Zone A":["SS","oryim6X9mWzzbQU5pvoJ2w==$MoNp3nQEmF8j1fnaJDkNKUzIeGMOcDiJW6yzvARP_XY="],
+    "Biswajit Bania":["KAM","CxWt8jy0PKA-8OQKCW7YJQ==$NeqA5CzpLUMPwX8y44XcCeN-BrF72ZsesyRgSqCPlqY="],
+    "Prasanta Roy":["KAM","c2FiRDC0B5IVu1ISIF6BDA==$qgNgY20QMmAKTquXZqEDhsfh6c2hLYiC-hKp8_VXItQ="],
+    "Sailen Das":["KAM","bGMXwMxGTNxyqyZhZTqPAQ==$FUdAc6Ua1iJ0Aqm8cy3287nWJoY62sCuU0ACUd8160Y="],
+    "Ireshwad Mehdi":["KAM","oq67gtLF6jwPH6me3cRSzQ==$vyV7Y9VMcrxYyU7fIBHX1uEchG00ryXWRqd_VEtNWmg="]
 }
         for name, (role, pin_hash) in pin_seeds.items():
             conn.execute("UPDATE users SET pin_hash = %s WHERE name = %s AND role = %s", (pin_hash, name, role))
