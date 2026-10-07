@@ -220,6 +220,43 @@ def init_db():
         conn.execute("CREATE INDEX IF NOT EXISTS idx_whatsapp_log_created_at ON whatsapp_notification_log(created_at)")
 
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS whatsapp_broadcast_config (
+                id SMALLINT PRIMARY KEY,
+                enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                send_hour INTEGER NOT NULL DEFAULT 19,
+                send_minute INTEGER NOT NULL DEFAULT 0,
+                audience TEXT NOT NULL DEFAULT 'TL',
+                updated_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            INSERT INTO whatsapp_broadcast_config
+                (id, enabled, send_hour, send_minute, audience, updated_at)
+            VALUES (1, TRUE, 19, 0, 'TL', CURRENT_TIMESTAMP::text)
+            ON CONFLICT (id) DO NOTHING
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS whatsapp_broadcast_runs (
+                id BIGSERIAL PRIMARY KEY,
+                run_key TEXT NOT NULL UNIQUE,
+                run_date TEXT NOT NULL,
+                scope_key TEXT NOT NULL,
+                audience TEXT NOT NULL,
+                trigger TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                finished_at TEXT,
+                status TEXT NOT NULL DEFAULT 'RUNNING',
+                total_recipients INTEGER NOT NULL DEFAULT 0,
+                submitted INTEGER NOT NULL DEFAULT 0,
+                skipped_no_number INTEGER NOT NULL DEFAULT 0,
+                skipped_no_data INTEGER NOT NULL DEFAULT 0,
+                failed INTEGER NOT NULL DEFAULT 0,
+                detail TEXT
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_whatsapp_broadcast_runs_started ON whatsapp_broadcast_runs(started_at)")
+
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS daily_retailer_remarks (
                 id BIGSERIAL PRIMARY KEY,
                 remark_date TEXT NOT NULL,
