@@ -603,7 +603,7 @@ def get_user_by_name_role(name: str, role: str) -> Optional[dict]:
 def get_user_by_pin(pin: str) -> Optional[dict]:
     with database.get_conn() as conn:
         rows = conn.execute(
-            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS') AND pin_hash IS NOT NULL"
+            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS','KAM') AND pin_hash IS NOT NULL"
         ).fetchall()
         matches = []
         for row in rows:
