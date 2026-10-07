@@ -580,3 +580,65 @@ def get_user_by_pin(pin: str) -> Optional[dict]:
         if len(matches) == 1:
             return matches[0]
         return None
+
+
+def upsert_daily_retailer_remark(
+    remark_date: str,
+    retailer_code: str,
+    retailer_name: str,
+    submitted_by: str,
+    submitted_role: str,
+    remark: str,
+) -> dict:
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    with database.get_conn() as conn:
+        row = conn.execute(
+            """
+            INSERT INTO daily_retailer_remarks
+                (remark_date, retailer_code, retailer_name, submitted_by, submitted_role, remark, created_at, updated_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT (remark_date, retailer_code, submitted_by, submitted_role)
+            DO UPDATE SET remark = EXCLUDED.remark, updated_at = EXCLUDED.updated_at
+            RETURNING id, remark_date, retailer_code, retailer_name, submitted_by, submitted_role, remark, created_at, updated_at
+            """,
+            (
+                remark_date,
+                retailer_code,
+                retailer_name,
+                submitted_by,
+                submitted_role,
+                remark,
+                now,
+                now,
+            ),
+        ).fetchone()
+        return dict(row)
+
+
+def list_daily_retailer_remarks(
+    remark_date: str,
+    submitted_by: Optional[str] = None,
+    submitted_role: Optional[str] = None,
+) -> list[dict]:
+    clauses = ["remark_date = %s"]
+    params = [remark_date]
+    if submitted_by:
+        clauses.append("submitted_by = %s")
+        params.append(submitted_by)
+    if submitted_role:
+        clauses.append("submitted_role = %s")
+        params.append(submitted_role)
+    where = " AND ".join(clauses)
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT id, remark_date, retailer_code, retailer_name, submitted_by,
+                   submitted_role, remark, created_at, updated_at
+            FROM daily_retailer_remarks
+            WHERE {where}
+            ORDER BY retailer_name
+            """,
+            params,
+        ).fetchall()
+        return [dict(row) for row in rows]
