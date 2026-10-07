@@ -294,6 +294,7 @@ def pin_users():
     return {
         "TL": sorted([r["name"] for r in rows if r["role"] == "TL"]),
         "SS": sorted([r["name"] for r in rows if r["role"] == "SS"]),
+        "KAM": sorted([r["name"] for r in rows if r["role"] == "KAM"]),
     }
 
 
@@ -303,7 +304,7 @@ def pin_login(payload: PinLoginRequest):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid PIN.")
     token = create_token(user)
-    safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "active")}
+    safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "kam", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
 
 
