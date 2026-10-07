@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
 from . import crud, database
+from . import whatsapp_mcp
 from .auth import get_current_user, get_dashboard_user, hash_password, require_admin_key, require_manager, verify_password, create_token
 from .schemas import (
     AdminUserOut,
@@ -271,6 +272,7 @@ def _festive_scheme_payout(club_value, scheme_sales):
 @app.on_event("startup")
 def on_startup():
     database.init_db()
+    whatsapp_mcp.init_tables()
 
 
 @app.on_event("startup")
@@ -1005,6 +1007,8 @@ def _send_whatsapp_preview(preview: dict):
 
     user_id = int(preview.get("user_id") or 0)
     number = _normalize_whatsapp_number(preview.get("whatsapp_number"))
+    if number:
+        whatsapp_mcp.require_recipient(number)
     if not number:
         raise HTTPException(status_code=400, detail="Recipient WhatsApp number is missing.")
 
@@ -1097,6 +1101,7 @@ def _execute_zone_tl_broadcast(run_id: int):
     errors = []
 
     try:
+        whatsapp_mcp.require_broadcast()
         status = admin_whatsapp_status()
         if not status.get("can_send"):
             detail = (
@@ -1170,7 +1175,7 @@ async def _whatsapp_broadcast_scheduler():
     while True:
         try:
             config = crud.get_whatsapp_broadcast_config()
-            if config.get("enabled"):
+            if config.get("enabled") and whatsapp_mcp.broadcasts_enabled():
                 now = datetime.now(IST)
                 scheduled_minutes = int(config.get("send_hour") or 19) * 60 + int(config.get("send_minute") or 0)
                 now_minutes = now.hour * 60 + now.minute
@@ -1215,6 +1220,7 @@ def admin_update_whatsapp_broadcast_config(payload: WhatsappBroadcastConfigUpdat
 
 @app.post("/admin/whatsapp/broadcast/send-now", dependencies=[Depends(require_admin_key)])
 def admin_whatsapp_broadcast_send_now(background_tasks: BackgroundTasks):
+    whatsapp_mcp.require_broadcast()
     run = _claim_zone_broadcast("MANUAL")
     if not run:
         raise HTTPException(status_code=409, detail="Unable to start broadcast run.")
@@ -1348,6 +1354,7 @@ def kam_whatsapp_send_all(
     user: dict = Depends(get_current_user),
 ):
     _require_kam(user)
+    whatsapp_mcp.require_broadcast()
     kam_name = str(user.get("name") or "")
     role_filter = None if role == "ALL" else role
     recipients = crud.list_kam_whatsapp_recipients(kam_name, role=role_filter)
@@ -2100,3 +2107,18 @@ def retailer_health(tl: Optional[str] = None, ss: Optional[str] = None, rds: Opt
     kam = scope.get("kam") if scope else None
     if scope: tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
     return crud.get_retailer_health(tl=tl, ss=ss, rds=rds, kam=kam, zone=zone, priority=priority, limit=limit)
+
+
+
+# Preserve existing database/scheduler startup while owning the mounted MCP lifespan.
+from contextlib import asynccontextmanager
+_original_lifespan = app.router.lifespan_context
+
+@asynccontextmanager
+async def _lifespan_with_mcp(application):
+    async with _original_lifespan(application):
+        async with whatsapp_mcp.mcp.session_manager.run():
+            yield
+
+app.router.lifespan_context = _lifespan_with_mcp
+app.mount("/mcp", whatsapp_mcp.mcp_app)
