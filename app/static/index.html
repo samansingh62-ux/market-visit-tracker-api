@@ -805,7 +805,13 @@ function filteredPerfRows(){
   let h=$('perfHierarchyFilter').value;
   if(search)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(search));
   if(status)rows=rows.filter(r=>r.status===status);
-  if(h)rows=rows.filter(r=>r.tl===h||r.ss===h||r.rds===h);
+  if(h)rows=rows.filter(r=>[r.tl,r.ss,r.rds].some(v=>String(v||'').split(' | ').includes(h))).map(r=>{
+    const stores=(perfData.store_sales||[]).filter(s=>s.retailer_code===r.code&&[s.tl,s.ss,s.rds].includes(h));
+    const sales=stores.reduce((n,s)=>n+Number(s.sales||0),0);
+    const stock=stores.reduce((n,s)=>n+Number(s.stock||0),0);
+    const gap=Math.max(Number(r.target||0)-sales,0);
+    return {...r,sales,stock,gap,achievement_pct:r.target>0?Math.round(1000*sales/r.target)/10:0,required_per_day:Math.round(10*gap/(perfData.period?.days_remaining||1))/10};
+  });
   return rows;
 }
 
