@@ -496,8 +496,9 @@ def retailer_360(
     inventory = live.get("inventory") or {}
     performance = live.get("performance") or {}
     sales_units = int(sales.get("units") or 0)
-    stock_units = int(inventory.get("units") or 0)
-    dos = performance.get("dos")
+    stock_matched = inventory.get("stock_matched") is not False
+    stock_units = int(inventory.get("units") or 0) if stock_matched else None
+    dos = performance.get("dos") if stock_matched else None
 
     target_month = start_date[:7]
     target_row = crud.get_retailer_target(retailer["code"], target_month)
@@ -518,7 +519,9 @@ def retailer_360(
     actions = []
     if sales_units == 0:
         actions.append("Discuss sell-out activation and identify why MTD sales are zero.")
-    if isinstance(dos, (int, float)):
+    if not stock_matched:
+        actions.append("Stock record was not matched by Retailer Code. Verify the retailer-code mapping before treating this as zero stock.")
+    elif isinstance(dos, (int, float)):
         if dos < 7:
             actions.append("Stock cover is below 7 days. Prioritise replenishment on fast-moving models.")
         elif dos > 30:
@@ -1698,11 +1701,12 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     retailer_rows = []
     for row in rows:
         code = str(row.get("code") or "").strip().upper()
-        live = live_by_code.get(code, {})
-        sales = int(live.get("mtd_sales") or 0)
-        stock = int(live.get("good_phone_stock") or 0)
-        avg_daily = float(live.get("avg_daily_sales") or 0)
-        dos = live.get("dos")
+        live = live_by_code.get(code)
+        sales = int((live or {}).get("mtd_sales") or 0)
+        stock_matched = bool(live and live.get("stock_matched"))
+        stock = int(live.get("good_phone_stock") or 0) if stock_matched else None
+        avg_daily = float((live or {}).get("avg_daily_sales") or 0)
+        dos = live.get("dos") if stock_matched else None
         target = int(row.get("target_volume") or 0)
         scheme = _festive_scheme_payout(row.get("club"), scheme_by_code.get(code, {}))
         focus_scheme = _focus_model_payout(focus_by_code.get(code, {}))
@@ -1719,7 +1723,9 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             except Exception:
                 pass
 
-        if target > 0 and ach < 50:
+        if not stock_matched:
+            status = "Stock Unmatched"
+        elif target > 0 and ach < 50:
             status = "Behind"
         elif isinstance(dos, (int, float)) and dos > 45:
             status = "High Stock"
@@ -1748,6 +1754,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "gap": gap,
             "required_per_day": req,
             "stock": stock,
+            "stock_matched": stock_matched,
+            "stock_match_basis": (live or {}).get("stock_match_basis") or "retailer_code",
             "avg_daily_sales": avg_daily,
             "dos": dos,
             "last_visit": last_visit,
@@ -1787,7 +1795,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         )
     if explicit_summary_target:
         total_target = int(explicit_summary_target.get("target_volume") or 0)
-    total_stock = sum(x["stock"] for x in retailer_rows)
+    total_stock = sum((x["stock"] or 0) for x in retailer_rows)
     total_gap = max(total_target - total_sales, 0)
     total_ach = round((total_sales / total_target) * 100, 1) if total_target > 0 else 0
     active_sales = [x for x in retailer_rows if x["sales"] > 0]
@@ -1866,6 +1874,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "gap": total_gap,
             "required_per_day": round(total_gap / days_remaining, 1) if total_target > 0 else 0,
             "stock": total_stock,
+            "stock_unmatched_retailers": sum(1 for x in retailer_rows if not x.get("stock_matched")),
+            "stock_match_basis": "retailer_code",
             "productive_retailers": len(active_sales),
             "zero_sales_retailers": len(retailer_rows) - len(active_sales),
             "scheme_payout": total_scheme_payout,
