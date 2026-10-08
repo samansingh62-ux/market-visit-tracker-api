@@ -450,7 +450,7 @@ def init_db():
     "Sujit Sinha":["SS","JURxLIVUYoadE8r2w-MujQ==$9nTtfGf2t-8pTZnca4T3ryhBW8YS0geX7i7K8JEUpjk="],
     "Avisek Das":["SS","1xd6-yy0SrAIGV0f_17bJA==$YiYSVDG6UWzxQde_7j5xX1Qh1pNNBFRC_YWoUqCJhSg="],
     "Subir Kumar Sinha":["SS","Z_ILa7UCgutbkkJqRVQh7Q==$_um0RK6Km5bFziz56EcBd-jd2geCdbOylJtXv3v7Ur4="],
-    "Abhishek Pradhan":["SS","NW1uZyc01YnwrvtsjaBssQ==$XiuEF44RezzONUVVuhwDapgG8sdTQuFhbR0w1xsuTNI="],
+    "Abhishek Pradhan":["TL","NW1uZyc01YnwrvtsjaBssQ==$XiuEF44RezzONUVVuhwDapgG8sdTQuFhbR0w1xsuTNI="],
     "Sougaijam Kennedy":["SS","0TcY1e6Gtb-OzMU8w0UJVw==$IkIRGttNrfqo2F6VI3NKqyYmGluJX8Be5ycIFroaCpw="],
     "Naba Jyoti Bora":["SS","bcWRloNfPssMjzlc4j0lUQ==$bdgdEcrBpep644jNcw_8eVZP4JUlm3dwUMGD-bSLPoA="],
     "Vacant-Zone A":["SS","oryim6X9mWzzbQU5pvoJ2w==$MoNp3nQEmF8j1fnaJDkNKUzIeGMOcDiJW6yzvARP_XY="],
@@ -461,6 +461,22 @@ def init_db():
 }
         for name, (role, pin_hash) in pin_seeds.items():
             conn.execute("UPDATE users SET pin_hash = %s WHERE name = %s AND role = %s", (pin_hash, name, role))
+
+        # Apply the explicit SS-to-TL role correction without losing credentials or history.
+        conn.execute("""
+            UPDATE users AS tl_user
+            SET pin_hash = COALESCE(ss_user.pin_hash, tl_user.pin_hash),
+                password_hash = COALESCE(ss_user.password_hash, tl_user.password_hash),
+                whatsapp_number = COALESCE(NULLIF(ss_user.whatsapp_number, ''), tl_user.whatsapp_number),
+                tl = 'Abhishek Pradhan', ss = NULL, active = TRUE
+            FROM users AS ss_user
+            WHERE tl_user.name = 'Abhishek Pradhan' AND tl_user.role = 'TL'
+              AND ss_user.name = tl_user.name AND ss_user.role = 'SS' AND ss_user.active = TRUE
+        """)
+        conn.execute("""
+            UPDATE users SET active = FALSE
+            WHERE name = 'Abhishek Pradhan' AND role = 'SS'
+        """)
 
 
 def apply_alignment(conn):
