@@ -351,6 +351,17 @@ button{min-height:44px}
 .waActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.waStatus{font-size:12px;color:#667085;margin-top:7px}
 .waNumberInput{min-width:160px}
 @media(max-width:700px){.waGrid{grid-template-columns:1fr}.waPreview{min-height:300px}.waNumberInput{min-width:130px}}
+
+.highDosBanner{display:flex;align-items:flex-start;gap:12px;margin:0 0 18px;padding:14px 17px;border:1px solid #efbf58;border-radius:12px;background:#fff5dc;color:#60410c;box-shadow:0 3px 12px #7b510b12}
+.highDosBanner .highDosSign{font-size:25px;line-height:1}
+.highDosBanner strong{display:block;font-size:16px;margin-bottom:3px}
+.highDosBanner p{margin:0;line-height:1.5}
+.highDosModal{position:fixed;inset:0;background:#1d2639a8;z-index:10001;display:flex;align-items:center;justify-content:center;padding:18px}
+.highDosModal.hidden{display:none}
+.highDosDialog{background:#fff;border:2px solid #e7aa35;border-radius:17px;box-shadow:0 24px 70px #0004;max-width:540px;width:100%;padding:25px}
+.highDosDialog h2{margin:0 0 10px;color:#7b4a00;font-size:23px}
+.highDosDialog p{margin:0 0 18px;line-height:1.6;color:#394150}
+.highDosDialog button{width:100%}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA ZONE A</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -445,6 +456,7 @@ button{min-height:44px}
 </div>
 <div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
 </section>
+<div id="highDosModal" class="highDosModal hidden" role="dialog" aria-modal="true" aria-labelledby="highDosTitle"><div class="highDosDialog"><h2 id="highDosTitle">⚠ High DOS models</h2><p>Please review stock and prioritise sales for <strong>Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</strong></p><button id="highDosClose" type="button" class="primary">I understand</button></div></div>
 <div id="welcomeModal" class="welcome hidden"><div class="welcomeBox"><div class="welcomeIcon">✓</div><h2>Welcome back <span id="welcomeName"></span>!</h2><p>Let’s visit the Market.</p><button id="welcomeClose" class="primary">Let’s Go</button></div></div>
 <section id="app" class="hidden">
 <div class="dashboardShell">
@@ -469,6 +481,7 @@ button{min-height:44px}
 <div class="dashMain">
 <div id="dashboardHome">
 <div class="dashTitle"><div><h2>Dashboard</h2><p>Overview of your market coverage and field activity.</p></div><div class="dashboardTools"><select id="dashboardPeriod"><option>This Month</option><option>Last 30 Days</option><option>All Time</option></select><div id="profileTop" class="profileTop"><div class="avatar" id="avatarInitials">—</div><div><div class="profileName" id="topUserName">—</div><div class="profileRole" id="topUserRole">—</div></div></div></div></div>
+<div id="highDosBanner" class="highDosBanner" role="alert"><span class="highDosSign" aria-hidden="true">⚠</span><div><strong>High DOS warning</strong><p>Please review stock and focus on selling these models: Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</p></div></div>
 <div id="performanceDashboard" class="perfShell">
   <div class="perfTabs">
     <button class="perfTab active" data-perf-tab="visits">Visit Status</button>
@@ -776,16 +789,19 @@ async function pinLogin(){
   }
 }
 function openWelcome(){ $('welcomeModal').classList.remove('hidden'); setTimeout(()=>$('welcomeClose').focus(),50) }
-function closeWelcome(){ $('welcomeModal').classList.add('hidden') }
+function closeWelcome(){ $('welcomeModal').classList.add('hidden'); openHighDosWarning() }
+function openHighDosWarning(){ if($('highDosModal').classList.contains('hidden')){ $('highDosModal').classList.remove('hidden'); $('highDosClose').focus() } }
+function closeHighDosWarning(){ $('highDosModal').classList.add('hidden') }
 async function login(){let username=$('username').value.trim(),password=$('password').value;if(!username||!password)return msg('authMsg','Enter username and password.');try{let r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});let d=await r.json();if(!r.ok)throw Error(d.detail||'Login failed');token=d.access_token;user=d.user;sessionStorage.setItem('mvt_token',token);sessionStorage.setItem('mvt_user',JSON.stringify(user));await showApp();msg('authMsg','Login successful.',true)}catch(e){msg('authMsg',e.message)}}
 function requestGPS(){if(!navigator.geolocation){$('gpsStatus').textContent='📍 GPS: This browser/device does not provide location.';return Promise.resolve(false)}$('gpsStatus').textContent='📍 GPS: Requesting current location…';return new Promise(resolve=>navigator.geolocation.getCurrentPosition(p=>{gps={latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy};$('gpsStatus').innerHTML=`📍 GPS: <b>Captured</b> · Accuracy ${Math.round(gps.accuracy)} m · ${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)}`;resolve(true)},()=>{$('gpsStatus').textContent='📍 GPS: Permission denied/unavailable. Allow location access and try again.';resolve(false)},{enableHighAccuracy:true,timeout:10000,maximumAge:60000}))}
 async function refreshGPS(){return requestGPS()}
 async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$('authPanel').classList.add('hidden');$('app').classList.remove('hidden');$('topUserName').textContent=user.name||'User';$('topUserRole').textContent=user.role||'';$('avatarInitials').textContent=(user.name||'U').split(/\\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();$('userMeta').innerHTML=`<b>${esc(user.name)}</b> · ${esc(user.role)} &nbsp; <span class="muted">Retailers are automatically restricted to your assigned ${esc(user.role)} hierarchy.</span>`;
   requestGPS().catch(e=>console.warn('GPS:',e));
   setPerfTabLayout('visits');
+  if($('welcomeModal').classList.contains('hidden'))openHighDosWarning();
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
 }
-function logout(){token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){closeHighDosWarning();token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
@@ -1459,6 +1475,7 @@ async function loadAdminUsers(){
     $('avatarInitials').textContent='MG';
     $('userMeta').innerHTML='<b>Manager</b> · Management &nbsp; <span class="muted">Full NESA dashboard access is enabled in management mode.</span>';
     setStatus(true,'Manager');
+    openHighDosWarning();
     renderAdminUsers();
     renderWaRecipients();
     loadWaLogs().catch(()=>{});
@@ -1890,7 +1907,7 @@ $('filter').onclick=()=>visits().catch(e=>msg('authMsg',e.message));$('clear').o
 
 
 
-document.querySelectorAll('.sideBtn[data-target],.viewAll[data-target]').forEach(el=>el.addEventListener('click',()=>{let t=$(el.dataset.target);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.sideBtn[data-target]').forEach(b=>b.classList.remove('active'));if(el.classList.contains('sideBtn'))el.classList.add('active')}));$('sideLogout').onclick=logout;$('date').value=new Date().toISOString().slice(0,10);
+document.querySelectorAll('.sideBtn[data-target],.viewAll[data-target]').forEach(el=>el.addEventListener('click',()=>{let t=$(el.dataset.target);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});if(el.dataset.target==='dashboardHome')openHighDosWarning();document.querySelectorAll('.sideBtn[data-target]').forEach(b=>b.classList.remove('active'));if(el.classList.contains('sideBtn'))el.classList.add('active')}));$('highDosClose').onclick=closeHighDosWarning;$('sideLogout').onclick=logout;$('date').value=new Date().toISOString().slice(0,10);
 $('visitPhotoClose').onclick=closeVisitPhotos;
 $('visitPhotoModal').onclick=e=>{if(e.target===$('visitPhotoModal'))closeVisitPhotos()};
 setStatus(false,'Checking...');
