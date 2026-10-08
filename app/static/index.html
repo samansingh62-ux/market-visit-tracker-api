@@ -999,26 +999,19 @@ function modelSignal(m){
 }
 
 function renderHighDosVariants(data){
-  const families=['Y11','Y31T','Y21','Y05','S2','V70 FE','Y51 Pro'];
-  const rows=data.watchlist_variants||[];
-  const grouped=new Map(families.map(name=>[name,[]]));
-  rows.forEach(row=>{if(grouped.has(row.family))grouped.get(row.family).push(row)});
+  const rows=(data.watchlist_variants||[]).filter(row=>Number(row.sales||0)>0 && row.dos!=null && Number(row.dos)>45);
   $('highDosPeriod').textContent='Live Good Phone stock as of '+(data.period?.inventory_date||'today')+
     ' · MTD sales '+(data.period?.start||'')+' to '+(data.period?.end||'');
-  $('highDosVariantRows').innerHTML=families.map(family=>{
-    const variants=grouped.get(family)||[];
-    if(!variants.length)return '<tr><td><b>'+esc(family)+'</b></td><td colspan="4">No variant data in this hierarchy</td></tr>';
-    return variants.map((row,index)=>{
-      const dos=row.dos==null?(data.watchlist_source_complete&&Number(row.stock||0)>0&&Number(row.sales||0)===0?'No MTD sales':'—'):Number(row.dos).toFixed(1);
-      return '<tr><td>'+(index===0?'<b>'+esc(family)+'</b>':'')+'</td><td>'+esc(row.variant||'—')+'</td>'+
-        '<td>'+Math.round(Number(row.sales||0)).toLocaleString()+'</td>'+
-        '<td>'+Math.round(Number(row.stock||0)).toLocaleString()+'</td>'+
-        '<td class="'+(row.dos==null?'highDosUnknown':'')+'">'+esc(dos)+'</td></tr>';
-    }).join('');
-  }).join('');
+  $('highDosVariantRows').innerHTML=rows.length?rows.map(row=>{
+    const dos=Number(row.dos).toFixed(1);
+    return '<tr><td><b>'+esc(row.family||'—')+'</b></td><td>'+esc(row.variant||'—')+'</td>'+
+      '<td>'+Math.round(Number(row.sales||0)).toLocaleString()+'</td>'+
+      '<td>'+Math.round(Number(row.stock||0)).toLocaleString()+'</td>'+
+      '<td>'+esc(dos)+'</td></tr>';
+  }).join(''):'<tr><td colspan="5">No running model is above 45 DOS in this hierarchy.</td></tr>';
   $('highDosCoverage').textContent=(!data.watchlist_source_complete?'Sales or stock pages are incomplete; DOS is unavailable. ':
-    'DOS = Good Phone stock ÷ average daily MTD sales. ')+
-    (data.watchlist_scope_partial?'Shared retailers without store-level inventory are excluded from these variant totals.':'');
+    'Warning rule: any running model/variant with MTD sales > 0 and DOS > 45. DOS = Good Phone stock ÷ average daily MTD sales. ')+
+    'Shared retailer stock follows the same hierarchy-safe Retailer Code logic as retailer stock.';
 }
 
 async function performanceTrends(){
