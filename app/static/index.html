@@ -362,6 +362,16 @@ button{min-height:44px}
 .highDosDialog h2{margin:0 0 10px;color:#7b4a00;font-size:23px}
 .highDosDialog p{margin:0 0 18px;line-height:1.6;color:#394150}
 .highDosDialog button{width:100%}
+
+.highDosContent{min-width:0;flex:1}
+.highDosMeta{font-size:12px;color:#795b2c;margin-top:8px!important}
+.highDosTableWrap{overflow-x:auto;margin-top:11px}
+.highDosTable{width:100%;border-collapse:collapse;background:#fffdf7;border:1px solid #edcf90;border-radius:8px;overflow:hidden;font-size:13px}
+.highDosTable th,.highDosTable td{padding:8px 10px;border-bottom:1px solid #f3e3bc;text-align:left;white-space:nowrap}
+.highDosTable th{background:#fff0c9;color:#674715;font-weight:800}
+.highDosTable td:nth-child(n+3),.highDosTable th:nth-child(n+3){text-align:right}
+.highDosTable tr:last-child td{border-bottom:0}
+.highDosUnknown{color:#8b5e14;font-weight:700}
 </style></head><body>
 <header class="top"><div><div class="ey">VIVO NESA ZONE A</div><h1>Market Visit Tracker</h1><p>Retailer coverage, field execution and market intelligence.</p></div><div id="status" class="pill">● Disconnected</div></header>
 <main>
@@ -481,7 +491,7 @@ button{min-height:44px}
 <div class="dashMain">
 <div id="dashboardHome">
 <div class="dashTitle"><div><h2>Dashboard</h2><p>Overview of your market coverage and field activity.</p></div><div class="dashboardTools"><select id="dashboardPeriod"><option>This Month</option><option>Last 30 Days</option><option>All Time</option></select><div id="profileTop" class="profileTop"><div class="avatar" id="avatarInitials">—</div><div><div class="profileName" id="topUserName">—</div><div class="profileRole" id="topUserRole">—</div></div></div></div></div>
-<div id="highDosBanner" class="highDosBanner" role="alert"><span class="highDosSign" aria-hidden="true">⚠</span><div><strong>High DOS warning</strong><p>Please review stock and focus on selling these models: Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</p></div></div>
+<div id="highDosBanner" class="highDosBanner" role="alert"><span class="highDosSign" aria-hidden="true">⚠</span><div class="highDosContent"><strong>High DOS warning</strong><p>Please review stock and focus on selling these models: Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</p><p id="highDosPeriod" class="highDosMeta">Loading live variant DOS…</p><div class="highDosTableWrap"><table class="highDosTable"><thead><tr><th>Model</th><th>Variant</th><th>MTD sales</th><th>Good Phone stock</th><th>DOS (days)</th></tr></thead><tbody id="highDosVariantRows"><tr><td colspan="5">Loading live variant DOS…</td></tr></tbody></table></div><p id="highDosCoverage" class="highDosMeta"></p></div></div>
 <div id="performanceDashboard" class="perfShell">
   <div class="perfTabs">
     <button class="perfTab active" data-perf-tab="visits">Visit Status</button>
@@ -987,9 +997,33 @@ function modelSignal(m){
   return 'Healthy';
 }
 
+function renderHighDosVariants(data){
+  const families=['Y11','Y31T','Y21','Y05','S2','V70 FE','Y51 Pro'];
+  const rows=data.watchlist_variants||[];
+  const grouped=new Map(families.map(name=>[name,[]]));
+  rows.forEach(row=>{if(grouped.has(row.family))grouped.get(row.family).push(row)});
+  $('highDosPeriod').textContent='Live Good Phone stock as of '+(data.period?.inventory_date||'today')+
+    ' · MTD sales '+(data.period?.start||'')+' to '+(data.period?.end||'');
+  $('highDosVariantRows').innerHTML=families.map(family=>{
+    const variants=grouped.get(family)||[];
+    if(!variants.length)return '<tr><td><b>'+esc(family)+'</b></td><td colspan="4">No variant data in this hierarchy</td></tr>';
+    return variants.map((row,index)=>{
+      const dos=row.dos==null?(data.watchlist_source_complete&&Number(row.stock||0)>0&&Number(row.sales||0)===0?'No MTD sales':'—'):Number(row.dos).toFixed(1);
+      return '<tr><td>'+(index===0?'<b>'+esc(family)+'</b>':'')+'</td><td>'+esc(row.variant||'—')+'</td>'+
+        '<td>'+Math.round(Number(row.sales||0)).toLocaleString()+'</td>'+
+        '<td>'+Math.round(Number(row.stock||0)).toLocaleString()+'</td>'+
+        '<td class="'+(row.dos==null?'highDosUnknown':'')+'">'+esc(dos)+'</td></tr>';
+    }).join('');
+  }).join('');
+  $('highDosCoverage').textContent=(!data.watchlist_source_complete?'Sales or stock pages are incomplete; DOS is unavailable. ':
+    'DOS = Good Phone stock ÷ average daily MTD sales. ')+
+    (data.watchlist_scope_partial?'Shared retailers without store-level inventory are excluded from these variant totals.':'');
+}
+
 async function performanceTrends(){
   try{
     perfTrendData=await api('/performance-trends');
+    renderHighDosVariants(perfTrendData);
     let daily=perfTrendData.daily||[];
     let total=daily.reduce((a,x)=>a+Number(x.units||0),0);
     $('trendMTD').textContent=Math.round(total).toLocaleString();
@@ -1018,6 +1052,9 @@ async function performanceTrends(){
       return `<tr><td><b>${esc(m.model||'—')}</b></td><td>${Math.round(Number(m.sales||0))}</td><td>${Number(m.avg_daily_sales||0).toFixed(1)}</td><td>${Math.round(Number(m.stock||0))}</td><td>${m.dos==null?'—':Math.round(Number(m.dos))}</td><td><span class="perfStatus ${cls}">${esc(sig)}</span></td></tr>`;
     }).join('')||'<tr><td colspan="6">No model data available.</td></tr>';
   }catch(e){
+    $('highDosPeriod').textContent='Live variant DOS is unavailable. Please refresh the Dashboard.';
+    $('highDosVariantRows').innerHTML='<tr><td colspan="5">Unable to load live sales and stock.</td></tr>';
+    $('highDosCoverage').textContent='';
     $('trendBars').innerHTML='<div class="msg err">Day-by-day data unavailable: '+esc(e.message)+'</div>';
     $('modelPerfRows').innerHTML='<tr><td colspan="6">Model data unavailable: '+esc(e.message)+'</td></tr>';
   }
