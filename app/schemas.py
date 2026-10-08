@@ -37,6 +37,7 @@ class VisitOut(BaseModel):
 
 
 class RetailerOut(BaseModel):
+    assignments: list[dict] = Field(default_factory=list)
     code: str
     name: str
     tl: str
@@ -119,6 +120,7 @@ class UserStatusOut(BaseModel):
 
 
 class RetailerHealthOut(BaseModel):
+    assignments: list[dict] = Field(default_factory=list)
     code: str
     name: str
     tl: str
