@@ -441,6 +441,7 @@ button{min-height:44px}
 <select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
 <button id="adminRefresh" class="secondary">Refresh</button>
 <button id="createRdsPins" class="secondary">Create Missing RDS PINs &amp; Download</button>
+<button id="createAlignedTlPins" class="secondary">Create PINs: Ajoy, Manash, Biru &amp; Kamal</button>
 </div>
 <div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
 </section>
@@ -1423,6 +1424,23 @@ async function createMissingRdsPins(){
   finally{if(url)URL.revokeObjectURL(url);btn.disabled=false;btn.textContent=old}
 }
 
+async function createAlignedTlPins(){
+  const btn=$('createAlignedTlPins'),old=btn.textContent;
+  let url;
+  try{
+    btn.disabled=true;btn.textContent='Creating TL PINs…';
+    const response=await fetch('/admin/users/tl/create-aligned-pins',{method:'POST',headers:adminHeaders()});
+    if(!response.ok){const data=await response.json();throw Error(data.detail||'Unable to create PINs.')}
+    const count=Number(response.headers.get('X-PINs-Created')||0);
+    if(!count)return msg('adminMsg','These four TL accounts already have PINs. Existing PINs were kept.',true);
+    url=URL.createObjectURL(await response.blob());
+    const link=document.createElement('a');link.href=url;link.download='new-aligned-tl-pins.csv';
+    document.body.appendChild(link);link.click();link.remove();
+    msg('adminMsg',count+' TL PINs created. Keep the downloaded list private; PINs cannot be retrieved again.',true);
+  }catch(e){msg('adminMsg',e.message)}
+  finally{if(url)URL.revokeObjectURL(url);btn.disabled=false;btn.textContent=old}
+}
+
 async function loadAdminUsers(){
   if(!adminKey)return msg('adminMsg','Enter the manager admin API key.');
   try{
@@ -1764,6 +1782,7 @@ $('managerAccess').onclick=()=>{adminKey=$('adminKey').value.trim();loadAdminUse
 $('closeManager').onclick=()=>{$('managerPanel').classList.add('hidden');if(managerMode)$('app').classList.remove('hidden');else if(token)$('app').classList.remove('hidden')};
 $('adminRefresh').onclick=loadAdminUsers;
 $('createRdsPins').onclick=createMissingRdsPins;
+$('createAlignedTlPins').onclick=createAlignedTlPins;
 $('adminRole').onchange=renderAdminUsers;
 $('adminStatus').onchange=renderAdminUsers;
 $('adminSearch').oninput=renderAdminUsers;
