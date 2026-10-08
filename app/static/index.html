@@ -533,7 +533,7 @@ button{min-height:44px}
 
   <div id="perfEodView" class="perfView hidden perfPanel">
     <h3>End of Day Retailer Remarks</h3>
-    <div class="perfSub">Only low-sale retailers in your hierarchy are shown. Low sale means zero MTD sales or below 50% target achievement.</div>
+    <div class="perfSub">Only low-sale retailers in your hierarchy are shown. Low sale means zero FTD sales or FTD sales below 60% of Required/Day. Only today’s sales are shown.</div>
     <div id="eodManagementExport" class="hidden" style="margin-top:14px">
       <p>Download all submitted TL and SS remarks for the selected dates.</p>
       <div class="formgrid">
@@ -896,15 +896,15 @@ async function loadEodRetailers(){
     return msg('eodMsg','EOD remarks are available for TL, SS and RDS users.');
   }
   try{
-    msg('eodMsg','Loading low-sale retailers…',true);
+    msg('eodMsg','Loading today’s low-sale retailers…',true);
     let d=await api('/eod-remarks/retailers');
     eodRetailers=d.retailers||[];
     $('eodRetailer').innerHTML='<option value="">Select low-sale retailer</option>'+eodRetailers.map(r=>{
-      let label=r.name+' · '+Math.round(Number(r.sales||0))+' sales · '+Math.round(Number(r.achievement_pct||0))+'%';
+      let label=r.name+' · FTD '+Math.round(Number(r.ftd_sales||0))+' · Required/Day '+Number(r.required_per_day||0)+' · '+Number(r.achievement_pct||0)+'% of Required/Day';
       return '<option value="'+esc(r.code)+'">'+esc(label)+'</option>';
     }).join('');
     $('eodRemark').value='';
-    msg('eodMsg',eodRetailers.length?eodRetailers.length+' low-sale retailers available.':'No low-sale retailers in your hierarchy today.',true);
+    msg('eodMsg',eodRetailers.length?eodRetailers.length+' retailers: zero FTD sales or below 60% of Required/Day.':'No low-sale retailers in your hierarchy today.',true);
   }catch(e){
     $('eodRetailer').innerHTML='<option value="">Unable to load retailers</option>';
     msg('eodMsg',e.message);

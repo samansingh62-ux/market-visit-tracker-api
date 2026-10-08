@@ -1968,6 +1968,50 @@ def export_eod_remarks_xlsx(
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
+def _eod_ftd_sales(user: dict) -> dict:
+    """Today's store-scoped sales; a failed/incomplete fetch is never zero sales."""
+    today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+    scope = _scope(user)
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
+            response = client.get(
+                f"{VWORK_LIVE_API_URL}/api/v1/vwork/sales",
+                params={"startDate": today, "endDate": today, "pageSize": 500,
+                        "allPages": True, "maxPages": 100},
+                headers=headers,
+            )
+        response.raise_for_status()
+        payload = response.json() or {}
+        data = payload.get("data") or {}
+        if payload.get("code") != 200 or not data.get("allPagesFetched"):
+            raise ValueError("Today's sales report is incomplete")
+        totals = {}
+        for raw in data.get("records") or []:
+            row = alignment.enrich(raw)
+            code = str(row.get("retailer_code") or "").strip().upper()
+            if code not in alignment.retailers:
+                continue
+            if row.get("alignment_status") != "STORE_MATCHED":
+                assignments = alignment.assignments(code)
+                if scope and alignment.assignments(code, scope) and not all(
+                    alignment.matches(a, scope) for a in assignments
+                ):
+                    raise ValueError("Today's sales are missing store attribution")
+                if scope and not alignment.assignments(code, scope):
+                    continue
+            elif scope and not alignment.matches(row, scope):
+                continue
+            totals[code] = totals.get(code, 0) + int(row.get("sales_cnt") or 0)
+        return totals
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Today's FTD sales are unavailable or incomplete. Please retry.") from exc
+
+
+def _eod_is_low_sale(ftd_sales: int, required_per_day: float) -> bool:
+    return ftd_sales == 0 or (required_per_day > 0 and ftd_sales < required_per_day * 0.60)
+
+
 @app.get("/eod-remarks/retailers")
 def eod_remark_retailers(user: dict = Depends(get_current_user)):
     role = str(user.get("role") or "").upper()
@@ -1975,7 +2019,8 @@ def eod_remark_retailers(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="EOD remarks are available to TL, SS and RDS users.")
 
     perf = performance_dashboard(user)
-    today = date.today().isoformat()
+    ftd_sales = _eod_ftd_sales(user)
+    today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
     existing = {
         str(row.get("retailer_code") or "").strip().upper(): row
         for row in crud.list_daily_retailer_remarks(
@@ -1987,17 +2032,18 @@ def eod_remark_retailers(user: dict = Depends(get_current_user)):
 
     rows = []
     for row in (perf.get("retailers") or []):
-        sales = int(row.get("sales") or 0)
-        ach = float(row.get("achievement_pct") or 0)
-        target = int(row.get("target") or 0)
-        if sales == 0 or (target > 0 and ach < 50):
-            code = str(row.get("code") or "").strip().upper()
+        code = str(row.get("code") or "").strip().upper()
+        sales = int(ftd_sales.get(code, 0))
+        required = float(row.get("required_per_day") or 0)
+        ach = round(sales / required * 100, 1) if required > 0 else 0
+        if _eod_is_low_sale(sales, required):
             saved = existing.get(code) or {}
             rows.append({
                 "code": code,
                 "name": row.get("name"),
                 "sales": sales,
-                "target": target,
+                "ftd_sales": sales,
+                "required_per_day": required,
                 "achievement_pct": ach,
                 "remark": saved.get("remark") or "",
                 "updated_at": saved.get("updated_at"),
@@ -2039,14 +2085,13 @@ def save_eod_remark(payload: DailyRetailerRemarkCreate, user: dict = Depends(get
     if not perf_row:
         raise HTTPException(status_code=404, detail="Retailer performance is unavailable.")
 
-    sales = int(perf_row.get("sales") or 0)
-    target = int(perf_row.get("target") or 0)
-    ach = float(perf_row.get("achievement_pct") or 0)
-    if not (sales == 0 or (target > 0 and ach < 50)):
-        raise HTTPException(status_code=400, detail="Remarks can only be submitted for low-sale retailers.")
+    sales = int(_eod_ftd_sales(user).get(code, 0))
+    required = float(perf_row.get("required_per_day") or 0)
+    if not _eod_is_low_sale(sales, required):
+        raise HTTPException(status_code=400, detail="Remarks require zero FTD sales or FTD sales below 60% of Required/Day.")
 
     return crud.upsert_daily_retailer_remark(
-        remark_date=date.today().isoformat(),
+        remark_date=datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat(),
         retailer_code=code,
         retailer_name=str(retailer.get("name") or perf_row.get("name") or ""),
         submitted_by=str(user.get("name") or ""),
