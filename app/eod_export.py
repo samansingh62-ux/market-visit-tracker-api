@@ -68,6 +68,12 @@ def build_eod_workbook(rows, start, end, coverage=None):
     summary.freeze_panes = "A2"
     summary.column_dimensions["A"].width = 36
     summary.column_dimensions["B"].width = 64
+    for cells in summary:
+        lines = max((len(str(cell.value or "")) // max(int(summary.column_dimensions[cell.column_letter].width or 26), 1) + 1 for cell in cells), default=1)
+        summary.row_dimensions[cells[0].row].height = max(20, lines * 18)
+    for cell in summary[1]:
+        cell.font = Font(bold=True, color="17365D")
+        cell.fill = PatternFill("solid", fgColor="DCEBFF")
     for title, role in [("All Remarks", None), ("TL Remarks", "TL"), ("SS Remarks", "SS")]:
         ws = wb.create_sheet(title)
         ws.append(HEADERS)
