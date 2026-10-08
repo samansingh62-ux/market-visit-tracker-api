@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
 from . import crud, database
+from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from .auth import get_current_user, get_dashboard_user, hash_password, require_admin_key, require_manager, verify_password, create_token
 from .schemas import (
@@ -291,6 +292,12 @@ async def stop_whatsapp_broadcast_scheduler():
             pass
 
 
+@app.get("/admin/alignment", dependencies=[Depends(require_admin_key)])
+def alignment_status():
+    with database.get_conn() as conn:
+        row = conn.execute("SELECT COUNT(*) AS stores, COUNT(DISTINCT retailer_code) AS retailers FROM store_alignment").fetchone()
+    return {"version": "2026-10-08", **dict(row), "shared_retailer_assignments": True, "sales_basis": "store"}
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -344,7 +351,7 @@ def me(user: dict = Depends(get_current_user)):
 
 def _scope(user: dict) -> dict:
     role = user.get("role")
-    name = user.get("name")
+    name = canonical_name(user.get("name"))
 
     if role == "TL":
         return {"tl": name}
@@ -361,6 +368,12 @@ def _scope(user: dict) -> dict:
 def _record_matches_scope(record: dict, scope: dict) -> bool:
     if not scope:
         return True
+    code = record.get("code") or record.get("retailer_code")
+    if not code and record.get("retailer"):
+        retailer = crud.lookup_retailer_by_name(record["retailer"])
+        code = retailer.get("code") if retailer else None
+    if code:
+        return bool(alignment.assignments(code, scope))
     for key, value in scope.items():
         if key == "kam":
             if record.get("kam") == value:
@@ -436,7 +449,7 @@ def retailer_360(
         raise HTTPException(status_code=404, detail="Retailer is not in the Market Visit master.")
 
     scope = _scope(user)
-    if scope and any(retailer.get(k) != v for k, v in scope.items()):
+    if scope and not _record_matches_scope(retailer, scope):
         raise HTTPException(status_code=403, detail="You cannot access this retailer.")
 
     today = date.today()
@@ -450,6 +463,7 @@ def retailer_360(
         "inventoryDate": inventory_date,
         "pageSize": 500,
         "maxPages": 100,
+        **scope,
     }
     headers = {}
     if VWORK_LIVE_API_KEY:
@@ -1519,7 +1533,7 @@ def get_coverage(
     rows = crud.get_coverage(group_by, kam=scope.get("kam"))
 
     if role in ("TL", "SS", "RDS"):
-        name = user.get("name")
+        name = canonical_name(user.get("name"))
         rows = [r for r in rows if r["name"] == name]
 
     return rows
@@ -1544,7 +1558,7 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
     if VWORK_LIVE_API_KEY:
         headers["X-API-Key"] = VWORK_LIVE_API_KEY
     payload = {
-        "store_codes": codes,
+        "store_codes": alignment.store_codes(codes, scope),
         "start_date": today.replace(day=1).isoformat(),
         "end_date": today.isoformat(),
         "inventory_date": today.isoformat(),
@@ -1554,6 +1568,7 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
         with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
             response = client.post(
                 f"{VWORK_LIVE_API_URL}/api/v1/dashboard/sales-trends",
+                params=scope,
                 json=payload,
                 headers=headers,
             )
@@ -1589,11 +1604,13 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     )
 
     params = {
+        **scope,
         "startDate": today.replace(day=1).isoformat(),
         "endDate": today.isoformat(),
         "inventoryDate": today.isoformat(),
         "pageSize": 500,
         "maxPages": 100,
+        **scope,
     }
     headers = {}
     if VWORK_LIVE_API_KEY:
@@ -1608,16 +1625,20 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             )
             scheme_response = client.get(
                 f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-festive-sales",
+                params=scope,
                 headers=headers,
             )
             additional_response = client.get(
                 f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-additional-sales",
+                params=scope,
                 headers=headers,
             )
         response.raise_for_status()
         scheme_response.raise_for_status()
         additional_response.raise_for_status()
-        live_rows = (response.json() or {}).get("retailers") or []
+        live_payload = response.json() or {}
+        live_rows = live_payload.get("retailers") or []
+        store_sales = live_payload.get("store_sales") or []
         scheme_payload = scheme_response.json() or {}
         scheme_rows = scheme_payload.get("retailers") or []
         additional_payload = additional_response.json() or {}
@@ -1690,6 +1711,7 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         retailer_rows.append({
             "code": code,
             "name": row.get("name"),
+            "assignments": row.get("assignments", []),
             "tl": row.get("tl"),
             "ss": row.get("ss"),
             "rds": row.get("rds"),
@@ -1759,31 +1781,44 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     for field in ("tl", "ss", "rds"):
         explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper())
         groups = {}
-        for item in retailer_rows:
-            name = item.get(field) or "Unassigned"
+        for store in store_sales:
+            name = store.get(field) or "Unassigned"
             g = groups.setdefault(name, {
                 "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
                 "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
-                "back_support_known": 0,
+                "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
             })
-            g["retailers"] += 1
-            g["target"] += item["target"]
-            g["sales"] += item["sales"]
-            g["stock"] += item["stock"]
-            g["festive_payout"] += int(item.get("scheme_payout") or 0)
-            g["focus_payout"] += int(item.get("focus_scheme_payout") or 0)
-            g["v80_normal_payout"] += int(item.get("v80_normal_sales_payout") or 0)
-            if item.get("back_support_payable") is not None:
-                g["back_support_known"] += int(item.get("back_support_payable") or 0)
+            g["sales"] += int(store.get("sales") or 0)
+            g["stock"] += int(store.get("stock") or 0)
+            g["_codes"].add(store["retailer_code"])
+        # Include assigned retailers even where there are no current sales.
+        for item in retailer_rows:
+            names = {canonical_name(a.get(field)) for a in item.get("assignments", [])}
+            for name in names:
+                g = groups.setdefault(name, {
+                    "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
+                    "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
+                    "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
+                })
+                g["_codes"].add(item["code"])
+                g["target"] += item["target"]
+                if len(names) > 1:
+                    g["shared_payout_pending"] = True
+                else:
+                    g["festive_payout"] += int(item.get("scheme_payout") or 0)
+                    g["focus_payout"] += int(item.get("focus_scheme_payout") or 0)
+                    g["v80_normal_payout"] += int(item.get("v80_normal_sales_payout") or 0)
+                    g["back_support_known"] += int(item.get("back_support_payable") or 0)
         out = []
         for g in groups.values():
+            g["retailers"] = len(g.pop("_codes"))
             explicit = explicit_targets.get(g["name"])
             if explicit:
                 g["target"] = int(explicit.get("target_volume") or 0)
                 g["target_value"] = int(explicit.get("target_value") or 0)
             g["achievement_pct"] = round((g["sales"] / g["target"]) * 100, 1) if g["target"] > 0 else 0
             g["gap"] = max(g["target"] - g["sales"], 0)
-            g["total_known_payout"] = g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
+            g["total_known_payout"] = None if g["shared_payout_pending"] else g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
             out.append(g)
         hierarchy[field] = sorted(out, key=lambda x: x["sales"], reverse=True)
 
@@ -1827,6 +1862,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "eligibility_note": "Provisional sales-based payout. Final payout remains subject to upload, activation, pre-activation, MOP and infiltration conditions.",
         },
         "hierarchy": hierarchy,
+        "store_sales": store_sales,
+        "alignment": live_payload.get("alignment", {}),
         "retailers": retailer_rows,
     }
 
@@ -1860,6 +1897,7 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
         "inventoryDate": today.isoformat(),
         "pageSize": 500,
         "maxPages": 100,
+        **scope,
     }
     headers = {}
     if VWORK_LIVE_API_KEY:
@@ -1987,7 +2025,7 @@ def save_eod_remark(payload: DailyRetailerRemarkCreate, user: dict = Depends(get
         raise HTTPException(status_code=404, detail="Retailer not found.")
 
     scope = _scope(user)
-    if scope and any(retailer.get(k) != v for k, v in scope.items()):
+    if scope and not _record_matches_scope(retailer, scope):
         raise HTTPException(status_code=403, detail="Retailer is outside your hierarchy.")
 
     perf = performance_dashboard(user)
@@ -2039,6 +2077,7 @@ def visit_priorities(
         "inventoryDate": today.isoformat(),
         "pageSize": 500,
         "maxPages": 100,
+        **scope,
     }
     headers = {}
     if VWORK_LIVE_API_KEY:
