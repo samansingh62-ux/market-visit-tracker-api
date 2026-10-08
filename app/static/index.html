@@ -805,7 +805,13 @@ function filteredPerfRows(){
   let h=$('perfHierarchyFilter').value;
   if(search)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(search));
   if(status)rows=rows.filter(r=>r.status===status);
-  if(h)rows=rows.filter(r=>r.tl===h||r.ss===h||r.rds===h);
+  if(h)rows=rows.filter(r=>[r.tl,r.ss,r.rds].some(v=>String(v||'').split(' | ').includes(h))).map(r=>{
+    const stores=(perfData.store_sales||[]).filter(s=>s.retailer_code===r.code&&[s.tl,s.ss,s.rds].includes(h));
+    const sales=stores.reduce((n,s)=>n+Number(s.sales||0),0);
+    const stock=stores.reduce((n,s)=>n+Number(s.stock||0),0);
+    const gap=Math.max(Number(r.target||0)-sales,0);
+    return {...r,sales,stock,gap,achievement_pct:r.target>0?Math.round(1000*sales/r.target)/10:0,required_per_day:Math.round(10*gap/(perfData.period?.days_remaining||1))/10};
+  });
   return rows;
 }
 
@@ -864,7 +870,7 @@ function renderPerfTables(){
   let visitRows=[...rows].sort((a,b)=>(Number(b.days_since_visit??9999)-Number(a.days_since_visit??9999)));
   $('perfVisitRows').innerHTML=visitRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.last_visit||'Never')}</td><td>${r.days_since_visit==null?'—':r.days_since_visit}</td><td>${r.visit_count}</td><td>${r.sales}</td><td><span class="perfStatus ${r.days_since_visit==null||r.days_since_visit>14?'behind':'track'}">${r.days_since_visit==null?'Never Visited':r.days_since_visit>14?'Overdue':'Covered'}</span></td></tr>`).join('');
 
-  const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td><td><b>${inr(x.total_known_payout||0)}</b></td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'};
+  const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td><td><b>${x.total_known_payout==null?'Pending allocation':inr(x.total_known_payout)}</b></td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'};
   renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
   renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
   renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);

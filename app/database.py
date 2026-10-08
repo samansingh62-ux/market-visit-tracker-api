@@ -357,16 +357,18 @@ def init_db():
               AND (r.kam IS DISTINCT FROM k.kam_name)
         """)
 
+        apply_alignment(conn)
+
         # User identity/hierarchy master. Credentials are only populated by admin provisioning.
         rows = conn.execute("""
             SELECT DISTINCT tl AS name, 'TL' AS role, tl, NULL AS ss, NULL AS rds
-            FROM retailers WHERE tl IS NOT NULL AND tl != ''
+            FROM store_alignment WHERE tl IS NOT NULL AND tl != ''
             UNION
             SELECT DISTINCT ss AS name, 'SS' AS role, NULL AS tl, ss, NULL AS rds
-            FROM retailers WHERE ss IS NOT NULL AND ss != ''
+            FROM store_alignment WHERE ss IS NOT NULL AND ss != ''
             UNION
             SELECT DISTINCT rds AS name, 'RDS' AS role, NULL AS tl, NULL AS ss, rds
-            FROM retailers WHERE rds IS NOT NULL AND rds != ''
+            FROM store_alignment WHERE rds IS NOT NULL AND rds != ''
         """).fetchall()
         for row in rows:
             base = "".join(ch.lower() if ch.isalnum() else "." for ch in row["name"]).strip(".")
@@ -460,3 +462,38 @@ def init_db():
         for name, (role, pin_hash) in pin_seeds.items():
             conn.execute("UPDATE users SET pin_hash = %s WHERE name = %s AND role = %s", (pin_hash, name, role))
 
+
+def apply_alignment(conn):
+    """Transactional master update, retaining store grain and every shared assignment."""
+    from .alignment import alignment, canonical_name
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS store_alignment (
+            store_code TEXT PRIMARY KEY, store_name TEXT NOT NULL,
+            retailer_code TEXT NOT NULL, retailer_name TEXT NOT NULL,
+            kam TEXT NOT NULL, ss TEXT NOT NULL, tl TEXT NOT NULL, rds TEXT NOT NULL,
+            ss_id TEXT, tl_id TEXT, source_month TEXT NOT NULL
+        )
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_store_alignment_retailer ON store_alignment(retailer_code)")
+    conn.execute("CREATE TABLE IF NOT EXISTS alignment_retailer_backup_20261008 AS SELECT * FROM retailers")
+    conn.execute("DELETE FROM store_alignment")
+    with conn.cursor() as cur:
+        cur.executemany("""
+            INSERT INTO store_alignment
+            (store_code, store_name, retailer_code, retailer_name, kam, ss, tl, rds, ss_id, tl_id, source_month)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'2026-10')
+        """, [(r["store_code"], r["store_name"], r["retailer_code"], r["retailer_name"],
+               canonical_name(r["kam"]), canonical_name(r["ss"]), canonical_name(r["tl"]),
+               canonical_name(r["rds"]), r["ss_id"], r["tl_id"]) for r in alignment.rows])
+        cur.executemany("""
+            INSERT INTO retailers (code,name,tl,ss,rds,kam,zone,club,status,town_name,district_name)
+            VALUES (%s,%s,%s,%s,%s,%s,'Zone A',%s,'Active',%s,%s)
+            ON CONFLICT (code) DO UPDATE SET name=EXCLUDED.name, tl=EXCLUDED.tl, ss=EXCLUDED.ss,
+                rds=EXCLUDED.rds, kam=EXCLUDED.kam, club=EXCLUDED.club,
+                status='Active', town_name=EXCLUDED.town_name, district_name=EXCLUDED.district_name
+        """, [(code, rows[0]["retailer_name"], canonical_name(rows[0]["tl"]),
+               canonical_name(rows[0]["ss"]), canonical_name(rows[0]["rds"]),
+               canonical_name(rows[0]["kam"]), rows[0]["club"] or "",
+               rows[0]["town_name"] or "", rows[0]["district_name"] or "")
+              for code, rows in alignment.retailers.items()])
+    conn.execute("UPDATE retailers SET status='Outside current alignment' WHERE code NOT IN (SELECT retailer_code FROM store_alignment)")
