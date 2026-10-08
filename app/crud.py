@@ -2,6 +2,14 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from . import database
+from .alignment import alignment, canonical_name
+
+
+def assignment_condition(alias, field, value_sql='%s'):
+    if field not in ('tl','ss','kam','rds'):
+        raise ValueError('Invalid hierarchy field')
+    return f"EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code = {alias}.code AND sa.{field} = {value_sql})"
+
 from .auth import verify_password
 
 
@@ -56,10 +64,10 @@ def get_hierarchy_target_summary(month: str, tl: Optional[str] = None, ss: Optio
     clauses = ["t.month = %s"]
     params = [month]
     if tl:
-        clauses.append("r.tl = %s")
+        clauses.append(assignment_condition("r", "tl"))
         params.append(tl)
     if ss:
-        clauses.append("r.ss = %s")
+        clauses.append(assignment_condition("r", "ss"))
         params.append(ss)
     where = " AND ".join(clauses)
     with database.get_conn() as conn:
@@ -91,19 +99,19 @@ def get_performance_scope_rows(
     rds: Optional[str] = None,
     kam: Optional[str] = None,
 ) -> list[dict]:
-    clauses = ["1=1"]
+    clauses = ["EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code = r.code)"]
     params = []
     if tl:
-        clauses.append("r.tl = %s")
+        clauses.append(assignment_condition("r", "tl"))
         params.append(tl)
     if ss:
-        clauses.append("r.ss = %s")
+        clauses.append(assignment_condition("r", "ss"))
         params.append(ss)
     if rds:
-        clauses.append("r.rds = %s")
+        clauses.append(assignment_condition("r", "rds"))
         params.append(rds)
     if kam:
-        clauses.append("r.kam = %s")
+        clauses.append(assignment_condition("r", "kam"))
         params.append(kam)
     where = " AND ".join(clauses)
     with database.get_conn() as conn:
@@ -125,7 +133,7 @@ def get_performance_scope_rows(
             WHERE {where}
             ORDER BY r.name
         """, [month, *params]).fetchall()
-    return [dict(row) for row in rows]
+    return [alignment.decorate_retailer(dict(row), {k:v for k,v in {"tl":tl,"ss":ss,"rds":rds,"kam":kam}.items() if v}) for row in rows]
 
 
 def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
@@ -223,10 +231,10 @@ def list_visits(retailer: Optional[str] = None, tl: Optional[str] = None,
     for col, value in (("retailer", retailer), ("tl", tl), ("ss", ss), ("rds", rds),
                        ("submitted_by", submitted_by), ("submitted_role", submitted_role)):
         if value:
-            clauses.append(f"{col} = %s")
+            clauses.append(f"EXISTS (SELECT 1 FROM retailers vr JOIN store_alignment sa ON sa.retailer_code=vr.code WHERE vr.name=v.retailer AND sa.{col}=%s)" if col in ("tl","ss","rds") else f"{col} = %s")
             params.append(value)
     if kam:
-        clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND rk.kam = %s)")
+        clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=rk.code AND sk.kam=%s))")
         params.append(kam)
     if date_from:
         clauses.append("visit_date >= %s")
@@ -264,17 +272,17 @@ def delete_visit(visit_id: int) -> bool:
 
 def list_retailers(tl: Optional[str] = None, ss: Optional[str] = None,
                    rds: Optional[str] = None, kam: Optional[str] = None, search: Optional[str] = None) -> list:
-    clauses, params = [], []
+    clauses, params = ["EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code = r.code)"], []
     for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam)):
         if value:
-            clauses.append(f"{col} = %s")
-            params.append(value)
+            clauses.append(assignment_condition("r", col))
+            params.append(canonical_name(value))
     if search:
         clauses.append("name ILIKE %s")
         params.append(f"%{search}%")
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
     with database.get_conn() as conn:
-        return [dict(r) for r in conn.execute(f"SELECT * FROM retailers {where} ORDER BY name", params).fetchall()]
+        return [alignment.decorate_retailer(dict(r), {k:v for k,v in {"tl":tl,"ss":ss,"rds":rds,"kam":kam}.items() if v}) for r in conn.execute(f"SELECT r.* FROM retailers r {where} ORDER BY name", params).fetchall()]
 
 
 def list_users_admin() -> list:
@@ -295,13 +303,13 @@ def list_users_admin() -> list:
             FROM users u
             LEFT JOIN retailers r
                 ON (
-                    (u.role = 'TL' AND r.tl = u.name)
+                    (u.role = 'TL' AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.tl=u.name))
                     OR
-                    (u.role = 'SS' AND r.ss = u.name)
+                    (u.role = 'SS' AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.ss=u.name))
                     OR
-                    (u.role = 'RDS' AND r.rds = u.name)
+                    (u.role = 'RDS' AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.rds=u.name))
                     OR
-                    (u.role = 'KAM' AND r.kam = u.name)
+                    (u.role = 'KAM' AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.kam=u.name))
                 )
             GROUP BY
                 u.id,
@@ -441,20 +449,20 @@ def set_user_status(user_id: int, active: bool) -> Optional[dict]:
 
 def get_stats(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None, kam: Optional[str] = None) -> dict:
     with database.get_conn() as conn:
-        retailer_clauses, retailer_params = [], []
+        retailer_clauses, retailer_params = ["EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code)"], []
         for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam)):
             if value:
-                retailer_clauses.append(f"r.{col} = %s")
+                retailer_clauses.append(assignment_condition("r", col))
                 retailer_params.append(value)
         retailer_where = f"WHERE {' AND '.join(retailer_clauses)}" if retailer_clauses else ""
 
         visit_clauses, visit_params = [], []
         for col, value in (("tl", tl), ("ss", ss), ("rds", rds)):
             if value:
-                visit_clauses.append(f"v.{col} = %s")
+                visit_clauses.append(f"EXISTS (SELECT 1 FROM retailers vr JOIN store_alignment sa ON sa.retailer_code=vr.code WHERE vr.name=v.retailer AND sa.{col}=%s)")
                 visit_params.append(value)
         if kam:
-            visit_clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND rk.kam = %s)")
+            visit_clauses.append("EXISTS (SELECT 1 FROM retailers rk WHERE rk.name = v.retailer AND EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=rk.code AND sk.kam=%s))")
             visit_params.append(kam)
         visit_where = f"WHERE {' AND '.join(visit_clauses)}" if visit_clauses else ""
 
@@ -467,42 +475,34 @@ def get_stats(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[
 
 def get_coverage(group_by: str, kam: Optional[str] = None) -> list:
     if group_by not in ("tl", "ss", "rds"):
-        raise ValueError("group_by must be one of: tl, ss, rds")
+        raise ValueError("Invalid hierarchy group")
     with database.get_conn() as conn:
-        scope_sql = " AND kam = %s" if kam else ""
-        scope_params = [kam] if kam else []
-        assigned_rows = conn.execute(
-            f"SELECT {group_by} AS grp, COUNT(*) AS assigned FROM retailers WHERE {group_by} IS NOT NULL AND {group_by} != ''{scope_sql} GROUP BY {group_by}",
-            scope_params,
-        ).fetchall()
-        result = []
-        for row in assigned_rows:
-            grp, assigned = row["grp"], row["assigned"]
-            visited_params = [grp]
-            visited_scope = ""
-            if kam:
-                visited_scope = " AND r.kam = %s"
-                visited_params.append(kam)
-            visited = conn.execute(
-                f"SELECT COUNT(DISTINCT v.retailer) AS c FROM visits v JOIN retailers r ON r.name = v.retailer WHERE r.{group_by} = %s{visited_scope}",
-                visited_params,
-            ).fetchone()["c"]
-            total_visits = conn.execute(
-                f"SELECT COUNT(*) AS c FROM visits v JOIN retailers r ON r.name = v.retailer WHERE r.{group_by} = %s{visited_scope}",
-                visited_params,
-            ).fetchone()["c"]
-            result.append({"name": grp, "assigned": assigned, "visited": visited,
-                           "coverage_pct": round((visited / assigned) * 100, 1) if assigned else 0.0,
-                           "total_visits": total_visits})
-        return sorted(result, key=lambda r: r["name"])
+        params = [canonical_name(kam)] if kam else []
+        where = "WHERE kam=%s" if kam else ""
+        rows = conn.execute(f"""
+            WITH assigned AS (
+                SELECT DISTINCT {group_by} AS name, retailer_code
+                FROM store_alignment {where}
+            ), totals AS (
+                SELECT a.name, COUNT(DISTINCT a.retailer_code) AS assigned,
+                       COUNT(DISTINCT a.retailer_code) FILTER (WHERE v.id IS NOT NULL) AS visited,
+                       COUNT(v.id) AS total_visits
+                FROM assigned a JOIN retailers r ON r.code=a.retailer_code
+                LEFT JOIN visits v ON v.retailer=r.name
+                GROUP BY a.name
+            )
+            SELECT *, ROUND(100.0 * visited / NULLIF(assigned,0),1) AS coverage_pct
+            FROM totals ORDER BY name
+        """, params).fetchall()
+        return [dict(r) for r in rows]
 
 def get_retailer_health(tl: Optional[str] = None, ss: Optional[str] = None,
                         rds: Optional[str] = None, kam: Optional[str] = None, zone: Optional[str] = None,
                         priority: Optional[str] = None, limit: int = 500) -> list:
-    clauses, params = [], []
+    clauses, params = ["EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code)"], []
     for col, value in (("tl", tl), ("ss", ss), ("rds", rds), ("kam", kam), ("zone", zone)):
         if value:
-            clauses.append(f"r.{col} = %s")
+            clauses.append(assignment_condition("r", col) if col in ("tl","ss","rds","kam") else f"r.{col} = %s")
             params.append(value)
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
     query = f"""
@@ -534,7 +534,7 @@ def get_retailer_health(tl: Optional[str] = None, ss: Optional[str] = None,
             row["priority"] = "Recently Visited"
     if priority:
         rows = [r for r in rows if r["priority"] == priority]
-    return rows
+    return [alignment.decorate_retailer(r, {k:v for k,v in {"tl":tl,"ss":ss,"rds":rds,"kam":kam}.items() if v}) for r in rows]
 
 
 def get_user_by_username(username: str) -> Optional[dict]:
@@ -696,11 +696,11 @@ def list_kam_whatsapp_recipients(kam_name: str, role: Optional[str] = None) -> l
                 CASE
                     WHEN u.role = 'TL' THEN (
                         SELECT COUNT(*) FROM retailers r
-                        WHERE r.kam = %s AND r.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.tl=u.name)
                     )
                     WHEN u.role = 'SS' THEN (
                         SELECT COUNT(*) FROM retailers r
-                        WHERE r.kam = %s AND r.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.ss=u.name)
                     )
                     ELSE 0
                 END AS assigned_retailers
@@ -709,12 +709,12 @@ def list_kam_whatsapp_recipients(kam_name: str, role: Optional[str] = None) -> l
               AND (
                     (u.role = 'TL' AND EXISTS (
                         SELECT 1 FROM retailers r1
-                        WHERE r1.kam = %s AND r1.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r1.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r1.code AND sa.tl=u.name)
                     ))
                     OR
                     (u.role = 'SS' AND EXISTS (
                         SELECT 1 FROM retailers r2
-                        WHERE r2.kam = %s AND r2.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r2.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r2.code AND sa.ss=u.name)
                     ))
               )
             ORDER BY u.role, u.name
@@ -736,12 +736,12 @@ def kam_can_message_user(kam_name: str, user_id: int) -> bool:
               AND (
                     (u.role = 'TL' AND EXISTS (
                         SELECT 1 FROM retailers r
-                        WHERE r.kam = %s AND r.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.tl=u.name)
                     ))
                     OR
                     (u.role = 'SS' AND EXISTS (
                         SELECT 1 FROM retailers r
-                        WHERE r.kam = %s AND r.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.ss=u.name)
                     ))
               )
             LIMIT 1
@@ -769,15 +769,15 @@ def list_kam_area_users(kam_name: str) -> list[dict]:
                 CASE
                     WHEN u.role = 'TL' THEN (
                         SELECT COUNT(*) FROM retailers r
-                        WHERE r.kam = %s AND r.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.tl=u.name)
                     )
                     WHEN u.role = 'SS' THEN (
                         SELECT COUNT(*) FROM retailers r
-                        WHERE r.kam = %s AND r.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.ss=u.name)
                     )
                     WHEN u.role = 'RDS' THEN (
                         SELECT COUNT(*) FROM retailers r
-                        WHERE r.kam = %s AND r.rds = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.rds=u.name)
                     )
                     ELSE 0
                 END AS assigned_retailers
@@ -786,12 +786,12 @@ def list_kam_area_users(kam_name: str) -> list[dict]:
               AND (
                     (u.role = 'TL' AND EXISTS (
                         SELECT 1 FROM retailers r1
-                        WHERE r1.kam = %s AND r1.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r1.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r1.code AND sa.tl=u.name)
                     ))
                     OR
                     (u.role = 'SS' AND EXISTS (
                         SELECT 1 FROM retailers r2
-                        WHERE r2.kam = %s AND r2.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r2.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r2.code AND sa.ss=u.name)
                     ))
                     OR
                     (u.role = 'RDS' AND EXISTS (
@@ -817,17 +817,17 @@ def kam_can_manage_user(kam_name: str, user_id: int) -> bool:
               AND (
                     (u.role = 'TL' AND EXISTS (
                         SELECT 1 FROM retailers r
-                        WHERE r.kam = %s AND r.tl = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.tl=u.name)
                     ))
                     OR
                     (u.role = 'SS' AND EXISTS (
                         SELECT 1 FROM retailers r
-                        WHERE r.kam = %s AND r.ss = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.ss=u.name)
                     ))
                     OR
                     (u.role = 'RDS' AND EXISTS (
                         SELECT 1 FROM retailers r
-                        WHERE r.kam = %s AND r.rds = u.name
+                        WHERE EXISTS (SELECT 1 FROM store_alignment sk WHERE sk.retailer_code=r.code AND sk.kam=%s) AND EXISTS (SELECT 1 FROM store_alignment sa WHERE sa.retailer_code=r.code AND sa.rds=u.name)
                     ))
               )
             LIMIT 1
