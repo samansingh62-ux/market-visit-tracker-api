@@ -1005,7 +1005,7 @@ def list_management_eod_remarks(date_from: str, date_to: str) -> list[dict]:
         return [dict(row) for row in rows]
 
 
-def create_missing_rds_pins() -> list[dict]:
+def create_missing_rds_pins(role: str = "RDS", names: tuple | None = None) -> list[dict]:
     """Provision only missing RDS PINs; return plaintext once to the admin."""
     import secrets
     from .auth import hash_password
@@ -1019,7 +1019,7 @@ def create_missing_rds_pins() -> list[dict]:
         hashes = [u["pin_hash"] for u in users if u.get("pin_hash")]
         issued = set()
         for user in users:
-            if user["role"] != "RDS" or user.get("pin_hash"):
+            if user["role"] != role or (names is not None and user["name"] not in names) or user.get("pin_hash"):
                 continue
             for _ in range(1000):
                 pin = str(secrets.randbelow(9000) + 1000)
