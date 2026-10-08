@@ -501,7 +501,7 @@ button{min-height:44px}
   </div>
   <div class="perfFilterBar">
     <label>Search Retailer<input id="perfSearch" placeholder="Retailer name"></label>
-    <label>Status<select id="perfStatusFilter"><option value="">All</option><option>On Track</option><option>Behind</option><option>High Stock</option><option>Out of Stock</option><option>No Sales</option></select></label>
+    <label>Status<select id="perfStatusFilter"><option value="">All</option><option>On Track</option><option>Behind</option><option>High Stock</option><option>Out of Stock</option><option>Stock Unmatched</option><option>No Sales</option></select></label>
     <label id="perfHierarchyFilterWrap">Hierarchy<select id="perfHierarchyFilter"><option value="">All</option></select></label>
     <button id="perfReset" class="secondary" type="button">Reset</button>
   </div>
@@ -821,6 +821,7 @@ function perfStatusClass(s){
   if(s==='On Track')return 'track';
   if(s==='Behind')return 'behind';
   if(s==='High Stock'||s==='Out of Stock')return 'stock';
+  if(s==='Stock Unmatched')return 'behind';
   return 'none';
 }
 
@@ -870,7 +871,7 @@ function renderPerfTables(){
       <td>${Math.round(Number(r.target||0))}</td><td><b>${Math.round(Number(r.sales||0))}</b></td>
       <td class="perfAch">${ach}%<div class="perfBar"><i style="width:${Math.min(100,ach)}%"></i></div></td>
       <td>${Math.round(Number(r.gap||0))}</td><td>${Math.round(Number(r.required_per_day||0))}</td>
-      <td>${Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
+      <td>${r.stock_matched===false?'—':Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
       <td><b>${inr(r.scheme_payout||0)}</b><div class="priorityReason">${esc(r.scheme_slab||'Not qualified')}</div></td>
       <td><b>${inr(r.focus_scheme_payout||0)}</b><div class="priorityReason">${Math.round(Number(r.focus_scheme_units||0))} units</div></td>
       <td><b>${inr(r.v80_normal_sales_payout||0)}</b><div class="priorityReason">${esc(r.v80_slab||'Not active/qualified')}</div></td>
@@ -892,7 +893,7 @@ function renderPerfTables(){
   });
 
   let stockRows=[...rows].sort((a,b)=>(Number(b.dos||-1)-Number(a.dos||-1))).slice(0,80);
-  $('perfStockRows').innerHTML=stockRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.sales}</td><td>${Math.round(Number(r.avg_daily_sales||0))}</td><td>${r.stock}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td><td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td></tr>`).join('');
+  $('perfStockRows').innerHTML=stockRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.sales}</td><td>${Math.round(Number(r.avg_daily_sales||0))}</td><td>${r.stock_matched===false?'—':Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td><td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td></tr>`).join('');
 
   let visitRows=[...rows].sort((a,b)=>(Number(b.days_since_visit??9999)-Number(a.days_since_visit??9999)));
   $('perfVisitRows').innerHTML=visitRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.last_visit||'Never')}</td><td>${r.days_since_visit==null?'—':r.days_since_visit}</td><td>${r.visit_count}</td><td>${r.sales}</td><td><span class="perfStatus ${r.days_since_visit==null||r.days_since_visit>14?'behind':'track'}">${r.days_since_visit==null?'Never Visited':r.days_since_visit>14?'Overdue':'Covered'}</span></td></tr>`).join('');
@@ -1111,6 +1112,7 @@ async function loadRetailer360(r){
   try{
     let d=await api('/retailers/'+encodeURIComponent(r.code)+'/360');
     let sales=d.sales||{},inv=d.inventory||{},perf=d.performance||{},mv=d.market_visit||{},target=d.target||{};
+    let stockMatched=inv.stock_matched!==false;
     let liveRetailer=d.retailer||{};
     let marketLocation=r.town_name||liveRetailer.town_name||liveRetailer.city||liveRetailer.province||'';
     if(marketLocation)$('market').value=marketLocation;
@@ -1140,7 +1142,7 @@ async function loadRetailer360(r){
     $('r360Body').innerHTML=
       '<div class="r360Grid">'+
       '<div class="r360Stat"><span>MTD Sales</span><b>'+esc(sales.units??0)+'</b></div>'+
-      '<div class="r360Stat"><span>Stock</span><b>'+esc(inv.good_phone_units??inv.units??0)+'</b></div>'+
+      '<div class="r360Stat"><span>Stock</span><b>'+(stockMatched?esc(inv.good_phone_units??inv.units??0):'—')+'</b></div>'+
       '<div class="r360Stat"><span>Avg/Day</span><b>'+(perf.avg_daily_sales==null?'—':Math.round(Number(perf.avg_daily_sales)))+'</b></div>'+
       '<div class="r360Stat"><span>DOS</span><b>'+(perf.dos==null?'—':Math.round(Number(perf.dos)))+'</b></div>'+
       '</div>'+
