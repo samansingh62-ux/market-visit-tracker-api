@@ -466,7 +466,7 @@ button{min-height:44px}
 </div>
 <div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
 </section>
-<div id="highDosModal" class="highDosModal hidden" role="dialog" aria-modal="true" aria-labelledby="highDosTitle"><div class="highDosDialog"><h2 id="highDosTitle">⚠ High DOS models</h2><p>Please review stock and prioritise sales for <strong>Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</strong></p><button id="highDosClose" type="button" class="primary">I understand</button></div></div>
+<div id="highDosModal" class="highDosModal hidden" role="dialog" aria-modal="true" aria-labelledby="highDosTitle"><div class="highDosDialog"><h2 id="highDosTitle">⚠ High DOS models</h2><p>Please review stock and prioritise sales for any <strong>running model/variant with DOS above 25.</strong></p><button id="highDosClose" type="button" class="primary">I understand</button></div></div>
 <div id="welcomeModal" class="welcome hidden"><div class="welcomeBox"><div class="welcomeIcon">✓</div><h2>Welcome back <span id="welcomeName"></span>!</h2><p>Let’s visit the Market.</p><button id="welcomeClose" class="primary">Let’s Go</button></div></div>
 <section id="app" class="hidden">
 <div class="dashboardShell">
@@ -491,7 +491,7 @@ button{min-height:44px}
 <div class="dashMain">
 <div id="dashboardHome">
 <div class="dashTitle"><div><h2>Dashboard</h2><p>Overview of your market coverage and field activity.</p></div><div class="dashboardTools"><select id="dashboardPeriod"><option>This Month</option><option>Last 30 Days</option><option>All Time</option></select><div id="profileTop" class="profileTop"><div class="avatar" id="avatarInitials">—</div><div><div class="profileName" id="topUserName">—</div><div class="profileRole" id="topUserRole">—</div></div></div></div></div>
-<div id="highDosBanner" class="highDosBanner" role="alert"><span class="highDosSign" aria-hidden="true">⚠</span><div class="highDosContent"><strong>High DOS warning</strong><p>Please review stock and focus on selling these models: Y11, Y31T, Y21, Y05, S2, V70 FE, and Y51 Pro — all variants.</p><p id="highDosPeriod" class="highDosMeta">Loading live variant DOS…</p><div class="highDosTableWrap"><table class="highDosTable"><thead><tr><th>Model</th><th>Variant</th><th>MTD sales</th><th>Good Phone stock</th><th>DOS (days)</th></tr></thead><tbody id="highDosVariantRows"><tr><td colspan="5">Loading live variant DOS…</td></tr></tbody></table></div><p id="highDosCoverage" class="highDosMeta"></p></div></div>
+<div id="highDosBanner" class="highDosBanner" role="alert"><span class="highDosSign" aria-hidden="true">⚠</span><div class="highDosContent"><strong>High DOS warning</strong><p>Please review stock and focus on any running model/variant with DOS above 25.</p><p id="highDosPeriod" class="highDosMeta">Loading live variant DOS…</p><div class="highDosTableWrap"><table class="highDosTable"><thead><tr><th>Model</th><th>Variant</th><th>MTD sales</th><th>Good Phone stock</th><th>DOS (days)</th></tr></thead><tbody id="highDosVariantRows"><tr><td colspan="5">Loading live variant DOS…</td></tr></tbody></table></div><p id="highDosCoverage" class="highDosMeta"></p></div></div>
 <div id="performanceDashboard" class="perfShell">
   <div class="perfTabs">
     <button class="perfTab active" data-perf-tab="visits">Visit Status</button>
@@ -992,7 +992,7 @@ let perfTrendData=null;
 function modelSignal(m){
   if(Number(m.sales||0)>0 && Number(m.stock||0)===0)return 'Out of Stock';
   if(m.dos!=null && Number(m.dos)>60)return 'Overstock Risk';
-  if(m.dos!=null && Number(m.dos)>45)return 'High Stock';
+  if(m.dos!=null && Number(m.dos)>25)return 'High Stock';
   if(m.dos!=null && Number(m.dos)<7)return 'Low Stock';
   if(Number(m.sales||0)===0 && Number(m.stock||0)>0)return 'No Sales';
   return 'Healthy';
@@ -1008,7 +1008,7 @@ function renderHighDosVariants(data){
       '<td>'+Math.round(Number(row.sales||0)).toLocaleString()+'</td>'+
       '<td>'+Math.round(Number(row.stock||0)).toLocaleString()+'</td>'+
       '<td>'+esc(dos)+'</td></tr>';
-  }).join(''):'<tr><td colspan="5">No running model is above 45 DOS in this hierarchy.</td></tr>';
+  }).join(''):'<tr><td colspan="5">No running model is above 25 DOS in this hierarchy.</td></tr>';
   $('highDosCoverage').textContent=(!data.watchlist_source_complete?'Sales or stock pages are incomplete; DOS is unavailable. ':
     'Warning rule: any running model/variant with MTD sales > 0 and DOS > 25. DOS = Good Phone stock ÷ average daily MTD sales. ')+
     'Shared retailer stock follows the same hierarchy-safe Retailer Code logic as retailer stock.';
