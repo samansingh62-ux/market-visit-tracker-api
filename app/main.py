@@ -1457,6 +1457,28 @@ def admin_create_missing_rds_pins():
     )
 
 
+@app.post("/admin/users/tl/create-aligned-pins", dependencies=[Depends(require_admin_key)])
+def admin_create_aligned_tl_pins():
+    rows = crud.create_missing_rds_pins("TL", ("Ajoy Gogoi", "Manash Borah", "Biru Subba", "Kamal Rai"))
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["TL", "Username", "PIN"])
+    for row in rows:
+        # Prevent spreadsheet formulas in account labels.
+        name = str(row["name"])
+        username = str(row["username"])
+        writer.writerow([("'" + name) if name.startswith(("=", "+", "-", "@")) else name,
+                         ("'" + username) if username.startswith(("=", "+", "-", "@")) else username,
+                         row["pin"]])
+    return Response(
+        content=buffer.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="new-aligned-tl-pins.csv"',
+                 "Cache-Control": "no-store",
+                 "X-PINs-Created": str(len(rows))},
+    )
+
+
 @app.post(
     "/admin/users/{user_id}/reset-password",
     response_model=PasswordResetOut,
