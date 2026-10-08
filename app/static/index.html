@@ -999,7 +999,7 @@ function modelSignal(m){
 }
 
 function renderHighDosVariants(data){
-  const rows=(data.watchlist_variants||[]).filter(row=>Number(row.sales||0)>0 && row.dos!=null && Number(row.dos)>45);
+  const rows=(data.watchlist_variants||[]).filter(row=>Number(row.sales||0)>0 && row.dos!=null && Number(row.dos)>25);
   $('highDosPeriod').textContent='Live Good Phone stock as of '+(data.period?.inventory_date||'today')+
     ' · MTD sales '+(data.period?.start||'')+' to '+(data.period?.end||'');
   $('highDosVariantRows').innerHTML=rows.length?rows.map(row=>{
@@ -1010,7 +1010,7 @@ function renderHighDosVariants(data){
       '<td>'+esc(dos)+'</td></tr>';
   }).join(''):'<tr><td colspan="5">No running model is above 45 DOS in this hierarchy.</td></tr>';
   $('highDosCoverage').textContent=(!data.watchlist_source_complete?'Sales or stock pages are incomplete; DOS is unavailable. ':
-    'Warning rule: any running model/variant with MTD sales > 0 and DOS > 45. DOS = Good Phone stock ÷ average daily MTD sales. ')+
+    'Warning rule: any running model/variant with MTD sales > 0 and DOS > 25. DOS = Good Phone stock ÷ average daily MTD sales. ')+
     'Shared retailer stock follows the same hierarchy-safe Retailer Code logic as retailer stock.';
 }
 
