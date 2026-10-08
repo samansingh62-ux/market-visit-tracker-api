@@ -1982,7 +1982,10 @@ def export_eod_remarks_xlsx(
         raise HTTPException(status_code=400, detail="End date must be on or after start date.")
     from .eod_export import build_eod_workbook
     rows = crud.list_management_eod_remarks(start.isoformat(), end.isoformat())
-    out = build_eod_workbook(rows, start, end)
+    if end > datetime.now(IST).date():
+        raise HTTPException(status_code=400, detail="EOD reports cannot include future dates.")
+    coverage = _eod_submission_coverage(rows, start, end)
+    out = build_eod_workbook(rows, start, end, coverage)
     filename = f"eod-remarks-tl-ss-{start.isoformat()}-to-{end.isoformat()}.xlsx"
     return StreamingResponse(
         out,
@@ -1990,44 +1993,100 @@ def export_eod_remarks_xlsx(
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
+def _eod_sales_records(start: date, end: date) -> list:
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
+        response = client.get(
+            f"{VWORK_LIVE_API_URL}/api/v1/vwork/sales",
+            params={"startDate": start.isoformat(), "endDate": end.isoformat(),
+                    "pageSize": 500, "allPages": True, "maxPages": 100},
+            headers=headers,
+        )
+    response.raise_for_status()
+    payload = response.json() or {}
+    data = payload.get("data") or {}
+    if payload.get("code") != 200 or not data.get("allPagesFetched"):
+        raise ValueError("Sales report is incomplete")
+    return [alignment.enrich(row) for row in data.get("records") or []]
+
+
+def _eod_sales_totals(records: list, scope: dict) -> dict:
+    totals = {}
+    for row in records:
+        code = str(row.get("retailer_code") or "").strip().upper()
+        if code not in alignment.retailers:
+            continue
+        if row.get("alignment_status") != "STORE_MATCHED":
+            assignments = alignment.assignments(code)
+            if scope and alignment.assignments(code, scope) and not all(
+                alignment.matches(a, scope) for a in assignments
+            ):
+                raise ValueError("Sales are missing store attribution")
+            if scope and not alignment.assignments(code, scope):
+                continue
+        elif scope and not alignment.matches(row, scope):
+            continue
+        totals[code] = totals.get(code, 0) + int(row.get("sales_cnt") or 0)
+    return totals
+
+
 def _eod_ftd_sales(user: dict) -> dict:
     """Today's store-scoped sales; a failed/incomplete fetch is never zero sales."""
-    today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
-    scope = _scope(user)
-    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    today = datetime.now(IST).date()
     try:
-        with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
-            response = client.get(
-                f"{VWORK_LIVE_API_URL}/api/v1/vwork/sales",
-                params={"startDate": today, "endDate": today, "pageSize": 500,
-                        "allPages": True, "maxPages": 100},
-                headers=headers,
-            )
-        response.raise_for_status()
-        payload = response.json() or {}
-        data = payload.get("data") or {}
-        if payload.get("code") != 200 or not data.get("allPagesFetched"):
-            raise ValueError("Today's sales report is incomplete")
-        totals = {}
-        for raw in data.get("records") or []:
-            row = alignment.enrich(raw)
-            code = str(row.get("retailer_code") or "").strip().upper()
-            if code not in alignment.retailers:
-                continue
-            if row.get("alignment_status") != "STORE_MATCHED":
-                assignments = alignment.assignments(code)
-                if scope and alignment.assignments(code, scope) and not all(
-                    alignment.matches(a, scope) for a in assignments
-                ):
-                    raise ValueError("Today's sales are missing store attribution")
-                if scope and not alignment.assignments(code, scope):
-                    continue
-            elif scope and not alignment.matches(row, scope):
-                continue
-            totals[code] = totals.get(code, 0) + int(row.get("sales_cnt") or 0)
-        return totals
+        return _eod_sales_totals(_eod_sales_records(today, today), _scope(user))
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Today's FTD sales are unavailable or incomplete. Please retry.") from exc
+
+
+def _eod_submission_coverage(rows: list, start: date, end: date) -> list:
+    """Recalculate daily eligibility using current alignment and monthly targets."""
+    users = crud.list_active_users_by_role("TL") + crud.list_active_users_by_role("SS")
+    submitted = {}
+    for row in rows:
+        key = (str(row["remark_date"])[:10], row["submitted_role"], row["submitted_by"])
+        submitted.setdefault(key, set()).add(row["retailer_code"])
+    coverage = []
+    target_cache = {}
+    day = start
+    while day <= end:
+        reports = None
+        try:
+            ftd = _eod_sales_records(day, day)
+            mtd = ftd if day.day == 1 else _eod_sales_records(day.replace(day=1), day)
+            reports = (ftd, mtd)
+        except Exception:
+            pass
+        remaining = max(calendar.monthrange(day.year, day.month)[1] - day.day + 1, 1)
+        for account in users:
+            scope = _scope(account)
+            key = (day.strftime("%Y-%m"), account["role"], account["name"])
+            if key not in target_cache:
+                target_cache[key] = crud.get_performance_scope_rows(day.strftime("%Y-%m"), **scope)
+            targets = target_cache[key]
+            eligible = None
+            if reports is not None:
+                try:
+                    ftd_totals = _eod_sales_totals(reports[0], scope)
+                    mtd_totals = _eod_sales_totals(reports[1], scope)
+                    eligible = set()
+                    for retailer in targets:
+                        code = str(retailer["code"]).strip().upper()
+                        target = int(retailer.get("target_volume") or 0)
+                        required = round(max(target - mtd_totals.get(code, 0), 0) / remaining, 1) if target > 0 else 0
+                        if _eod_is_low_sale(ftd_totals.get(code, 0), required):
+                            eligible.add(code)
+                except Exception:
+                    eligible = None
+            saved = submitted.get((day.isoformat(), account["role"], account["name"]), set())
+            coverage.append({
+                "date": day.isoformat(), "role": account["role"], "name": account["name"],
+                "eligible_count": len(eligible) if eligible is not None else None,
+                "submitted_count": len(saved),
+                "pending_count": len(eligible - saved) if eligible is not None else None,
+            })
+        day += timedelta(days=1)
+    return coverage
 
 
 def _eod_is_low_sale(ftd_sales: int, required_per_day: float) -> bool:
