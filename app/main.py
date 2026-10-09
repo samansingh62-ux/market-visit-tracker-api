@@ -5,6 +5,7 @@ import calendar
 import csv
 import io
 import os
+import time
 import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -46,6 +47,28 @@ app = FastAPI(title="Market Visit Tracker API", description="GTM retailer visits
 
 VWORK_LIVE_API_URL = os.getenv("VWORK_LIVE_API_URL", "http://127.0.0.1:8000").rstrip("/")
 VWORK_LIVE_API_KEY = os.getenv("VWORK_LIVE_API_KEY", "").strip()
+
+def _vwork_request(client: httpx.Client, method: str, url: str, **kwargs) -> httpx.Response:
+    """Retry transient Render cold-start/gateway failures before surfacing an error."""
+    delays = (0, 4, 8, 15, 25)
+    last_response = None
+    last_error = None
+    for delay in delays:
+        if delay:
+            time.sleep(delay)
+        try:
+            response = client.request(method, url, **kwargs)
+            last_response = response
+            if response.status_code not in (502, 503, 504):
+                return response
+        except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout) as exc:
+            last_error = exc
+            continue
+    if last_response is not None:
+        return last_response
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("V-Work live API request failed")
 WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN", "").strip()
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "").strip()
 WHATSAPP_WABA_ID = os.getenv("WHATSAPP_WABA_ID", "").strip()
@@ -471,7 +494,9 @@ def retailer_360(
 
     try:
         with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
-            response = client.get(
+            response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/retailers/{retailer['code']}/360",
                 params=params,
                 headers=headers,
@@ -1591,7 +1616,9 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
 
     try:
         with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
-            response = client.post(
+            response = _vwork_request(
+                client,
+                "POST",
                 f"{VWORK_LIVE_API_URL}/api/v1/dashboard/sales-trends",
                 params=scope,
                 json=payload,
@@ -1643,17 +1670,23 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
 
     try:
         with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
-            response = client.get(
+            response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
                 params=params,
                 headers=headers,
             )
-            scheme_response = client.get(
+            scheme_response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-festive-sales",
                 params=scope,
                 headers=headers,
             )
-            additional_response = client.get(
+            additional_response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-additional-sales",
                 params=scope,
                 headers=headers,
@@ -1937,7 +1970,9 @@ def my_target_performance(user: dict = Depends(get_dashboard_user)):
 
     try:
         with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
-            response = client.get(
+            response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
                 params=params,
                 headers=headers,
@@ -2221,7 +2256,9 @@ def visit_priorities(
 
     try:
         with httpx.Client(timeout=httpx.Timeout(240.0, connect=10.0)) as client:
-            response = client.get(
+            response = _vwork_request(
+                client,
+                "GET",
                 f"{VWORK_LIVE_API_URL}/api/v1/retailers/priority-data",
                 params=params,
                 headers=headers,
