@@ -242,14 +242,6 @@ def build_eod_workbook(rows,start,end,coverage=None):
     _style_header(ia); _set_widths(ia,[25,10,10,12,10,14,55]); ia.freeze_panes="A2"; _add_table(ia,"EODIssueAnalysis")
     for c in ia["C"][1:]: c.number_format="0.0%"
 
-    # Existing coverage data retained
-    if coverage is not None:
-        cov=wb.create_sheet("Submission Coverage")
-        cov.append(["Date","Role","Name","Eligible Retailers","Remarks Submitted","Remarks Pending"])
-        for x in coverage:
-            cov.append([x["date"],x["role"],x["name"],x["eligible_count"] if x["eligible_count"] is not None else "Unavailable",x["submitted_count"],x["pending_count"] if x["pending_count"] is not None else "Unavailable"])
-        _style_header(cov); _set_widths(cov,[14,10,30,20,20,20]); cov.freeze_panes="A2"; _add_table(cov,"EODSubmissionCoverage")
-
     meth=wb.create_sheet("Methodology")
     meth.append(["Item","Definition / Limitation"])
     method_rows=[
