@@ -506,8 +506,13 @@ button{min-height:44px}
     <button id="perfReset" class="secondary" type="button">Reset</button>
   </div>
   <div class="perfKpis">
-    <div class="perfKpi"><span>Target</span><b id="perfTarget">—</b></div>
-    <div class="perfKpi"><span>MTD Achievement</span><b id="perfSales">—</b></div>
+    <div class="perfKpi"><span>Target Volume</span><b id="perfTarget">—</b></div>
+    <div class="perfKpi"><span>MTD Volume</span><b id="perfSales">—</b></div>
+    <div class="perfKpi"><span>MTD Value</span><b id="perfSalesValue">—</b></div>
+    <div class="perfKpi"><span>MTD ASP</span><b id="perfAsp">—</b></div>
+    <div class="perfKpi"><span>FTD Volume</span><b id="perfFtdSales">—</b></div>
+    <div class="perfKpi"><span>FTD Value</span><b id="perfFtdValue">—</b></div>
+    <div class="perfKpi"><span>FTD ASP</span><b id="perfFtdAsp">—</b></div>
     <div class="perfKpi"><span>Achievement %</span><b id="perfAch">—</b></div>
     <div class="perfKpi"><span>Gap</span><b id="perfGap">—</b></div>
     <div class="perfKpi"><span>Required / Day</span><b id="perfReq">—</b></div>
@@ -525,8 +530,8 @@ button{min-height:44px}
       <div class="schemeBannerValue"><b id="perfAllSchemePayout">₹0</b><span>known/provisional payout in current view</span></div>
     </div>
     <div class="wrap"><table class="perfTable"><thead><tr>
-      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>Sales</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Festive</th><th>Focus Model</th><th>V80 Normal</th><th>V80 Max*</th><th>Back Support</th><th>Total Known</th><th>Last Visit</th><th>Status</th>
-    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="19">Loading…</td></tr></tbody></table></div>
+      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>MTD Vol</th><th>MTD Value</th><th>MTD ASP</th><th>FTD Vol</th><th>FTD Value</th><th>FTD ASP</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Festive</th><th>Focus Model</th><th>V80 Normal</th><th>V80 Max*</th><th>Back Support</th><th>Total Known</th><th>Last Visit</th><th>Status</th>
+    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="24">Loading…</td></tr></tbody></table></div>
   </div>
 
   <div id="perfDayView" class="perfView hidden">
@@ -836,9 +841,12 @@ function filteredPerfRows(){
   if(h)rows=rows.filter(r=>[r.tl,r.ss,r.rds].some(v=>String(v||'').split(' | ').includes(h))).map(r=>{
     const stores=(perfData.store_sales||[]).filter(s=>s.retailer_code===r.code&&[s.tl,s.ss,s.rds].includes(h));
     const sales=stores.reduce((n,s)=>n+Number(s.sales||0),0);
+    const salesValue=stores.reduce((n,s)=>n+Number(s.sales_value||0),0);
+    const ftdSales=stores.reduce((n,s)=>n+Number(s.ftd_sales||0),0);
+    const ftdSalesValue=stores.reduce((n,s)=>n+Number(s.ftd_sales_value||0),0);
     const stock=stores.reduce((n,s)=>n+Number(s.stock||0),0);
     const gap=Math.max(Number(r.target||0)-sales,0);
-    return {...r,sales,stock,gap,achievement_pct:r.target>0?Math.round(1000*sales/r.target)/10:0,required_per_day:Math.round(10*gap/(perfData.period?.days_remaining||1))/10};
+    return {...r,sales,sales_value:salesValue,asp:sales>0?salesValue/sales:0,ftd_sales:ftdSales,ftd_sales_value:ftdSalesValue,ftd_asp:ftdSales>0?ftdSalesValue/ftdSales:0,stock,gap,achievement_pct:r.target>0?Math.round(1000*sales/r.target)/10:0,required_per_day:Math.round(10*gap/(perfData.period?.days_remaining||1))/10};
   });
   return rows;
 }
@@ -848,10 +856,20 @@ function renderPerfTables(){
   let rows=filteredPerfRows();
   let target=rows.reduce((a,r)=>a+Number(r.target||0),0);
   let sales=rows.reduce((a,r)=>a+Number(r.sales||0),0);
+  let salesValue=rows.reduce((a,r)=>a+Number(r.sales_value||0),0);
+  let asp=sales>0?salesValue/sales:0;
+  let ftdSales=rows.reduce((a,r)=>a+Number(r.ftd_sales||0),0);
+  let ftdValue=rows.reduce((a,r)=>a+Number(r.ftd_sales_value||0),0);
+  let ftdAsp=ftdSales>0?ftdValue/ftdSales:0;
   let gap=Math.max(target-sales,0);
   let days=Math.max(Number(perfData.period?.days_remaining||1),1);
   $('perfTarget').textContent=Math.round(target).toLocaleString();
   $('perfSales').textContent=Math.round(sales).toLocaleString();
+  $('perfSalesValue').textContent=inr(salesValue);
+  $('perfAsp').textContent=inr(asp);
+  $('perfFtdSales').textContent=Math.round(ftdSales).toLocaleString();
+  $('perfFtdValue').textContent=inr(ftdValue);
+  $('perfFtdAsp').textContent=inr(ftdAsp);
   $('perfAch').textContent=(target?Math.round(sales*100/target):0)+'%';
   $('perfGap').textContent=Math.round(gap).toLocaleString();
   $('perfReq').textContent=Math.round(gap/days).toLocaleString();
@@ -869,6 +887,8 @@ function renderPerfTables(){
       <td><b>${esc(r.name)}</b><div class="priorityReason">${esc(r.club||'')}</div></td>
       <td>${esc(r.tl||'—')}</td><td>${esc(r.ss||'—')}</td><td>${esc(r.rds||'—')}</td>
       <td>${Math.round(Number(r.target||0))}</td><td><b>${Math.round(Number(r.sales||0))}</b></td>
+      <td>${inr(r.sales_value||0)}</td><td>${inr(r.asp||0)}</td>
+      <td><b>${Math.round(Number(r.ftd_sales||0))}</b></td><td>${inr(r.ftd_sales_value||0)}</td><td>${inr(r.ftd_asp||0)}</td>
       <td class="perfAch">${ach}%<div class="perfBar"><i style="width:${Math.min(100,ach)}%"></i></div></td>
       <td>${Math.round(Number(r.gap||0))}</td><td>${Math.round(Number(r.required_per_day||0))}</td>
       <td>${r.stock_matched===false?'—':Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
@@ -881,7 +901,7 @@ function renderPerfTables(){
       <td>${esc(r.last_visit||'Never')}</td>
       <td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="19">No retailers match the selected filters.</td></tr>';
+  }).join(''):'<tr><td colspan="24">No retailers match the selected filters.</td></tr>';
 
   $('perfRetailerRows').querySelectorAll('tr[data-code]').forEach(tr=>tr.onclick=()=>{
     let r=master.find(x=>String(x.code||'').toUpperCase()===String(tr.dataset.code||'').toUpperCase());
@@ -1070,7 +1090,7 @@ async function performanceDashboard(){
     $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
     renderPerfTables();
   }catch(e){
-    $('perfRetailerRows').innerHTML='<tr><td colspan="13">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
+    $('perfRetailerRows').innerHTML='<tr><td colspan="24">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
   }
 }
 
