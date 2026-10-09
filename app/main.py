@@ -1736,6 +1736,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         code = str(row.get("code") or "").strip().upper()
         live = live_by_code.get(code)
         sales = int((live or {}).get("mtd_sales") or 0)
+        sales_value = float((live or {}).get("mtd_sales_value") or 0)
+        sales_asp = float((live or {}).get("mtd_asp") or (sales_value / sales if sales > 0 else 0))
+        ftd_sales = int((live or {}).get("ftd_sales") or 0)
+        ftd_sales_value = float((live or {}).get("ftd_sales_value") or 0)
+        ftd_asp = float((live or {}).get("ftd_asp") or (ftd_sales_value / ftd_sales if ftd_sales > 0 else 0))
         stock_matched = bool(live and live.get("stock_matched"))
         stock = int(live.get("good_phone_stock") or 0) if stock_matched else None
         avg_daily = float((live or {}).get("avg_daily_sales") or 0)
@@ -1783,6 +1788,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "district_name": row.get("district_name"),
             "target": target,
             "sales": sales,
+            "sales_value": round(sales_value, 2),
+            "asp": round(sales_asp, 2),
+            "ftd_sales": ftd_sales,
+            "ftd_sales_value": round(ftd_sales_value, 2),
+            "ftd_asp": round(ftd_asp, 2),
             "achievement_pct": ach,
             "gap": gap,
             "required_per_day": req,
@@ -1817,6 +1827,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
 
     total_target = sum(x["target"] for x in retailer_rows)
     total_sales = sum(x["sales"] for x in retailer_rows)
+    total_sales_value = sum(float(x.get("sales_value") or 0) for x in retailer_rows)
+    total_asp = round(total_sales_value / total_sales, 2) if total_sales > 0 else 0
+    total_ftd_sales = sum(int(x.get("ftd_sales") or 0) for x in retailer_rows)
+    total_ftd_sales_value = sum(float(x.get("ftd_sales_value") or 0) for x in retailer_rows)
+    total_ftd_asp = round(total_ftd_sales_value / total_ftd_sales, 2) if total_ftd_sales > 0 else 0
 
     explicit_summary_target = None
     role = str(user.get("role") or "MANAGER").upper()
@@ -1847,11 +1862,15 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
         for store in store_sales:
             name = store.get(field) or "Unassigned"
             g = groups.setdefault(name, {
-                "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
+                "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
+                "ftd_sales": 0, "ftd_sales_value": 0.0, "stock": 0,
                 "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
                 "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
             })
             g["sales"] += int(store.get("sales") or 0)
+            g["sales_value"] += float(store.get("sales_value") or 0)
+            g["ftd_sales"] += int(store.get("ftd_sales") or 0)
+            g["ftd_sales_value"] += float(store.get("ftd_sales_value") or 0)
             g["stock"] += int(store.get("stock") or 0)
             g["_codes"].add(store["retailer_code"])
         # Include assigned retailers even where there are no current sales.
@@ -1859,7 +1878,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             names = {canonical_name(a.get(field)) for a in item.get("assignments", [])}
             for name in names:
                 g = groups.setdefault(name, {
-                    "name": name, "retailers": 0, "target": 0, "sales": 0, "stock": 0,
+                    "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
+                "ftd_sales": 0, "ftd_sales_value": 0.0, "stock": 0,
                     "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
                     "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
                 })
@@ -1880,6 +1900,8 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
                 g["target"] = int(explicit.get("target_volume") or 0)
                 g["target_value"] = int(explicit.get("target_value") or 0)
             g["achievement_pct"] = round((g["sales"] / g["target"]) * 100, 1) if g["target"] > 0 else 0
+            g["asp"] = round(g["sales_value"] / g["sales"], 2) if g["sales"] > 0 else 0
+            g["ftd_asp"] = round(g["ftd_sales_value"] / g["ftd_sales"], 2) if g["ftd_sales"] > 0 else 0
             g["gap"] = max(g["target"] - g["sales"], 0)
             g["total_known_payout"] = None if g["shared_payout_pending"] else g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
             out.append(g)
@@ -1903,6 +1925,11 @@ def performance_dashboard(user: dict = Depends(get_dashboard_user)):
             "retailers": len(retailer_rows),
             "target": total_target,
             "sales": total_sales,
+            "sales_value": round(total_sales_value, 2),
+            "asp": total_asp,
+            "ftd_sales": total_ftd_sales,
+            "ftd_sales_value": round(total_ftd_sales_value, 2),
+            "ftd_asp": total_ftd_asp,
             "achievement_pct": total_ach,
             "gap": total_gap,
             "required_per_day": round(total_gap / days_remaining, 1) if total_target > 0 else 0,
