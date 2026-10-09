@@ -986,15 +986,44 @@ def list_whatsapp_broadcast_runs(limit: int = 20) -> list[dict]:
 
 
 def list_management_eod_remarks(date_from: str, date_to: str) -> list[dict]:
-    """All saved TL/SS remarks in the inclusive reporting period."""
+    """All saved TL/SS remarks enriched for management-outcome analysis."""
     with database.get_conn() as conn:
         rows = conn.execute(
             """
-            SELECT d.remark_date, d.submitted_by, d.submitted_role,
-                   d.retailer_code, d.retailer_name, d.remark,
-                   r.tl, r.ss, r.rds, d.created_at, d.updated_at
+            SELECT
+                d.id,
+                d.remark_date,
+                d.submitted_by,
+                d.submitted_role,
+                d.retailer_code,
+                d.retailer_name,
+                d.remark,
+                d.created_at,
+                d.updated_at,
+                r.tl,
+                r.ss,
+                r.rds,
+                r.kam,
+                r.zone,
+                r.club,
+                r.town_name,
+                r.district_name,
+                COALESCE(t.target_volume, 0) AS target_volume,
+                COALESCE(t.target_value, 0) AS target_value,
+                v.last_visit,
+                COALESCE(v.visit_count, 0) AS visit_count
             FROM daily_retailer_remarks d
-            LEFT JOIN retailers r ON r.code = d.retailer_code
+            LEFT JOIN retailers r
+              ON UPPER(TRIM(r.code)) = UPPER(TRIM(d.retailer_code))
+            LEFT JOIN retailer_targets t
+              ON UPPER(TRIM(t.retailer_code)) = UPPER(TRIM(d.retailer_code))
+             AND t.month = LEFT(d.remark_date, 7)
+            LEFT JOIN LATERAL (
+                SELECT MAX(visit_date) AS last_visit, COUNT(*) AS visit_count
+                FROM visits
+                WHERE retailer = d.retailer_name
+                  AND visit_date <= d.remark_date
+            ) v ON TRUE
             WHERE d.remark_date >= %s AND d.remark_date <= %s
               AND d.submitted_role IN ('TL', 'SS')
             ORDER BY d.remark_date, d.submitted_role, d.submitted_by,
