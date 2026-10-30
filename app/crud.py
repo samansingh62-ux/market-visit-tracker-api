@@ -198,6 +198,25 @@ def retailer_visit_history(retailer_name: str, limit: int = 5) -> list:
         return [dict(r) for r in rows]
 
 
+def retailer_gps_points(max_accuracy_m: float = 150.0) -> list:
+    """Average GPS position per retailer, learned from past geotagged visits."""
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT retailer,
+                   AVG(latitude) AS latitude,
+                   AVG(longitude) AS longitude,
+                   COUNT(*) AS samples
+            FROM visits
+            WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+              AND (gps_accuracy IS NULL OR gps_accuracy <= %s)
+            GROUP BY retailer
+            """,
+            (max_accuracy_m,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def create_visit(payload) -> dict:
     with database.get_conn() as conn:
         info = lookup_retailer(conn, payload.retailer) or {}

@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Each GitHub Actions run gets a higher version number so phones see it as an update.
+def runNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace 'com.zonea.marketvisit'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.zonea.marketvisit'
+        minSdk 26
+        // 34 keeps the classic status bar; 35 would force edge-to-edge drawing.
+        targetSdk 34
+        versionCode runNumber
+        versionName "1.0.${runNumber}"
+        // The live app address. Change it here if the Tracker ever moves.
+        buildConfigField 'String', 'APP_URL', '"https://market-visit-tracker-api.onrender.com/app"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        // Uses a stable signing key when the repo provides one (see android/README.md);
+        // otherwise falls back to the build machine's debug key.
+        release {
+            def ks = System.getenv('ANDROID_KEYSTORE_FILE')
+            if (ks && file(ks).exists()) {
+                storeFile file(ks)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            def ks = System.getenv('ANDROID_KEYSTORE_FILE')
+            signingConfig (ks && file(ks).exists()) ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.13.1'
+}

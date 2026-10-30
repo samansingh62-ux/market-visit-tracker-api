@@ -331,6 +331,75 @@ def frontend():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+# Phone app (used by the Android APK and installable from Chrome).
+_APP_NO_CACHE = {"Cache-Control": "no-cache"}
+
+
+@app.get("/app", include_in_schema=False)
+@app.get("/app/", include_in_schema=False)
+def mobile_app():
+    return FileResponse(STATIC_DIR / "app.html", headers=_APP_NO_CACHE)
+
+
+@app.get("/app/manifest.webmanifest", include_in_schema=False)
+def mobile_manifest():
+    return FileResponse(STATIC_DIR / "manifest.webmanifest", media_type="application/manifest+json", headers=_APP_NO_CACHE)
+
+
+@app.get("/app/icon.svg", include_in_schema=False)
+def mobile_icon():
+    return FileResponse(STATIC_DIR / "icon.svg", media_type="image/svg+xml")
+
+
+@app.get("/app/sw.js", include_in_schema=False)
+def mobile_service_worker():
+    return FileResponse(STATIC_DIR / "sw.js", media_type="text/javascript", headers={**_APP_NO_CACHE, "Service-Worker-Allowed": "/app/"})
+
+
+def _distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    import math
+    r = 6371000.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = p2 - p1, math.radians(lon2 - lon1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(a))
+
+
+@app.get("/retailers/nearby")
+def nearby_retailers(
+    lat: float = Query(..., ge=-90, le=90),
+    lng: float = Query(..., ge=-180, le=180),
+    radius_m: float = Query(default=500, ge=10, le=5000),
+    limit: int = Query(default=5, ge=1, le=20),
+    user: dict = Depends(get_dashboard_user),
+):
+    """Assigned retailers near the user, located from earlier geotagged visits."""
+    scope = _scope(user)
+    allowed = {
+        r["name"]: r
+        for r in crud.list_retailers(
+            tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), kam=scope.get("kam")
+        )
+    }
+    out = []
+    for p in crud.retailer_gps_points():
+        retailer = allowed.get(p["retailer"])
+        if not retailer:
+            continue
+        d = _distance_m(lat, lng, float(p["latitude"]), float(p["longitude"]))
+        if d <= radius_m:
+            out.append({
+                "code": retailer.get("code"),
+                "name": retailer.get("name"),
+                "town_name": retailer.get("town_name"),
+                "district_name": retailer.get("district_name"),
+                "distance_m": round(d),
+                "samples": int(p["samples"]),
+            })
+    out.sort(key=lambda x: x["distance_m"])
+    return out[:limit]
+
+
 @app.post("/auth/login", response_model=LoginOut)
 def login(payload: LoginRequest):
     user = crud.get_user_by_username(payload.username)

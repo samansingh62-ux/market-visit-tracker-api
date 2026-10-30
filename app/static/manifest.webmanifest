@@ -1,0 +1,13 @@
+{
+  "name": "Market Visit · Zone A",
+  "short_name": "Market Visit",
+  "start_url": "/app",
+  "scope": "/app",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F6FA",
+  "theme_color": "#0E1B33",
+  "icons": [
+    {"src": "/app/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

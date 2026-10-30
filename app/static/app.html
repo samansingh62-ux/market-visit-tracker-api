@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1B33">
+<title>Market Visit · Zone A</title>
+<link rel="manifest" href="/app/manifest.webmanifest">
+<link rel="icon" href="/app/icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --ink:#0E1B33;--muted:#5B6B85;--line:#E3E8F0;--bg:#F4F6FA;--card:#FFFFFF;
+  --brand:#2457E6;--brand-ink:#1A43B8;--brand-soft:#E8EEFD;--bar:#4C7DFF;
+  --good:#0F6B41;--good-bg:#E6F5EE;--good-bar:#1F9D61;
+  --warn:#8A4A0B;--warn-bg:#FEF3E2;--warn-bar:#E08A1E;
+  --bad:#B42318;--bad-bg:#FDECEA;--bad-bar:#D93A2B;
+  --hi:#5B34C4;--hi-bg:#EEE9FD;--hi-bar:#7B57E0;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px}
+body{overscroll-behavior-y:contain}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--brand);text-decoration:none}
+.num{font-variant-numeric:tabular-nums}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+h1,h2,h3{margin:0}
+
+/* layout */
+.screen{min-height:100%;display:flex;flex-direction:column}
+.scroll{flex:1;padding:calc(20px + var(--safe-top)) 20px 24px;display:flex;flex-direction:column;gap:16px;max-width:640px;width:100%;margin:0 auto}
+.withNav .scroll{padding-bottom:calc(96px + var(--safe-bottom))}
+.withBar .scroll{padding-bottom:calc(104px + var(--safe-bottom))}
+.topbar{display:flex;align-items:center;gap:6px;padding:calc(8px + var(--safe-top)) 12px 4px;max-width:640px;width:100%;margin:0 auto}
+.topbar h1{font-size:20px;font-weight:800}
+.iconBtn{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:inherit;flex-shrink:0}
+.iconBtn:active{background:rgba(14,27,51,.06)}
+.card{background:var(--card);border-radius:18px;padding:16px}
+.row{display:flex;align-items:center;gap:12px}
+.between{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat span{font-size:12px;color:var(--muted)}
+.stat b{font-size:18px}
+.sectionHead{display:flex;justify-content:space-between;align-items:baseline;padding-top:4px}
+.sectionHead h2{font-size:18px;font-weight:800}
+.sectionHead a,.sectionHead button{font-size:14px;font-weight:600;border:0;background:none;color:var(--brand);padding:8px 0}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.tag{font-size:12px;font-weight:600;padding:3px 8px;border-radius:8px}
+.bar{height:8px;border-radius:5px;background:#E6EBF3;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:5px}
+.chev{flex-shrink:0;color:var(--muted)}
+.listCard{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:14px 16px;color:var(--ink);width:100%;border:0;text-align:left}
+.listCard:active,.rCard:active{background:#F7F9FD}
+.ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skeleton{background:linear-gradient(90deg,#E9EDF4 0%,#F4F6FA 50%,#E9EDF4 100%);background-size:200% 100%;animation:sk 1.2s infinite linear;border-radius:12px}
+@keyframes sk{to{background-position:-200% 0}}
+.note{font-size:13px;color:var(--muted);line-height:1.45}
+.err{font-size:14px;color:var(--bad);background:var(--bad-bg);border-radius:12px;padding:10px 12px;line-height:1.4}
+
+/* buttons */
+.btn{height:56px;border:0;border-radius:16px;background:var(--brand);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{background:var(--brand-ink)}
+.btn[disabled]{background:#9DB1E8}
+.btn.dark{background:var(--ink)}
+.btn.soft{background:var(--brand-soft);color:var(--brand)}
+.chip{border:0;border-radius:999px;padding:0 14px;height:40px;font-size:14px;font-weight:600;background:#fff;box-shadow:inset 0 0 0 1px #D3DAE5;white-space:nowrap;flex-shrink:0}
+.chip[aria-pressed="true"]{background:var(--brand);color:#fff;box-shadow:inset 0 0 0 1px var(--brand)}
+.chip.dark[aria-pressed="true"]{background:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipScroll{display:flex;gap:8px;overflow-x:auto;margin:0 -20px;padding:0 20px 2px;scrollbar-width:none}
+.chipScroll::-webkit-scrollbar{display:none}
+.seg{display:grid;gap:4px;padding:4px;background:#E6EBF3;border-radius:14px}
+.seg button{border:0;height:42px;border-radius:11px;background:transparent;font-size:14px;font-weight:700;color:var(--muted)}
+.seg button[aria-selected="true"]{background:#fff;color:var(--ink)}
+
+/* inputs */
+.field{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.field input{flex:1;border:0;outline:none;background:transparent;font-size:16px;min-width:0}
+textarea.box,input.box{width:100%;border:0;border-radius:14px;padding:14px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);resize:none;font-size:15px;outline:none}
+textarea.box:focus,input.box:focus,.field:focus-within{box-shadow:inset 0 0 0 2px var(--brand)}
+::placeholder{color:#6B7A93}
+label.lbl{display:flex;flex-direction:column;gap:8px;font-size:16px;font-weight:800}
+label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4px}
+
+/* bottom nav + bars */
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 12px calc(10px + var(--safe-bottom));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;z-index:20}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--muted);font-size:12px;font-weight:600}
+.nav a[aria-current="page"]{color:var(--brand);font-weight:700}
+.bottomBar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 20px calc(16px + var(--safe-bottom));z-index:20}
+.bottomBar>div{max-width:600px;margin:0 auto;display:flex;gap:10px}
+
+/* login */
+.loginHead{background:var(--ink);color:#fff;padding:calc(52px + var(--safe-top)) 28px 36px;border-radius:0 0 28px 28px;display:flex;flex-direction:column;gap:12px}
+.brandRow{display:flex;align-items:center;gap:10px}
+.brandMark{width:40px;height:40px;border-radius:12px;background:var(--brand);display:flex;align-items:center;justify-content:center}
+.loginBody{flex:1;display:flex;flex-direction:column;gap:24px;padding:28px 28px calc(24px + var(--safe-bottom));max-width:440px;width:100%;margin:0 auto}
+.dots{display:flex;justify-content:center;gap:16px}
+.dots div{width:52px;height:60px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--line)}
+.dots div.cur{box-shadow:inset 0 0 0 2px var(--brand)}
+.dots div.on::after{content:"";width:14px;height:14px;border-radius:50%;background:var(--ink)}
+.keypad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.key{border:0;background:#fff;border-radius:16px;height:60px;font-size:24px;font-weight:600;box-shadow:0 1px 0 var(--line)}
+.key:active{background:var(--brand-soft)}
+.key.ghost{background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center}
+
+/* home */
+.hero{background:var(--ink);color:#fff;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.hero .lite{color:#C9D3EA}
+.hero .bar{background:#24365C;height:10px}
+.hero .bar>i{background:var(--bar)}
+.heroTile{background:#17284A;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.heroTile span{font-size:12px;color:#C9D3EA}
+.heroTile b{font-size:18px}
+.alert{display:flex;align-items:center;gap:12px;border-radius:16px;padding:14px 16px;border:0;text-align:left;width:100%}
+.alert.warn{background:var(--warn-bg);color:#7A3E06}
+.alert.info{background:var(--brand-soft);color:var(--brand-ink)}
+.rank{width:32px;height:32px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;border:0}
+
+/* retailer cards */
+.rCard{display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:18px;padding:14px 16px;color:var(--ink);border:0;text-align:left;width:100%}
+
+/* retailer 360 */
+.r360Head{background:var(--ink);color:#fff;padding:calc(8px + var(--safe-top)) 12px 18px;border-radius:0 0 24px 24px}
+.r360Head .inner{max-width:640px;margin:0 auto}
+.r360Head .iconBtn{color:#fff}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #EEF1F6;font-size:15px}
+.kv:last-child{border-bottom:0}
+
+/* photos */
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.photo{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:#D9E0EC}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo button{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(14,27,51,.72);color:#fff;display:flex;align-items:center;justify-content:center}
+.addPhoto{aspect-ratio:1;border-radius:14px;border:2px dashed #9DB1E8;background:#F7F9FF;color:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;position:relative}
+.addPhoto input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+
+/* sheets & toast */
+.scrim{position:fixed;inset:0;background:rgba(14,27,51,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:86vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:10px 20px calc(24px + var(--safe-bottom));display:flex;flex-direction:column;gap:14px}
+.grab{width:40px;height:5px;border-radius:3px;background:#C9D1DE;margin:0 auto 4px}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(96px + var(--safe-bottom));margin:0 auto;max-width:520px;background:var(--ink);color:#fff;border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.4;z-index:60;box-shadow:0 8px 24px rgba(14,27,51,.25)}
+.toast.bad{background:var(--bad)}
+.picker{background:#fff;border-radius:14px;box-shadow:0 8px 24px rgba(14,27,51,.12);max-height:280px;overflow-y:auto}
+.picker button{display:block;width:100%;text-align:left;border:0;background:#fff;padding:12px 14px;border-bottom:1px solid #EEF1F6;font-size:15px}
+.picker button small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.spin{width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.updated{font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section id="s-login" class="screen hidden" aria-label="Log in">
+  <div class="loginHead">
+    <div class="brandRow">
+      <div class="brandMark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#B9C6E4">VIVO NESA · ZONE A</div>
+    </div>
+    <h1 style="font-size:30px;font-weight:800;line-height:1.15">Market Visit</h1>
+    <p id="loginLead" style="margin:0;font-size:15px;line-height:1.45;color:#C9D3EA">Enter your 4-digit PIN to start your day.</p>
+  </div>
+  <div class="loginBody">
+    <div id="pinArea" style="display:flex;flex-direction:column;gap:24px">
+      <div class="dots" id="dots" aria-live="polite" aria-label="PIN entry"></div>
+      <div class="keypad" id="keypad"></div>
+    </div>
+    <form id="pwForm" class="hidden" style="display:flex;flex-direction:column;gap:12px" autocomplete="on">
+      <input class="box" id="username" placeholder="Username" autocomplete="username" aria-label="Username">
+      <input class="box" id="password" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+    </form>
+    <div id="loginErr" class="err hidden" role="alert"></div>
+    <button id="loginBtn" class="btn" disabled>Log in</button>
+    <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600">
+      <a href="#" id="toggleLogin">Use username instead</a>
+      <a href="/" style="color:var(--muted)">Full website</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOME ============ -->
+<section id="s-home" class="screen withNav hidden" aria-label="Home">
+  <div class="scroll">
+    <div class="row" style="justify-content:space-between">
+      <div class="stat" style="gap:2px">
+        <div id="homeDate" style="font-size:13px;font-weight:600;color:var(--muted)">—</div>
+        <h1 id="homeHello" style="font-size:22px;font-weight:800">Hi</h1>
+      </div>
+      <button class="avatar" id="avatarBtn" aria-label="Profile and settings">—</button>
+    </div>
+
+    <div class="hero" id="heroCard">
+      <div class="between"><div class="lite" style="font-size:14px;font-weight:600" id="heroTitle">Sell-out this month</div><div class="lite" style="font-size:13px;font-weight:600" id="heroDays"></div></div>
+      <div id="heroBody"><div class="skeleton" style="height:100px;opacity:.15"></div></div>
+    </div>
+
+    <div id="eodAlert"></div>
+    <div id="dosAlert"></div>
+
+    <div class="sectionHead"><h2>Visit today</h2><a href="#/retailers">See all</a></div>
+    <div id="todayList" style="display:flex;flex-direction:column;gap:10px"></div>
+
+    <div class="grid3" id="quickStats"></div>
+    <div class="updated" id="homeUpdated"></div>
+  </div>
+</section>
+
+<!-- ============ LOG VISIT ============ -->
+<section id="s-visit" class="screen withBar hidden" aria-label="Log a visit">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1>Log a visit</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div id="gpsLine" class="row" style="gap:8px;font-size:13px;font-weight:600;color:var(--muted)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <span id="gpsText">Getting your location…</span>
+      </div>
+      <div id="pickedRetailer"></div>
+      <div id="retailerSearch" class="hidden" style="display:flex;flex-direction:column;gap:8px">
+        <label class="field">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="retailerQuery" placeholder="Search your retailers" autocomplete="off" aria-label="Search your retailers">
+        </label>
+        <div id="nearbyList"></div>
+        <div id="retailerPicker" class="picker hidden"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="font-size:16px;font-weight:800">What did you find?</h2>
+      <div class="chips" id="feedbackChips"></div>
+    </div>
+
+    <label class="lbl">Notes <small>Retailer feedback</small>
+      <textarea class="box" id="visitNotes" rows="3" placeholder="e.g. Wants 10 more Y29 before Sunday"></textarea>
+    </label>
+    <label class="lbl">Follow-up <small>Optional — what needs to happen next</small>
+      <textarea class="box" id="visitFollow" rows="2" placeholder="e.g. RDS to send stock by Monday"></textarea>
+    </label>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="between"><h2 style="font-size:16px;font-weight:800">Stock photos</h2><span class="note" id="photoCount">0 of 5</span></div>
+      <div class="photos" id="photoGrid"></div>
+      <span class="note">Each photo is stamped with location and time.</span>
+    </div>
+    <div id="visitErr" class="err hidden" role="alert"></div>
+  </div>
+  <div class="bottomBar"><div><button class="btn" id="submitVisit">Submit visit</button></div></div>
+</section>
+
+<!-- ============ RETAILERS ============ -->
+<section id="s-retailers" class="screen withNav hidden" aria-label="My retailers">
+  <div class="scroll">
+    <div class="between"><h1 style="font-size:24px;font-weight:800">My retailers</h1><span class="num note" id="retailerTotal"></span></div>
+    <label class="field">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="rSearch" placeholder="Search retailer or town" aria-label="Search retailers" autocomplete="off">
+    </label>
+    <div class="chipScroll" id="rFilters"></div>
+    <div id="rList" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="updated" id="rUpdated"></div>
+  </div>
+</section>
+
+<!-- ============ RETAILER 360 ============ -->
+<section id="s-r360" class="screen withBar hidden" aria-label="Retailer 360">
+  <div class="r360Head"><div class="inner">
+    <div class="row" style="gap:6px">
+      <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <span style="font-size:13px;font-weight:600;color:#C9D3EA;letter-spacing:.04em">RETAILER 360</span>
+    </div>
+    <div style="padding:0 8px;display:flex;flex-direction:column;gap:6px">
+      <h1 id="r360Name" style="font-size:24px;font-weight:800;line-height:1.2">—</h1>
+      <div id="r360Meta" style="font-size:13px;color:#C9D3EA;line-height:1.5"></div>
+      <div id="r360Pills" style="display:flex;gap:8px;flex-wrap:wrap;padding-top:4px"></div>
+    </div>
+  </div></div>
+  <div class="scroll" style="padding-top:14px">
+    <div class="seg" role="tablist" id="r360Tabs" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+    <div id="r360Body" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+  <div class="bottomBar"><div><a class="btn" id="r360Visit" href="#/visit">Log visit here</a></div></div>
+</section>
+
+<!-- ============ TEAM / REPORTS ============ -->
+<section id="s-team" class="screen withNav hidden" aria-label="Reports">
+  <div class="scroll">
+    <div class="stat" style="gap:2px">
+      <span id="teamWho" style="font-size:13px;font-weight:600;color:var(--muted)"></span>
+      <h1 style="font-size:24px;font-weight:800">Team performance</h1>
+    </div>
+    <div class="card grid3" id="teamSummary"></div>
+    <div class="seg" role="tablist" id="teamSeg"></div>
+    <div class="note">Lowest achievement first</div>
+    <div id="teamList" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="teamAll"></div>
+    <div class="updated" id="teamUpdated"></div>
+  </div>
+</section>
+
+<!-- ============ EOD REMARKS ============ -->
+<section id="s-eod" class="screen hidden" aria-label="End of day remarks">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1>End-of-day remarks</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <p class="note" style="margin:0">Retailers with zero sales today, or below 60% of their required daily sales. Add a reason for each.</p>
+    <div id="eodList" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</section>
+
+<!-- bottom navigation -->
+<nav class="nav hidden" id="nav" aria-label="Main">
+  <a href="#/home" data-nav="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#/visit" data-nav="visit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Log visit</a>
+  <a href="#/retailers" data-nav="retailers"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>Retailers</a>
+  <a href="#/team" data-nav="team"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</a>
+</nav>
+
+<div id="sheetRoot"></div>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ---------------- helpers ---------------- */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = (n) => (n == null || isNaN(n)) ? '—' : Math.round(Number(n)).toLocaleString('en-IN');
+const fmt1 = (n) => (n == null || isNaN(n)) ? '—' : (Math.round(Number(n) * 10) / 10).toLocaleString('en-IN');
+const money = (v) => {
+  v = Number(v || 0);
+  if (v >= 1e7) return '₹' + (v / 1e7).toFixed(2) + ' Cr';
+  if (v >= 1e5) return '₹' + (v / 1e5).toFixed(1) + ' L';
+  return '₹' + Math.round(v).toLocaleString('en-IN');
+};
+const firstName = (n) => String(n || '').split(/\s+/)[0] || 'there';
+const initials = (n) => String(n || 'U').split(/\s+/).filter(Boolean).map((x) => x[0]).slice(0, 2).join('').toUpperCase();
+const chevron = '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const ago = (ts) => {
+  if (!ts) return '';
+  const m = Math.round((Date.now() - ts) / 60000);
+  return m < 1 ? 'Updated just now' : m < 60 ? `Updated ${m} min ago` : `Updated ${Math.round(m / 60)} h ago`;
+};
+const daysLabel = (d) => d == null ? 'never' : d === 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`;
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+
+let toastTimer;
+function toast(text, bad) {
+  const t = $('toast');
+  t.textContent = text;
+  t.className = 'toast' + (bad ? ' bad' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), bad ? 6000 : 3500);
+}
+
+/* ---------------- session + API ---------------- */
+let token = store.get('mvt_app_token');
+let user = store.get('mvt_app_user');
+
+async function api(path, opt = {}) {
+  const headers = { ...(opt.headers || {}) };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (opt.json !== undefined) { headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(opt.json); }
+  let res;
+  try {
+    res = await fetch(path, { method: opt.method || 'GET', headers, body: opt.body });
+  } catch {
+    throw new Error('No internet connection. Check your network and try again.');
+  }
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { detail = (await res.json()).detail || detail; } catch {}
+    if (res.status === 401 && path.indexOf('/auth/') !== 0) {
+      logout('Your session has expired. Please log in again.');
+    }
+    const e = new Error(typeof detail === 'string' ? detail : 'Request failed');
+    e.status = res.status;
+    throw e;
+  }
+  return (res.headers.get('content-type') || '').includes('json') ? res.json() : res.text();
+}
+
+/* cached loaders: show last data instantly, refresh in background */
+const cache = {};
+const inflight = {};
+function load(key, path, maxAgeMs) {
+  const saved = cache[key] || store.get('mvt_cache_' + key + '_' + (user && user.id));
+  if (saved) cache[key] = saved;
+  const fresh = saved && (Date.now() - saved.at) < maxAgeMs;
+  if (!fresh && !inflight[key]) {
+    inflight[key] = api(path).then((data) => {
+      cache[key] = { at: Date.now(), data };
+      store.set('mvt_cache_' + key + '_' + (user && user.id), cache[key]);
+      return cache[key];
+    }).finally(() => { delete inflight[key]; });
+  }
+  return { saved, pending: inflight[key] || null };
+}
+function invalidate(...keys) {
+  keys.forEach((k) => { delete cache[k]; store.del('mvt_cache_' + k + '_' + (user && user.id)); });
+}
+
+function logout(message) {
+  token = null; user = null;
+  store.del('mvt_app_token'); store.del('mvt_app_user');
+  Object.keys(cache).forEach((k) => delete cache[k]);
+  location.hash = '#/login';
+  if (message) setTimeout(() => showLoginError(message), 50);
+}
+
+/* ---------------- router ---------------- */
+const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod'];
+const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'team' };
+
+function route() {
+  const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('?')[0].split('/');
+  let name = parts[0] || 'home';
+  if (!token && name !== 'login') { location.replace('#/login'); return; }
+  if (token && name === 'login') { location.replace('#/home'); return; }
+  if (name === 'r') name = 'r360';
+  if (!SCREENS.includes(name)) name = 'home';
+  SCREENS.forEach((s) => $('s-' + s).classList.toggle('hidden', s !== name));
+  const navOn = !!NAV_SCREENS[name];
+  $('nav').classList.toggle('hidden', !navOn);
+  document.querySelectorAll('[data-nav]').forEach((a) => {
+    if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  closeSheet();
+  window.scrollTo(0, 0);
+  const arg = decodeURIComponent(parts.slice(1).join('/') || '');
+  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod })[name]();
+}
+window.addEventListener('hashchange', route);
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-back]')) { e.preventDefault(); if (history.length > 1) history.back(); else location.hash = '#/home'; }
+});
+
+/* ---------------- sheets ---------------- */
+function openSheet(html, onMount) {
+  $('sheetRoot').innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div></div>`;
+  $('scrim').addEventListener('click', (e) => { if (e.target.id === 'scrim') closeSheet(); });
+  if (onMount) onMount();
+}
+function closeSheet() { $('sheetRoot').innerHTML = ''; }
+
+/* ---------------- LOGIN ---------------- */
+let pin = '';
+let pwMode = false;
+function showLoginError(m) { const e = $('loginErr'); e.textContent = m; e.classList.remove('hidden'); }
+function renderPin() {
+  $('dots').innerHTML = [0, 1, 2, 3].map((i) => `<div class="${i < pin.length ? 'on' : ''} ${i === pin.length ? 'cur' : ''}"></div>`).join('');
+  $('loginBtn').disabled = pwMode ? !($('username').value && $('password').value) : pin.length !== 4;
+}
+function showLogin() {
+  pin = ''; $('loginErr').classList.add('hidden');
+  $('keypad').innerHTML = ['1','2','3','4','5','6','7','8','9','','0','⌫'].map((k) =>
+    k === '' ? '<div></div>' :
+    k === '⌫' ? `<button class="key ghost" data-k="back" aria-label="Delete last digit"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button>` :
+    `<button class="key" data-k="${k}">${k}</button>`).join('');
+  renderPin();
+}
+$('keypad').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  $('loginErr').classList.add('hidden');
+  if (b.dataset.k === 'back') pin = pin.slice(0, -1);
+  else if (pin.length < 4) pin += b.dataset.k;
+  renderPin();
+  if (pin.length === 4) doLogin();
+});
+document.addEventListener('keydown', (e) => {
+  if ($('s-login').classList.contains('hidden') || pwMode) return;
+  if (/^[0-9]$/.test(e.key) && pin.length < 4) { pin += e.key; renderPin(); if (pin.length === 4) doLogin(); }
+  if (e.key === 'Backspace') { pin = pin.slice(0, -1); renderPin(); }
+});
+$('toggleLogin').addEventListener('click', (e) => {
+  e.preventDefault(); pwMode = !pwMode;
+  $('pinArea').classList.toggle('hidden', pwMode); $('pwForm').classList.toggle('hidden', !pwMode);
+  $('toggleLogin').textContent = pwMode ? 'Use PIN instead' : 'Use username instead';
+  $('loginLead').textContent = pwMode ? 'Log in with your username and password.' : 'Enter your 4-digit PIN to start your day.';
+  renderPin();
+});
+$('pwForm').addEventListener('input', renderPin);
+$('pwForm').addEventListener('submit', (e) => { e.preventDefault(); doLogin(); });
+$('loginBtn').addEventListener('click', doLogin);
+async function doLogin() {
+  const btn = $('loginBtn');
+  if (btn.dataset.busy) return;
+  btn.dataset.busy = '1'; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const out = pwMode
+      ? await api('/auth/login', { method: 'POST', json: { username: $('username').value.trim(), password: $('password').value } })
+      : await api('/auth/pin-login', { method: 'POST', json: { pin } });
+    token = out.access_token; user = out.user;
+    store.set('mvt_app_token', token); store.set('mvt_app_user', user);
+    location.hash = '#/home';
+  } catch (err) {
+    pin = ''; renderPin();
+    showLoginError(err.status === 401 ? (pwMode ? 'Wrong username or password.' : 'That PIN didn’t match. Try again.') : err.message);
+  } finally {
+    delete btn.dataset.busy; btn.textContent = 'Log in'; renderPin();
+  }
+}
+
+/* ---------------- shared data ---------------- */
+const FIELD_ROLES = ['TL', 'SS', 'RDS'];
+const perfLoad = () => load('perf', '/performance-dashboard', 5 * 60e3);
+const STATUS = {
+  'On Track': { label: 'On track', bg: 'var(--good-bg)', fg: 'var(--good)', bar: 'var(--good-bar)' },
+  'Behind': { label: 'Behind', bg: 'var(--warn-bg)', fg: 'var(--warn)', bar: 'var(--warn-bar)' },
+  'No Sales': { label: 'No sale', bg: 'var(--bad-bg)', fg: 'var(--bad)', bar: 'var(--bad-bar)' },
+  'High Stock': { label: 'High stock', bg: 'var(--hi-bg)', fg: 'var(--hi)', bar: 'var(--hi-bar)' },
+  'Out of Stock': { label: 'Out of stock', bg: 'var(--bad-bg)', fg: 'var(--bad)', bar: 'var(--bad-bar)' },
+  'Stock Unmatched': { label: 'Stock unmatched', bg: '#EEF1F6', fg: 'var(--muted)', bar: 'var(--bar)' }
+};
+const st = (s) => STATUS[s] || STATUS['On Track'];
+
+function whenLoaded(loader, render, onError) {
+  const { saved, pending } = loader;
+  if (saved) render(saved.data, saved.at);
+  if (pending) pending.then((r) => render(r.data, r.at)).catch((e) => { if (!saved && onError) onError(e); else toast(e.message, true); });
+}
+
+/* ---------------- HOME ---------------- */
+function showHome() {
+  const now = new Date();
+  $('homeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + (user.role || '');
+  $('homeHello').textContent = 'Hi, ' + firstName(user.name);
+  $('avatarBtn').textContent = initials(user.name);
+
+  whenLoaded(perfLoad(), renderHero, (e) => {
+    $('heroBody').innerHTML = `<div class="lite" style="font-size:14px;line-height:1.5">Live sales couldn’t load: ${esc(e.message)}</div><button class="btn soft" style="height:44px;margin-top:10px" onclick="invalidate('perf');showHome()">Try again</button>`;
+  });
+
+  whenLoaded(load('trends', '/performance-trends', 15 * 60e3), (data) => {
+    const rows = (data.watchlist_variants || []).filter((r) => Number(r.sales || 0) > 0 && r.dos != null && Number(r.dos) > 25)
+      .sort((a, b) => Number(b.dos) - Number(a.dos));
+    if (!rows.length) { $('dosAlert').innerHTML = ''; return; }
+    const names = rows.slice(0, 3).map((r) => [r.family, r.variant].filter(Boolean).join(' ')).join(', ');
+    $('dosAlert').innerHTML = `<button class="alert warn" id="dosBtn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg>
+      <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><b style="font-size:15px">${rows.length} model${rows.length > 1 ? 's' : ''} above 25 days of stock</b><span style="font-size:13px" class="ellipsis">${esc(names)} — push these first</span></div>${chevron}</button>`;
+    $('dosBtn').onclick = () => openSheet(`<h2 style="font-size:18px;font-weight:800">High stock models</h2>
+      <p class="note" style="margin:0">Running models with MTD sales and more than 25 days of Good Phone stock.</p>
+      <div class="card" style="padding:6px 16px">${rows.map((r) => `<div class="kv"><div style="display:flex;flex-direction:column;gap:2px"><b>${esc(r.family || '—')}</b><span class="note">${esc(r.variant || '')} · sold ${fmt(r.sales)} · stock ${fmt(r.stock)}</span></div><span class="pill num" style="background:var(--bad-bg);color:var(--bad);align-self:center">${fmt1(r.dos)} days</span></div>`).join('')}</div>
+      <button class="btn dark" onclick="closeSheet()">Got it</button>`);
+  });
+
+  if (FIELD_ROLES.includes(user.role)) {
+    whenLoaded(load('eod', '/eod-remarks/retailers', 5 * 60e3), (data) => {
+      const pending = (data.retailers || []).filter((r) => !r.remark).length;
+      const h = now.getHours();
+      $('eodAlert').innerHTML = (data.count && (pending || h >= 17)) ? `<a class="alert info" href="#/eod">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">${pending ? `${pending} end-of-day remark${pending > 1 ? 's' : ''} to add` : 'End-of-day remarks done'}</b><span style="font-size:13px">${data.count} low-sale retailer${data.count > 1 ? 's' : ''} today</span></div>${chevron}</a>` : '';
+    });
+  } else { $('eodAlert').innerHTML = ''; }
+
+  const pr = load('priorities', '/visit-priorities?limit=5', 10 * 60e3);
+  if (!pr.saved) $('todayList').innerHTML = [1, 2, 3].map(() => '<div class="skeleton" style="height:72px"></div>').join('');
+  whenLoaded(pr, (rows) => {
+    $('todayList').innerHTML = rows.length ? rows.slice(0, 3).map((r, i) => {
+      const reason = (r.reason || '').split(' · ');
+      const tone = /never|no mtd|out of stock/i.test(reason[0]) ? ['var(--bad-bg)', 'var(--bad)'] : /stock/i.test(reason[0]) ? ['var(--warn-bg)', 'var(--warn)'] : ['var(--brand-soft)', 'var(--brand-ink)'];
+      return `<a class="listCard" href="#/r/${encodeURIComponent(r.retailer_code)}">
+        <div class="rank num">${i + 1}</div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <b class="ellipsis" style="font-size:15px">${esc(r.retailer)}</b>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="tag" style="background:${tone[0]};color:${tone[1]}">${esc(reason[0] || 'Routine coverage')}</span>${reason[1] ? `<span class="note">${esc(reason[1])}</span>` : ''}</div>
+        </div>${chevron}</a>`;
+    }).join('') : '<div class="card note">No priority visits right now.</div>';
+  }, (e) => { $('todayList').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+
+  whenLoaded(load('health', '/retailer-health?limit=2000', 10 * 60e3), (rows) => {
+    const total = rows.length || 0;
+    const visited = rows.filter((r) => r.visit_count > 0).length;
+    const overdue = rows.filter((r) => r.priority === 'Never Visited' || r.priority === 'Overdue 15+ Days').length;
+    const recent = rows.filter((r) => r.days_since_visit != null && r.days_since_visit <= 7).length;
+    $('quickStats').innerHTML = `
+      <div class="card stat"><span>Visited in 7 days</span><b class="num">${fmt(recent)}</b></div>
+      <div class="card stat"><span>Coverage</span><b class="num">${total ? Math.round(visited / total * 100) : 0}%</b></div>
+      <a class="card stat" href="#/retailers?overdue"><span>Overdue / never</span><b class="num" style="color:var(--bad)">${fmt(overdue)}</b></a>`;
+  });
+}
+
+function renderHero(perf, at) {
+  const s = perf.summary || {};
+  const days = (perf.period || {}).days_remaining;
+  const pct = s.achievement_pct || 0;
+  const month = new Date().toLocaleDateString('en-IN', { month: 'long' });
+  $('heroTitle').textContent = month + ' sell-out';
+  $('heroDays').textContent = days != null ? `${days} day${days === 1 ? '' : 's'} left` : '';
+  $('heroBody').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="num" style="font-size:44px;font-weight:800;line-height:1">${fmt(s.sales)}</div>
+        <div class="num lite" style="font-size:16px;font-weight:600">${s.target ? '/ ' + fmt(s.target) + ' units' : 'units MTD'}</div>
+        ${s.target ? `<div class="num" style="margin-left:auto;font-size:20px;font-weight:800;color:#8FB0FF">${fmt1(pct)}%</div>` : ''}
+      </div>
+      ${s.target ? `<div class="bar"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}
+      <div class="grid3" style="gap:8px">
+        <div class="heroTile"><span>Gap</span><b class="num">${s.target ? fmt(s.gap) : '—'}</b></div>
+        <div class="heroTile"><span>Need / day</span><b class="num" style="color:#FFC46B">${s.target ? fmt(Math.ceil(s.required_per_day || 0)) : '—'}</b></div>
+        <div class="heroTile"><span>Today</span><b class="num">${fmt(s.ftd_sales)}</b></div>
+      </div>
+      <div class="num lite" style="font-size:13px">Value ${money(s.sales_value)} · ASP ${money(s.asp)} · ${fmt(s.zero_sales_retailers)} retailer${s.zero_sales_retailers === 1 ? '' : 's'} with no sale</div>
+    </div>`;
+  $('homeUpdated').textContent = ago(at);
+}
+
+$('avatarBtn').addEventListener('click', () => openSheet(`
+  <div class="row"><div class="avatar">${esc(initials(user.name))}</div><div class="stat"><b style="font-size:17px">${esc(user.name)}</b><span>${esc(user.role)}${user.kam ? ' · KAM ' + esc(user.kam) : ''}</span></div></div>
+  <button class="btn soft" id="refreshAll">Refresh live data</button>
+  <a class="btn soft" href="/">Open full website</a>
+  <button class="btn dark" id="logoutBtn">Log out</button>`, () => {
+  $('logoutBtn').onclick = () => { closeSheet(); logout(); };
+  $('refreshAll').onclick = () => { invalidate('perf', 'trends', 'priorities', 'health', 'eod', 'master'); closeSheet(); toast('Refreshing live data…'); route(); };
+}));
+
+/* ---------------- LOG VISIT ---------------- */
+const CHIPS = ['Stock low', 'Good sale', 'Scheme query', 'Needs demo set', 'Competitor offer', 'Display issue', 'Payment issue'];
+let visitState = { retailer: null, chips: new Set(), photos: [] };
+let gps = null;
+let gpsWatch = null;
+
+function masterLoad() { return load('master', '/retailers', 60 * 60e3); }
+
+function getGPS(timeout = 15000) {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (p) => { gps = { latitude: p.coords.latitude, longitude: p.coords.longitude, accuracy: p.coords.accuracy, at: Date.now() }; resolve(gps); },
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout, maximumAge: 60000 });
+  });
+}
+function setGpsText() {
+  const line = $('gpsLine');
+  if (gps) { line.style.color = 'var(--good)'; $('gpsText').textContent = `Location captured · ±${Math.round(gps.accuracy || 0)} m`; }
+  else { line.style.color = 'var(--bad)'; $('gpsText').innerHTML = 'Location is off. <a href="#" id="gpsRetry">Turn on and retry</a>'; $('gpsRetry').onclick = async (e) => { e.preventDefault(); $('gpsText').textContent = 'Getting your location…'; await getGPS(); setGpsText(); findNearby(); }; }
+}
+
+function showVisit(code) {
+  visitState.photos.forEach((p) => URL.revokeObjectURL(p.url));
+  visitState = { retailer: null, chips: new Set(), photos: [] };
+  $('visitNotes').value = ''; $('visitFollow').value = ''; $('visitErr').classList.add('hidden');
+  renderChips(); renderPhotos();
+  $('retailerQuery').value = '';
+  $('retailerPicker').classList.add('hidden');
+  $('nearbyList').innerHTML = '';
+  $('gpsLine').style.color = 'var(--muted)'; $('gpsText').textContent = 'Getting your location…';
+
+  const m = masterLoad();
+  const ready = m.saved ? Promise.resolve(m.saved.data) : m.pending.then((r) => r.data);
+  ready.then((master) => {
+    if (code) {
+      const r = master.find((x) => String(x.code).toUpperCase() === String(code).toUpperCase());
+      if (r) pickRetailer(r, null);
+    }
+    if (!visitState.retailer) showSearch();
+  }).catch((e) => toast(e.message, true));
+
+  getGPS().then(() => { setGpsText(); if (!code) findNearby(); });
+}
+
+async function findNearby() {
+  if (!gps || visitState.retailer) return;
+  try {
+    const near = await api(`/retailers/nearby?lat=${gps.latitude}&lng=${gps.longitude}&radius_m=400&limit=4`);
+    if (visitState.retailer || !near.length) return;
+    const master = (cache.master || {}).data || [];
+    const full = (n) => master.find((x) => x.code === n.code) || n;
+    if (near[0].distance_m <= 150) { pickRetailer(full(near[0]), near[0].distance_m); return; }
+    $('nearbyList').innerHTML = `<div class="note" style="margin:4px 0 6px">Near you</div>` + near.map((n) =>
+      `<button class="listCard" style="padding:12px 14px;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:8px" data-code="${esc(n.code)}" data-dist="${n.distance_m}">
+        <div style="flex:1;min-width:0"><b class="ellipsis" style="display:block;font-size:15px">${esc(n.name)}</b><span class="note">${fmt(n.distance_m)} m away · ${esc(n.town_name || '')}</span></div>${chevron}</button>`).join('');
+    $('nearbyList').querySelectorAll('[data-code]').forEach((b) => b.onclick = () => pickRetailer(full(near.find((n) => n.code === b.dataset.code)), Number(b.dataset.dist)));
+  } catch { /* nearby is a convenience; search still works */ }
+}
+
+function showSearch() {
+  $('pickedRetailer').innerHTML = '';
+  $('retailerSearch').classList.remove('hidden');
+}
+
+function pickRetailer(r, dist) {
+  visitState.retailer = r;
+  $('retailerSearch').classList.add('hidden');
+  const perf = (cache.perf || {}).data;
+  const row = perf && (perf.retailers || []).find((x) => x.code === r.code);
+  $('pickedRetailer').innerHTML = `
+    <div class="row">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+        <span class="note">${dist != null ? `You are at (${fmt(dist)} m away)` : 'Retailer'}</span>
+        <b style="font-size:17px">${esc(r.name)}</b>
+        <span class="note">${esc([r.town_name, r.district_name].filter(Boolean).join(' · '))}</span>
+      </div>
+      <button class="chip" id="changeRetailer" style="background:var(--brand-soft);color:var(--brand);box-shadow:none;font-weight:700">Change</button>
+    </div>
+    ${row ? `<div class="grid3" style="border-top:1px solid var(--line);padding-top:12px;gap:8px">
+      <div class="stat"><span>MTD</span><b class="num" style="font-size:16px">${fmt(row.sales)}${row.target ? ' / ' + fmt(row.target) : ''}</b></div>
+      <div class="stat"><span>Stock</span><b class="num" style="font-size:16px">${row.stock == null ? '—' : fmt(row.stock)}</b></div>
+      <div class="stat"><span>Last visit</span><b style="font-size:16px">${esc(daysLabel(row.days_since_visit))}</b></div></div>` : ''}`;
+  $('changeRetailer').onclick = () => { visitState.retailer = null; showSearch(); $('retailerQuery').focus(); if (gps) findNearby(); };
+}
+
+$('retailerQuery').addEventListener('input', () => {
+  const q = $('retailerQuery').value.trim().toLowerCase();
+  const master = (cache.master || {}).data || [];
+  const hits = q ? master.filter((r) => (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q)).slice(0, 30) : [];
+  const p = $('retailerPicker');
+  p.classList.toggle('hidden', !q);
+  p.innerHTML = hits.length ? hits.map((r) => `<button data-code="${esc(r.code)}">${esc(r.name)}<small>${esc([r.town_name, r.district_name].filter(Boolean).join(' · '))}</small></button>`).join('') : '<button disabled>No matching retailer in your list</button>';
+  p.querySelectorAll('[data-code]').forEach((b) => b.onclick = () => { p.classList.add('hidden'); pickRetailer(master.find((r) => r.code === b.dataset.code), null); });
+});
+
+function renderChips() {
+  $('feedbackChips').innerHTML = CHIPS.map((c) => `<button class="chip" type="button" aria-pressed="${visitState.chips.has(c)}" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
+}
+$('feedbackChips').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-chip]'); if (!b) return;
+  const c = b.dataset.chip;
+  visitState.chips.has(c) ? visitState.chips.delete(c) : visitState.chips.add(c);
+  b.setAttribute('aria-pressed', visitState.chips.has(c));
+});
+
+function renderPhotos() {
+  const ph = visitState.photos;
+  $('photoCount').textContent = `${ph.length} of 5`;
+  $('photoGrid').innerHTML = ph.map((p, i) => `<div class="photo"><img src="${p.url}" alt="Stock photo ${i + 1}"><button type="button" data-rm="${i}" aria-label="Remove photo ${i + 1}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('') +
+    (ph.length < 5 ? `<label class="addPhoto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Take photo<input type="file" accept="image/*" capture="environment" id="photoInput" aria-label="Take a stock photo"></label>` : '');
+  const inp = $('photoInput');
+  if (inp) inp.onchange = () => {
+    [...inp.files].filter((f) => f.type.startsWith('image/')).slice(0, 5 - visitState.photos.length)
+      .forEach((f) => visitState.photos.push({ file: f, url: URL.createObjectURL(f) }));
+    renderPhotos();
+  };
+}
+$('photoGrid').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rm]'); if (!b) return;
+  const [p] = visitState.photos.splice(Number(b.dataset.rm), 1);
+  if (p) URL.revokeObjectURL(p.url);
+  renderPhotos();
+});
+
+function stampPhoto(file, label) {
+  return new Promise((resolve) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      let w = img.width, h = img.height; const max = 1600;
+      if (Math.max(w, h) > max) { if (w >= h) { h = Math.round(h * max / w); w = max; } else { w = Math.round(w * max / h); h = max; } }
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+      if (gps) {
+        const pad = Math.max(12, Math.round(w * 0.012)), fs = Math.max(18, Math.round(w * 0.022)), bandH = Math.round(fs * 1.35) * 2 + pad * 2;
+        ctx.fillStyle = 'rgba(0,0,0,.62)'; ctx.fillRect(0, h - bandH, w, bandH);
+        ctx.fillStyle = '#fff'; ctx.font = `600 ${fs}px system-ui,sans-serif`;
+        ctx.fillText(label, pad, h - bandH + pad + fs);
+        ctx.font = `500 ${Math.max(16, fs - 2)}px system-ui,sans-serif`;
+        ctx.fillText(`GPS ${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)} · ±${Math.round(gps.accuracy || 0)}m · ${new Date().toLocaleString('en-IN')}`, pad, h - pad);
+      }
+      c.toBlob((b) => { URL.revokeObjectURL(url); resolve(b ? new File([b], 'stock-geotagged.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+$('submitVisit').addEventListener('click', async () => {
+  const btn = $('submitVisit'), err = $('visitErr');
+  err.classList.add('hidden');
+  const r = visitState.retailer;
+  const fail = (m) => { err.textContent = m; err.classList.remove('hidden'); err.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+  if (!r) return fail('Choose the retailer you are visiting.');
+  const chips = [...visitState.chips];
+  const notes = $('visitNotes').value.trim();
+  if (!chips.length && !notes) return fail('Tap what you found, or add a note.');
+  btn.disabled = true;
+  try {
+    btn.innerHTML = '<span class="spin"></span> Checking location…';
+    if (!gps || Date.now() - gps.at > 120000) await getGPS();
+    setGpsText();
+    if (!gps) throw new Error('Location is needed to log a visit. Allow location access and try again.');
+    btn.innerHTML = '<span class="spin"></span> Saving visit…';
+    const today = new Date(); const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const v = await api('/visits', { method: 'POST', json: {
+      retailer: r.name, market: r.town_name || r.district_name || r.zone || 'Market', visit_date: iso,
+      feedback: [chips.length ? chips.join(', ') : '', notes].filter(Boolean).join(' — '),
+      suggestions: $('visitFollow').value.trim(),
+      latitude: gps.latitude, longitude: gps.longitude, gps_accuracy: gps.accuracy
+    } });
+    if (visitState.photos.length) {
+      btn.innerHTML = `<span class="spin"></span> Uploading ${visitState.photos.length} photo${visitState.photos.length > 1 ? 's' : ''}…`;
+      const fd = new FormData();
+      for (const p of visitState.photos) { const f = await stampPhoto(p.file, r.name); fd.append('files', f, f.name); }
+      const res = await fetch(`/visits/${v.id}/photos`, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
+      if (!res.ok) { let d = {}; try { d = await res.json(); } catch {} throw new Error('Visit saved, but photos failed to upload: ' + (d.detail || res.statusText)); }
+    }
+    visitState.photos.forEach((p) => URL.revokeObjectURL(p.url));
+    visitState.photos = [];
+    invalidate('priorities', 'health', 'perf');
+    toast(`Visit to ${r.name} saved.`);
+    location.hash = '#/home';
+  } catch (e) {
+    fail(e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit visit';
+  }
+});
+
+/* ---------------- RETAILERS ---------------- */
+const R_FILTERS = {
+  'All': () => true,
+  'Behind': (r) => r.status === 'Behind',
+  'No sale': (r) => !r.sales,
+  'High stock': (r) => r.dos != null && r.dos > 25,
+  'Overdue visit': (r) => r.days_since_visit == null || r.days_since_visit >= 15
+};
+let rFilter = 'All';
+function showRetailers() {
+  if (/overdue/.test(location.hash)) rFilter = 'Overdue visit';
+  const p = perfLoad();
+  if (!p.saved) $('rList').innerHTML = [1, 2, 3, 4].map(() => '<div class="skeleton" style="height:118px"></div>').join('');
+  whenLoaded(p, renderRetailers, (e) => { $('rList').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+}
+function renderRetailers() {
+  const perf = (cache.perf || {}).data; if (!perf) return;
+  const all = perf.retailers || [];
+  $('retailerTotal').textContent = `${fmt(all.length)} assigned`;
+  $('rFilters').innerHTML = Object.keys(R_FILTERS).map((k) => `<button class="chip dark" data-f="${k}" aria-pressed="${k === rFilter}">${k} <span class="num" style="opacity:.75">${all.filter(R_FILTERS[k]).length}</span></button>`).join('');
+  const q = $('rSearch').value.trim().toLowerCase();
+  const rows = all.filter(R_FILTERS[rFilter]).filter((r) => !q || (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q));
+  $('rList').innerHTML = rows.length ? rows.slice(0, 200).map((r) => {
+    const s = st(r.status);
+    const pct = r.target ? Math.min(100, Math.round(r.sales / r.target * 100)) : 0;
+    return `<a class="rCard" href="#/r/${encodeURIComponent(r.code)}">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:16px">${esc(r.name)}</b><span class="note">${esc(r.town_name || '')} · visited ${esc(daysLabel(r.days_since_visit))}</span></div>
+        <span class="pill" style="background:${s.bg};color:${s.fg}">${s.label}</span>
+      </div>
+      <div class="row" style="gap:10px"><div class="bar" style="flex:1"><i style="width:${pct}%;background:${s.bar}"></i></div><span class="num" style="font-size:13px;font-weight:700;min-width:64px;text-align:right">${fmt(r.sales)}${r.target ? ' / ' + fmt(r.target) : ''}</span></div>
+      <div class="num" style="display:flex;gap:16px;font-size:13px;color:var(--muted);flex-wrap:wrap">
+        <span>Need <b style="color:var(--ink)">${r.target ? fmt1(r.required_per_day) + '/day' : '—'}</b></span>
+        <span>Stock <b style="color:var(--ink)">${r.stock == null ? '—' : fmt(r.stock)}</b></span>
+        <span>DOS <b style="color:${r.dos > 25 ? 'var(--bad)' : 'var(--ink)'}">${r.dos == null ? '—' : fmt1(r.dos)}</b></span>
+      </div></a>`;
+  }).join('') + (rows.length > 200 ? `<div class="note" style="text-align:center">Showing 200 of ${rows.length}. Search to narrow down.</div>` : '') : '<div class="card note">No retailers match.</div>';
+  $('rUpdated').textContent = ago((cache.perf || {}).at);
+}
+$('rFilters').addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (b) { rFilter = b.dataset.f; renderRetailers(); } });
+$('rSearch').addEventListener('input', renderRetailers);
+
+/* ---------------- RETAILER 360 ---------------- */
+let r360Tab = 'Sales', r360Data = null, r360Code = null;
+function showR360(code) {
+  r360Code = String(code || '').toUpperCase();
+  r360Tab = 'Sales'; r360Data = null;
+  $('r360Visit').href = '#/visit/' + encodeURIComponent(r360Code);
+  const fill = () => {
+    const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
+    const master = (((cache.master || {}).data) || []).find((x) => x.code === r360Code);
+    const base = row || master || {};
+    $('r360Name').textContent = base.name || r360Code;
+    $('r360Meta').textContent = [base.town_name, base.tl && 'TL ' + base.tl, base.ss && 'SS ' + base.ss, base.rds && 'RDS ' + base.rds].filter(Boolean).join(' · ');
+    $('r360Pills').innerHTML = row ? [
+      `<span class="pill" style="background:${st(row.status).bg};color:${st(row.status).fg}">${st(row.status).label}</span>`,
+      row.dos != null ? `<span class="pill num" style="background:var(--hi-bg);color:var(--hi)">DOS ${fmt1(row.dos)}</span>` : '',
+      `<span class="pill" style="background:#24365C;color:#fff">Visited ${esc(daysLabel(row.days_since_visit))}</span>`
+    ].join('') : '';
+    renderR360();
+  };
+  fill();
+  perfLoad().pending?.then(fill).catch(() => {});
+  masterLoad().pending?.then(fill).catch(() => {});
+  api(`/retailers/${encodeURIComponent(r360Code)}/360`).then((d) => { if (r360Code === String(code).toUpperCase()) { r360Data = d; renderR360(); } })
+    .catch((e) => { r360Data = { error: e.message }; renderR360(); });
+}
+function renderR360() {
+  $('r360Tabs').innerHTML = ['Sales', 'Stock', 'Schemes', 'Visits'].map((t) => `<button role="tab" aria-selected="${t === r360Tab}" data-t="${t}">${t}</button>`).join('');
+  const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
+  const d = r360Data;
+  const loading = '<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:120px"></div>';
+  const errBox = d && d.error ? `<div class="err">${esc(d.error)}</div>` : '';
+  let html = '';
+  if (r360Tab === 'Sales') {
+    const t = (d && d.target) || {};
+    const sales = d && d.sales ? d.sales.units : row ? row.sales : null;
+    const target = t.volume != null ? t.volume : row ? row.target : null;
+    const pct = target ? Math.round(sales / target * 100) : null;
+    html = `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:8px"><b class="num" style="font-size:36px;line-height:1">${fmt(sales)}</b><span class="num note" style="font-size:15px">${target ? '/ ' + fmt(target) + ' units MTD' : 'units MTD'}</span>${pct != null ? `<span class="num" style="margin-left:auto;font-size:18px;font-weight:800;color:${pct >= 90 ? 'var(--good)' : pct >= 50 ? 'var(--brand-ink)' : 'var(--bad)'}">${pct}%</span>` : ''}</div>
+        ${target ? `<div class="bar"><i style="width:${Math.min(100, pct)}%;background:${st(row && row.status).bar}"></i></div>` : ''}
+        <div class="grid3" style="gap:8px">
+          <div class="stat"><span>Gap</span><b class="num">${target ? fmt(t.gap_volume ?? (row && row.gap)) : '—'}</b></div>
+          <div class="stat"><span>Need / day</span><b class="num" style="color:var(--warn)">${target ? fmt1(t.required_run_rate ?? (row && row.required_per_day)) : '—'}</b></div>
+          <div class="stat"><span>Today</span><b class="num">${row ? fmt(row.ftd_sales) : '—'}</b></div>
+        </div>
+        ${row ? `<div class="num note">Value ${money(row.sales_value)} · ASP ${money(row.asp)}</div>` : ''}
+      </div>` + (d && !d.error ? `
+      ${(d.market_visit && d.market_visit.what_to_discuss || []).length ? `<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-size:15px">What to discuss</b>${d.market_visit.what_to_discuss.map((a) => `<div style="display:flex;gap:10px;font-size:14px;line-height:1.45"><span style="color:var(--brand);font-weight:800">•</span><span>${esc(a)}</span></div>`).join('')}</div>` : ''}
+      <div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">Models sold this month</div>${(d.sales.models || []).slice(0, 8).map((m) => `<div class="kv"><span>${esc(m.model)}</span><b class="num">${fmt(m.units)}</b></div>`).join('') || '<div class="kv note">No sales yet this month.</div>'}</div>` : (errBox || loading));
+  } else if (r360Tab === 'Stock') {
+    html = d && !d.error ? (d.inventory && d.inventory.stock_matched === false ? '<div class="card note">Stock wasn’t matched for this retailer code, so stock and DOS are unavailable.</div>' :
+      `<div class="card grid3"><div class="stat"><span>Good Phone stock</span><b class="num">${fmt(d.inventory.units)}</b></div><div class="stat"><span>Avg / day</span><b class="num">${fmt1(d.performance.avg_daily_sales)}</b></div><div class="stat"><span>DOS</span><b class="num">${fmt1(d.performance.dos)}</b></div></div>
+       <div class="card" style="padding:6px 16px">${(d.performance.model_intelligence || []).map((m) => {
+         const bad = /Out of Stock|Low Stock|High Stock|No MTD/.test(m.status);
+         return `<div class="kv"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(m.model)}</b><span class="num note">Sold ${fmt(m.sales)} · Stock ${fmt(m.stock)} · ${esc(m.action || '')}</span></div><span class="pill num" style="align-self:center;background:${bad ? 'var(--bad-bg)' : 'var(--good-bg)'};color:${bad ? 'var(--bad)' : 'var(--good)'}">${m.dos == null ? esc(m.status) : fmt1(m.dos) + ' days'}</span></div>`;
+       }).join('') || '<div class="kv note">No stock records.</div>'}</div>`) : (errBox || loading);
+  } else if (r360Tab === 'Schemes') {
+    if (!row) html = '<div class="card note">Scheme figures appear once live sales load.</div>';
+    else {
+      const items = [['Festive Booster', row.scheme_payout], ['Focus Model', row.focus_scheme_payout], ['V80 NPL', row.v80_normal_sales_payout], ['Back Support Margin', row.back_support_payable]];
+      const total = items.reduce((a, [, v]) => a + Number(v || 0), 0);
+      html = `<div class="card stat" style="gap:4px"><span style="font-size:13px">October schemes · provisional</span><b class="num" style="font-size:30px">${money(total)}</b><span class="note">Final payout depends on activation, MOP and other scheme conditions.</span></div>
+        <div class="card" style="padding:6px 16px">${items.map(([k, v]) => `<div class="kv"><span>${k}</span><b class="num">${v == null ? '—' : money(v)}</b></div>`).join('')}</div>`;
+    }
+  } else {
+    const visits = d && d.market_visit ? d.market_visit.recent_visits || [] : null;
+    html = visits ? (visits.length ? visits.map((v) => `<div class="card" style="display:flex;flex-direction:column;gap:6px">
+        <div class="between note"><b style="color:var(--ink)">${esc(v.submitted_by)} (${esc(v.submitted_role)})</b><span>${esc(new Date(v.visit_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
+        ${v.feedback ? `<div style="font-size:14px;line-height:1.45">${esc(v.feedback)}</div>` : ''}${v.suggestions ? `<div class="note">Follow-up: ${esc(v.suggestions)}</div>` : ''}</div>`).join('') : '<div class="card note">No visits logged yet.</div>') : (errBox || loading);
+  }
+  $('r360Body').innerHTML = html;
+}
+$('r360Tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-t]'); if (b) { r360Tab = b.dataset.t; renderR360(); } });
+
+/* ---------------- TEAM ---------------- */
+let teamSeg = null, kamRecipients = null;
+function showTeam() {
+  $('teamWho').textContent = `${user.role} · ${user.name}`;
+  const p = perfLoad();
+  if (!p.saved) $('teamList').innerHTML = [1, 2, 3].map(() => '<div class="skeleton" style="height:96px"></div>').join('');
+  whenLoaded(p, renderTeam, (e) => { $('teamList').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+  if (user.role === 'KAM' && !kamRecipients) api('/kam/whatsapp/recipients').then((r) => { kamRecipients = r; renderTeam(); }).catch(() => { kamRecipients = []; });
+}
+function renderTeam() {
+  const perf = (cache.perf || {}).data; if (!perf) return;
+  const s = perf.summary || {}, days = (perf.period || {}).days_remaining || 1, h = perf.hierarchy || {};
+  $('teamSummary').innerHTML = `
+    <div class="stat"><span>MTD / Target</span><b class="num" style="font-size:16px">${fmt(s.sales)} / ${fmt(s.target)}</b></div>
+    <div class="stat" style="align-items:center"><span>Achieved</span><b class="num" style="font-size:16px;color:var(--brand)">${fmt1(s.achievement_pct)}%</b></div>
+    <div class="stat" style="align-items:flex-end"><span>Need / day</span><b class="num" style="font-size:16px;color:var(--warn)">${fmt(Math.ceil(s.required_per_day || 0))}</b></div>`;
+  const own = { TL: 'tl', SS: 'ss', RDS: 'rds' }[user.role];
+  const segs = ['tl', 'ss', 'rds'].filter((k) => k !== own && (h[k] || []).filter((g) => g.name !== 'Unassigned').length);
+  if (!segs.length) { $('teamSeg').innerHTML = ''; $('teamList').innerHTML = '<div class="card note">No team breakdown for your role.</div>'; $('teamAll').innerHTML = ''; return; }
+  if (!segs.includes(teamSeg)) teamSeg = segs[0];
+  $('teamSeg').style.gridTemplateColumns = `repeat(${segs.length},minmax(0,1fr))`;
+  $('teamSeg').innerHTML = segs.map((k) => `<button role="tab" data-seg="${k}" aria-selected="${k === teamSeg}">${k.toUpperCase()}</button>`).join('');
+
+  const zero = {};
+  (perf.retailers || []).forEach((r) => { if (!r.sales) new Set((r.assignments || []).map((a) => a[teamSeg])).forEach((n) => { if (n) zero[n] = (zero[n] || 0) + 1; }); });
+  const rec = (name) => (kamRecipients || []).find((x) => x.name === name && x.role === teamSeg.toUpperCase());
+  const rows = (h[teamSeg] || []).filter((g) => g.name !== 'Unassigned').sort((a, b) => (a.achievement_pct || 0) - (b.achievement_pct || 0));
+  $('teamList').innerHTML = rows.map((g) => {
+    const pct = g.target ? g.achievement_pct : null;
+    const col = pct == null ? ['var(--bar)', 'var(--ink)'] : pct >= 90 ? ['var(--good-bar)', 'var(--good)'] : pct >= 70 ? ['var(--bar)', 'var(--brand-ink)'] : ['var(--warn-bar)', 'var(--warn)'];
+    const r = user.role === 'KAM' ? rec(g.name) : null;
+    return `<div class="card row">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+        <div class="between"><b class="ellipsis" style="font-size:15px">${esc(g.name)}</b><b class="num" style="font-size:15px;color:${col[1]}">${pct == null ? '—' : fmt1(pct) + '%'}</b></div>
+        <div class="bar"><i style="width:${Math.min(100, pct || 0)}%;background:${col[0]}"></i></div>
+        <div class="num" style="display:flex;gap:14px;font-size:13px;color:var(--muted);flex-wrap:wrap">
+          <span><b style="color:var(--ink)">${fmt(g.sales)}</b> / ${g.target ? fmt(g.target) : '—'}</span>
+          <span>Need <b style="color:var(--ink)">${g.target ? fmt(Math.ceil(g.gap / days)) + '/day' : '—'}</b></span>
+          <span>Zero-sale <b style="color:var(--ink)">${fmt(zero[g.name] || 0)}</b></span>
+        </div>
+      </div>
+      ${r ? `<button class="iconBtn" style="background:var(--good-bg);color:var(--good)" data-wa="${r.id}" data-name="${esc(g.name)}" aria-label="Send WhatsApp update to ${esc(g.name)}" ${r.whatsapp_number ? '' : 'disabled title="No WhatsApp number saved"'}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg></button>` : ''}
+    </div>`;
+  }).join('');
+  $('teamAll').innerHTML = user.role === 'KAM' && (teamSeg === 'tl' || teamSeg === 'ss') ? `<button class="btn dark" id="waAll">Send update to all ${teamSeg.toUpperCase()}s</button>` : '';
+  if ($('waAll')) $('waAll').onclick = () => confirmSend(`Send each ${teamSeg.toUpperCase()} in your area their own WhatsApp performance update now?`, () => api(`/kam/whatsapp/send-all?role=${teamSeg.toUpperCase()}`, { method: 'POST' }));
+  $('teamUpdated').textContent = ago((cache.perf || {}).at);
+}
+$('teamSeg').addEventListener('click', (e) => { const b = e.target.closest('[data-seg]'); if (b) { teamSeg = b.dataset.seg; renderTeam(); } });
+$('teamList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-wa]'); if (!b) return;
+  confirmSend(`Send ${b.dataset.name} their WhatsApp performance update now?`, () => api(`/kam/whatsapp/send?user_id=${b.dataset.wa}`, { method: 'POST' }));
+});
+function confirmSend(text, send) {
+  openSheet(`<h2 style="font-size:18px;font-weight:800">Send WhatsApp update</h2><p style="margin:0;line-height:1.5">${esc(text)}</p>
+    <div style="display:flex;gap:10px"><button class="btn soft" onclick="closeSheet()">Cancel</button><button class="btn" id="doSend">Send</button></div>`, () => {
+    $('doSend').onclick = async () => {
+      $('doSend').disabled = true; $('doSend').innerHTML = '<span class="spin"></span>';
+      try { await send(); closeSheet(); toast('WhatsApp update sent.'); } catch (e) { closeSheet(); toast(e.message, true); }
+    };
+  });
+}
+
+/* ---------------- EOD ---------------- */
+function showEod() {
+  $('eodList').innerHTML = '<div class="skeleton" style="height:150px"></div>';
+  invalidate('eod');
+  const l = load('eod', '/eod-remarks/retailers', 0);
+  l.pending.then(({ data }) => {
+    const rows = data.retailers || [];
+    $('eodList').innerHTML = rows.length ? rows.map((r) => `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div class="between"><b style="font-size:15px">${esc(r.name)}</b><span class="pill num" style="background:${r.sales ? 'var(--warn-bg)' : 'var(--bad-bg)'};color:${r.sales ? 'var(--warn)' : 'var(--bad)'}">${fmt(r.sales)} today</span></div>
+        <span class="note num">Needs ${fmt1(r.required_per_day)}/day</span>
+        <textarea class="box" rows="3" data-code="${esc(r.code)}" placeholder="Reason for low sale, retailer feedback and action">${esc(r.remark || '')}</textarea>
+        <button class="btn ${r.remark ? 'soft' : ''}" style="height:48px" data-save="${esc(r.code)}">${r.remark ? 'Update remark' : 'Save remark'}</button>
+      </div>`).join('') : '<div class="card note">No low-sale retailers today. Nothing to add.</div>';
+  }).catch((e) => { $('eodList').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+}
+$('eodList').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-save]'); if (!b) return;
+  const ta = $('eodList').querySelector(`textarea[data-code="${CSS.escape(b.dataset.save)}"]`);
+  const remark = ta.value.trim();
+  if (remark.length < 3) { toast('Write a short reason first.', true); ta.focus(); return; }
+  b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  try {
+    await api('/eod-remarks', { method: 'POST', json: { retailer_code: b.dataset.save, remark } });
+    b.className = 'btn soft'; b.textContent = 'Saved ✓';
+    invalidate('eod');
+  } catch (err) { toast(err.message, true); b.textContent = 'Save remark'; }
+  finally { b.disabled = false; }
+});
+
+/* ---------------- start ---------------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('/app/sw.js', { scope: '/app' }).catch(() => {});
+}
+if (token) masterLoad();
+route();
+</script>
+</body>
+</html>
