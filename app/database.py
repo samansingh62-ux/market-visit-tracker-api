@@ -273,6 +273,31 @@ def init_db():
         conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_date ON daily_retailer_remarks(remark_date)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_daily_remarks_retailer ON daily_retailer_remarks(retailer_code)")
 
+        # Competitor sales and activity, entered by the field team per retailer.
+        # One row per brand per submission; the latest row for a retailer/brand/month is current.
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS competition_entries (
+                id BIGSERIAL PRIMARY KEY,
+                month TEXT NOT NULL,
+                retailer_code TEXT NOT NULL,
+                retailer_name TEXT NOT NULL,
+                brand TEXT NOT NULL,
+                mtd_units INTEGER,
+                promoters INTEGER,
+                demo_units INTEGER,
+                branding BOOLEAN,
+                offer TEXT,
+                offer_amount INTEGER,
+                launch_model TEXT,
+                launch_price INTEGER,
+                notes TEXT,
+                submitted_by TEXT NOT NULL,
+                submitted_role TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_competition_month_retailer ON competition_entries(month, retailer_code, brand, created_at)")
+
         conn.execute("""
             CREATE TABLE IF NOT EXISTS kam_rds_assignments (
                 kam_name TEXT NOT NULL,

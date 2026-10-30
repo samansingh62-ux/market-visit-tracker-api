@@ -1081,3 +1081,79 @@ def create_missing_rds_pins(role: str = "RDS", names: tuple | None = None) -> li
             issued.add(pin)
             created.append({"name": user["name"], "username": user["username"], "pin": pin})
     return created
+
+
+# ---------------------------------------------------------------------------
+# Competition tracking
+# ---------------------------------------------------------------------------
+COMPETITION_FIELDS = (
+    "mtd_units", "promoters", "demo_units", "branding",
+    "offer", "offer_amount", "launch_model", "launch_price",
+)
+
+
+def add_competition_entries(month: str, retailer_code: str, retailer_name: str, entries: list,
+                            notes: str, submitted_by: str, submitted_role: str) -> list:
+    now = datetime.now(timezone.utc).isoformat()
+    out = []
+    with database.get_conn() as conn:
+        for e in entries:
+            row = conn.execute(
+                """
+                INSERT INTO competition_entries
+                    (month, retailer_code, retailer_name, brand, mtd_units, promoters, demo_units, branding,
+                     offer, offer_amount, launch_model, launch_price, notes, submitted_by, submitted_role, created_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                RETURNING *
+                """,
+                (month, retailer_code, retailer_name, e["brand"],
+                 *(e.get(f) for f in COMPETITION_FIELDS),
+                 notes, submitted_by, submitted_role, now),
+            ).fetchone()
+            out.append(dict(row))
+    return out
+
+
+def latest_competition(month: str, retailer_codes: Optional[list] = None) -> list:
+    """Current (latest) entry per retailer and brand for a month."""
+    params = [month]
+    where = "month = %s"
+    if retailer_codes is not None:
+        if not retailer_codes:
+            return []
+        where += " AND retailer_code = ANY(%s)"
+        params.append(list(retailer_codes))
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT DISTINCT ON (retailer_code, brand) *
+            FROM competition_entries
+            WHERE {where}
+            ORDER BY retailer_code, brand, created_at DESC, id DESC
+            """,
+            params,
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def competition_history(retailer_codes: Optional[list] = None, limit: int = 50) -> list:
+    """Most recent submissions, newest first (used for the activity feed)."""
+    params = []
+    where = "TRUE"
+    if retailer_codes is not None:
+        if not retailer_codes:
+            return []
+        where = "retailer_code = ANY(%s)"
+        params.append(list(retailer_codes))
+    params.append(limit)
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT * FROM competition_entries
+            WHERE {where}
+            ORDER BY created_at DESC, id DESC
+            LIMIT %s
+            """,
+            params,
+        ).fetchall()
+        return [dict(r) for r in rows]

@@ -26,6 +26,7 @@ from . import whatsapp_mcp
 from .auth import get_current_user, get_dashboard_user, hash_password, require_admin_key, require_manager, verify_password, create_token
 from .schemas import (
     AdminUserOut,
+    CompetitionSubmit,
     CoverageRow,
     DailyRetailerRemarkCreate,
     LoginOut,
@@ -363,6 +364,140 @@ def _distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dp, dl = p2 - p1, math.radians(lon2 - lon1)
     a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
     return 2 * r * math.asin(math.sqrt(a))
+
+
+# ---------------------------------------------------------------------------
+# Competition tracking (entered by the field team, per retailer)
+# ---------------------------------------------------------------------------
+COMPETITOR_BRANDS = ["Samsung", "Oppo", "Realme", "Xiaomi"]
+
+
+def _ist_month() -> str:
+    return datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m")
+
+
+def _scoped_retailer_codes(user: dict) -> Optional[list]:
+    """Retailer codes the user may see; None means everything (manager)."""
+    scope = _scope(user)
+    if not scope:
+        return None
+    rows = crud.list_retailers(tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), kam=scope.get("kam"))
+    return [str(r.get("code") or "").strip().upper() for r in rows if r.get("code")]
+
+
+def _competition_row_out(r: dict) -> dict:
+    return {k: r.get(k) for k in (
+        "id", "month", "retailer_code", "retailer_name", "brand", "mtd_units", "promoters", "demo_units",
+        "branding", "offer", "offer_amount", "launch_model", "launch_price", "notes",
+        "submitted_by", "submitted_role", "created_at",
+    )}
+
+
+@app.get("/competition/brands")
+def competition_brands(user: dict = Depends(get_dashboard_user)):
+    return {"brands": COMPETITOR_BRANDS, "month": _ist_month()}
+
+
+@app.post("/competition")
+def submit_competition(payload: CompetitionSubmit, user: dict = Depends(get_current_user)):
+    code = payload.retailer_code.strip().upper()
+    retailer = crud.lookup_retailer_by_code(code)
+    if not retailer:
+        raise HTTPException(status_code=404, detail="Retailer not found.")
+    scope = _scope(user)
+    if scope and not _record_matches_scope(retailer, scope):
+        raise HTTPException(status_code=403, detail="Retailer is outside your hierarchy.")
+
+    entries = []
+    for e in payload.entries:
+        brand = next((b for b in COMPETITOR_BRANDS if b.lower() == e.brand.strip().lower()), None)
+        if not brand:
+            raise HTTPException(status_code=400, detail=f"Unknown brand: {e.brand}")
+        item = e.model_dump()
+        item["brand"] = brand
+        for k in ("offer", "launch_model"):
+            item[k] = (item.get(k) or "").strip() or None
+        if all(item.get(k) is None for k in crud.COMPETITION_FIELDS):
+            continue  # nothing entered for this brand
+        entries.append(item)
+    if not entries:
+        raise HTTPException(status_code=400, detail="Enter at least one brand's sales or activity.")
+
+    saved = crud.add_competition_entries(
+        month=_ist_month(),
+        retailer_code=code,
+        retailer_name=str(retailer.get("name") or ""),
+        entries=entries,
+        notes=(payload.notes or "").strip(),
+        submitted_by=str(user.get("name") or "Manager"),
+        submitted_role=str(user.get("role") or "MANAGER"),
+    )
+    return {"saved": len(saved), "entries": [_competition_row_out(r) for r in saved]}
+
+
+@app.get("/competition/retailers/{retailer_code}")
+def retailer_competition(retailer_code: str, user: dict = Depends(get_dashboard_user)):
+    code = retailer_code.strip().upper()
+    retailer = crud.lookup_retailer_by_code(code)
+    if not retailer:
+        raise HTTPException(status_code=404, detail="Retailer not found.")
+    scope = _scope(user)
+    if scope and not _record_matches_scope(retailer, scope):
+        raise HTTPException(status_code=403, detail="You cannot access this retailer.")
+    month = _ist_month()
+    return {
+        "month": month,
+        "brands": COMPETITOR_BRANDS,
+        "retailer": {"code": code, "name": retailer.get("name")},
+        "latest": [_competition_row_out(r) for r in crud.latest_competition(month, [code])],
+        "history": [_competition_row_out(r) for r in crud.competition_history([code], limit=20)],
+    }
+
+
+@app.get("/competition/summary")
+def competition_summary(user: dict = Depends(get_dashboard_user)):
+    """Competitor units and activity across the user's retailers for this month."""
+    month = _ist_month()
+    codes = _scoped_retailer_codes(user)
+    latest = crud.latest_competition(month, codes)
+
+    brands = {b: {"brand": b, "units": 0, "retailers": 0, "promoters": 0, "demo_units": 0,
+                  "branding_retailers": 0, "offers": 0} for b in COMPETITOR_BRANDS}
+    retailers = {}
+    for r in latest:
+        b = brands.get(r["brand"])
+        if b is None:
+            continue
+        if r.get("mtd_units") is not None:
+            b["units"] += int(r["mtd_units"])
+        b["retailers"] += 1
+        b["promoters"] += int(r.get("promoters") or 0)
+        b["demo_units"] += int(r.get("demo_units") or 0)
+        b["branding_retailers"] += 1 if r.get("branding") else 0
+        b["offers"] += 1 if r.get("offer") else 0
+        item = retailers.setdefault(r["retailer_code"], {
+            "code": r["retailer_code"], "name": r["retailer_name"], "brands": {},
+            "competitor_units": 0, "promoters": 0, "updated_at": r["created_at"], "updated_by": r["submitted_by"],
+        })
+        item["brands"][r["brand"]] = r.get("mtd_units")
+        item["competitor_units"] += int(r.get("mtd_units") or 0)
+        item["promoters"] += int(r.get("promoters") or 0)
+        if r["created_at"] > item["updated_at"]:
+            item["updated_at"], item["updated_by"] = r["created_at"], r["submitted_by"]
+
+    activity = [
+        _competition_row_out(r) for r in crud.competition_history(codes, limit=200)
+        if r.get("offer") or r.get("launch_model")
+    ][:30]
+
+    return {
+        "month": month,
+        "brands": [brands[b] for b in COMPETITOR_BRANDS],
+        "retailers": sorted(retailers.values(), key=lambda x: x["updated_at"], reverse=True),
+        "retailers_reporting": len(retailers),
+        "retailers_in_scope": len(codes) if codes is not None else None,
+        "activity": activity,
+    }
 
 
 @app.get("/retailers/nearby")

@@ -173,3 +173,21 @@ class WhatsappBroadcastConfigUpdate(BaseModel):
     send_hour: int = Field(default=19, ge=0, le=23)
     send_minute: int = Field(default=0, ge=0, le=59)
     audience: str = Field(default="TL", pattern="^TL$")
+
+
+class CompetitionEntryIn(BaseModel):
+    brand: str = Field(..., min_length=1, max_length=40)
+    mtd_units: Optional[int] = Field(default=None, ge=0, le=100000)
+    promoters: Optional[int] = Field(default=None, ge=0, le=50)
+    demo_units: Optional[int] = Field(default=None, ge=0, le=500)
+    branding: Optional[bool] = None
+    offer: Optional[str] = Field(default=None, max_length=300)
+    offer_amount: Optional[int] = Field(default=None, ge=0, le=1000000)
+    launch_model: Optional[str] = Field(default=None, max_length=80)
+    launch_price: Optional[int] = Field(default=None, ge=0, le=1000000)
+
+
+class CompetitionSubmit(BaseModel):
+    retailer_code: str = Field(..., min_length=1)
+    entries: list[CompetitionEntryIn] = Field(..., min_length=1, max_length=20)
+    notes: Optional[str] = Field(default="", max_length=1000)

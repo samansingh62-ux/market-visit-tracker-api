@@ -86,8 +86,8 @@ label.lbl{display:flex;flex-direction:column;gap:8px;font-size:16px;font-weight:
 label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4px}
 
 /* bottom nav + bars */
-.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 12px calc(10px + var(--safe-bottom));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;z-index:20}
-.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--muted);font-size:12px;font-weight:600}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 6px calc(10px + var(--safe-bottom));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;z-index:20}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--muted);font-size:11.5px;font-weight:600;white-space:nowrap}
 .nav a[aria-current="page"]{color:var(--brand);font-weight:700}
 .bottomBar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 20px calc(16px + var(--safe-bottom));z-index:20}
 .bottomBar>div{max-width:600px;margin:0 auto;display:flex;gap:10px}
@@ -150,6 +150,24 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 .spin{width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .updated{font-size:12px;color:var(--muted);text-align:center}
+
+/* competition */
+.shareRow{display:grid;grid-template-columns:96px minmax(0,1fr) 72px;align-items:center;gap:10px;font-size:14px}
+.shareRow .bar{height:10px}
+.shareRow>span:first-child{white-space:nowrap}
+.brandDot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.brandCard{background:#fff;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.brandCard h3{font-size:17px;font-weight:800;display:flex;align-items:center}
+.stepper{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;border-radius:14px;box-shadow:inset 0 0 0 1px var(--line);background:#fff;height:48px;overflow:hidden}
+.stepper button{border:0;background:var(--brand-soft);color:var(--brand);height:100%;font-size:22px;font-weight:700}
+.stepper input{border:0;text-align:center;font-size:18px;font-weight:700;width:100%;outline:none;background:transparent;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.fieldRow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.mini{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#E6EBF3;border-radius:12px;height:48px}
+.yn button{border:0;border-radius:9px;background:transparent;font-weight:700;color:var(--muted);font-size:14px}
+.yn button[aria-pressed="true"]{background:#fff;color:var(--ink)}
+.linkBtn{border:0;background:none;color:var(--brand);font-weight:700;font-size:14px;padding:6px 0;text-align:left}
 </style>
 </head>
 <body>
@@ -282,7 +300,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
     </div>
   </div></div>
   <div class="scroll" style="padding-top:14px">
-    <div class="seg" role="tablist" id="r360Tabs" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+    <div class="seg" role="tablist" id="r360Tabs" style="grid-template-columns:repeat(5,minmax(0,1fr))"></div>
     <div id="r360Body" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
   <div class="bottomBar"><div><a class="btn" id="r360Visit" href="#/visit">Log visit here</a></div></div>
@@ -304,6 +322,44 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   </div>
 </section>
 
+<!-- ============ COMPETITION ============ -->
+<section id="s-compete" class="screen withNav hidden" aria-label="Competition">
+  <div class="scroll">
+    <div class="between">
+      <div class="stat" style="gap:2px"><span id="cMonth" style="font-size:13px;font-weight:600;color:var(--muted)"></span><h1 style="font-size:24px;font-weight:800">Competition</h1></div>
+      <button class="chip" id="cAdd" style="background:var(--brand);color:#fff;box-shadow:none;font-weight:700">+ Add data</button>
+    </div>
+    <div class="card" id="cShare" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="grid3" id="cBrandStats" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+    <div class="seg" role="tablist" id="cSeg" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+    <div id="cList" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</section>
+
+<!-- ============ COMPETITION ENTRY ============ -->
+<section id="s-centry" class="screen withBar hidden" aria-label="Competition entry">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1>Competition</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="card" style="display:flex;flex-direction:column;gap:4px">
+      <span class="note" id="ceMonth"></span>
+      <b id="ceName" style="font-size:18px">—</b>
+      <span class="note" id="ceVivo"></span>
+    </div>
+    <p class="note" style="margin:0">Fill in what you saw for each brand. Leave anything you don’t know blank.</p>
+    <div id="ceBrands" style="display:flex;flex-direction:column;gap:12px"></div>
+    <label class="lbl">Notes <small>Optional — anything else about competitor activity</small>
+      <textarea class="box" id="ceNotes" rows="3" placeholder="e.g. Samsung giving extra ₹500 per unit to staff this week"></textarea>
+    </label>
+    <div id="ceErr" class="err hidden" role="alert"></div>
+    <div class="sectionHead" style="padding-top:8px"><h2 style="font-size:16px">Earlier entries</h2></div>
+    <div id="ceHistory" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+  <div class="bottomBar"><div><button class="btn" id="ceSave">Save competition data</button></div></div>
+</section>
+
 <!-- ============ EOD REMARKS ============ -->
 <section id="s-eod" class="screen hidden" aria-label="End of day remarks">
   <div class="topbar">
@@ -321,6 +377,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   <a href="#/home" data-nav="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
   <a href="#/visit" data-nav="visit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Log visit</a>
   <a href="#/retailers" data-nav="retailers"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>Retailers</a>
+  <a href="#/compete" data-nav="compete"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 8h4l-2 6H3z"/><path d="M15 8h4l2 6h-6z"/><path d="M5 8l7-2 7 2"/><path d="M8 21h8"/></svg>Compete</a>
   <a href="#/team" data-nav="team"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</a>
 </nav>
 
@@ -421,8 +478,9 @@ function logout(message) {
 }
 
 /* ---------------- router ---------------- */
-const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod'];
-const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'team' };
+let afterRoute = null;
+const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry'];
+const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'team', compete: 'compete' };
 
 function route() {
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('?')[0].split('/');
@@ -430,6 +488,7 @@ function route() {
   if (!token && name !== 'login') { location.replace('#/login'); return; }
   if (token && name === 'login') { location.replace('#/home'); return; }
   if (name === 'r') name = 'r360';
+  if (name === 'c') name = 'centry';
   if (!SCREENS.includes(name)) name = 'home';
   SCREENS.forEach((s) => $('s-' + s).classList.toggle('hidden', s !== name));
   const navOn = !!NAV_SCREENS[name];
@@ -440,7 +499,8 @@ function route() {
   closeSheet();
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
-  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod })[name]();
+  if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
+  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -810,8 +870,10 @@ $('submitVisit').addEventListener('click', async () => {
     visitState.photos.forEach((p) => URL.revokeObjectURL(p.url));
     visitState.photos = [];
     invalidate('priorities', 'health', 'perf');
-    toast(`Visit to ${r.name} saved.`);
-    location.hash = '#/home';
+    afterRoute = () => openSheet(`<div class="row"><div class="avatar" style="background:var(--good-bg);color:var(--good)">✓</div><div class="stat"><b style="font-size:17px">Visit saved</b><span>${esc(r.name)}</span></div></div>
+      <p style="margin:0;line-height:1.5">While you’re here, add what Samsung, Oppo, Realme and Xiaomi are selling and doing at this counter?</p>
+      <div style="display:flex;gap:10px"><button class="btn soft" onclick="closeSheet()">Not now</button><a class="btn" href="#/c/${encodeURIComponent(r.code)}">Add competition</a></div>`);
+    location.replace('#/home');
   } catch (e) {
     fail(e.message);
   } finally {
@@ -862,10 +924,14 @@ $('rFilters').addEventListener('click', (e) => { const b = e.target.closest('[da
 $('rSearch').addEventListener('input', renderRetailers);
 
 /* ---------------- RETAILER 360 ---------------- */
-let r360Tab = 'Sales', r360Data = null, r360Code = null;
+let r360Tab = 'Sales', r360Data = null, r360Code = null, r360Comp = null, r360OpenTab = null;
 function showR360(code) {
   r360Code = String(code || '').toUpperCase();
-  r360Tab = 'Sales'; r360Data = null;
+  r360Tab = r360OpenTab || 'Sales';
+  r360OpenTab = null;
+  r360Data = null; r360Comp = null;
+  api(`/competition/retailers/${encodeURIComponent(r360Code)}`).then((c) => { if (c.retailer.code === r360Code) { r360Comp = c; renderR360(); } })
+    .catch((e) => { r360Comp = { error: e.message }; renderR360(); });
   $('r360Visit').href = '#/visit/' + encodeURIComponent(r360Code);
   const fill = () => {
     const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
@@ -887,7 +953,7 @@ function showR360(code) {
     .catch((e) => { r360Data = { error: e.message }; renderR360(); });
 }
 function renderR360() {
-  $('r360Tabs').innerHTML = ['Sales', 'Stock', 'Schemes', 'Visits'].map((t) => `<button role="tab" aria-selected="${t === r360Tab}" data-t="${t}">${t}</button>`).join('');
+  $('r360Tabs').innerHTML = ['Sales', 'Stock', 'Schemes', 'Visits', 'Compete'].map((t) => `<button role="tab" aria-selected="${t === r360Tab}" data-t="${t}" style="font-size:13px">${t}</button>`).join('');
   const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
   const d = r360Data;
   const loading = '<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:120px"></div>';
@@ -924,6 +990,15 @@ function renderR360() {
       const total = items.reduce((a, [, v]) => a + Number(v || 0), 0);
       html = `<div class="card stat" style="gap:4px"><span style="font-size:13px">October schemes · provisional</span><b class="num" style="font-size:30px">${money(total)}</b><span class="note">Final payout depends on activation, MOP and other scheme conditions.</span></div>
         <div class="card" style="padding:6px 16px">${items.map(([k, v]) => `<div class="kv"><span>${k}</span><b class="num">${v == null ? '—' : money(v)}</b></div>`).join('')}</div>`;
+    }
+  } else if (r360Tab === 'Compete') {
+    const c = r360Comp;
+    if (!c) html = '<div class="skeleton" style="height:180px"></div>';
+    else if (c.error) html = `<div class="err">${esc(c.error)}</div>`;
+    else {
+      const vivo = row ? row.sales : null;
+      html = competitionCard(c.brands, c.latest, vivo) +
+        `<a class="btn soft" href="#/c/${encodeURIComponent(r360Code)}">${c.latest.length ? 'Update competition data' : 'Add competition data'}</a>`;
     }
   } else {
     const visits = d && d.market_visit ? d.market_visit.recent_visits || [] : null;
@@ -997,6 +1072,213 @@ function confirmSend(text, send) {
     };
   });
 }
+
+/* ---------------- COMPETITION ---------------- */
+const BRAND_COLOR = { vivo: '#2457E6', Samsung: '#5B6B85', Oppo: '#1F9D61', Realme: '#D99A16', Xiaomi: '#E0631E' };
+const dot = (b) => `<span class="brandDot" style="background:${BRAND_COLOR[b] || '#9AA5B8'}"></span>`;
+const whenIso = (iso) => {
+  if (!iso) return '';
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 60) return m <= 1 ? 'just now' : `${m} min ago`;
+  if (m < 1440) return `${Math.round(m / 60)} h ago`;
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+};
+const monthName = (ym) => { try { return new Date(ym + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); } catch { return ym; } };
+
+function shareRows(vivo, units) {
+  // units: { brand: number|null }
+  const known = Object.entries(units).filter(([, v]) => v != null);
+  const total = (vivo || 0) + known.reduce((a, [, v]) => a + Number(v), 0);
+  if (!total) return '<div class="note">No units entered yet this month.</div>';
+  const rows = (vivo != null ? [['vivo', vivo]] : []).concat(known).sort((a, b) => b[1] - a[1]);
+  return rows.map(([b, v]) => {
+    const pct = Math.round(v / total * 100);
+    return `<div class="shareRow"><span style="font-weight:${b === 'vivo' ? 800 : 600}">${dot(b)}${esc(b)}</span><div class="bar"><i style="width:${pct}%;background:${BRAND_COLOR[b] || '#9AA5B8'}"></i></div><span class="num" style="text-align:right;font-weight:700">${pct}% <span class="note" style="font-weight:500">${fmt(v)}</span></span></div>`;
+  }).join('');
+}
+
+function competitionCard(brands, latest, vivo) {
+  const by = {}; (latest || []).forEach((r) => { by[r.brand] = r; });
+  const units = {}; brands.forEach((b) => { if (by[b] && by[b].mtd_units != null) units[b] = by[b].mtd_units; });
+  const newest = (latest || []).reduce((a, r) => (!a || r.created_at > a.created_at) ? r : a, null);
+  return `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="between"><b style="font-size:15px">Counter share this month</b>${newest ? `<span class="note">${esc(whenIso(newest.created_at))}</span>` : ''}</div>
+      ${latest && latest.length ? shareRows(vivo, units) : '<div class="note">No competition data for this retailer yet this month.</div>'}
+      ${newest ? `<div class="note">Last updated by ${esc(newest.submitted_by)} (${esc(newest.submitted_role)})</div>` : ''}
+    </div>` +
+    (latest && latest.length ? `<div class="card" style="padding:6px 16px">${brands.filter((b) => by[b]).map((b) => {
+      const r = by[b];
+      const bits = [
+        r.promoters != null ? `${fmt(r.promoters)} promoter${r.promoters === 1 ? '' : 's'}` : '',
+        r.demo_units != null ? `${fmt(r.demo_units)} demo` : '',
+        r.branding != null ? (r.branding ? 'Branding up' : 'No branding') : ''
+      ].filter(Boolean).join(' · ');
+      return `<div class="kv" style="flex-direction:column;gap:4px">
+        <div class="between"><b>${dot(b)}${esc(b)}</b><span class="num note">${r.mtd_units == null ? '—' : fmt(r.mtd_units) + ' units'}</span></div>
+        ${bits ? `<span class="note">${bits}</span>` : ''}
+        ${r.offer ? `<span style="font-size:14px">Offer: ${esc(r.offer)}${r.offer_amount ? ` <b class="num">${money(r.offer_amount)}</b>` : ''}</span>` : ''}
+        ${r.launch_model ? `<span style="font-size:14px">New launch: <b>${esc(r.launch_model)}</b>${r.launch_price ? ` at <b class="num">${money(r.launch_price)}</b>` : ''}</span>` : ''}
+      </div>`;
+    }).join('')}</div>` : '');
+}
+
+let cSeg = 'Retailers';
+function showCompete() {
+  const l = load('compete', '/competition/summary', 2 * 60e3);
+  if (!l.saved) { $('cShare').innerHTML = '<div class="skeleton" style="height:150px"></div>'; $('cList').innerHTML = ''; }
+  whenLoaded(l, renderCompete, (e) => { $('cShare').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+  const p = perfLoad(); if (p.pending) p.pending.then(renderCompete).catch(() => {});
+}
+function renderCompete() {
+  const c = (cache.compete || {}).data; if (!c) return;
+  const perf = (cache.perf || {}).data;
+  const vivoBy = {}; ((perf && perf.retailers) || []).forEach((r) => { vivoBy[r.code] = r.sales; });
+  const reporting = c.retailers || [];
+  const vivo = perf ? reporting.reduce((a, r) => a + Number(vivoBy[r.code] || 0), 0) : null;
+  const units = {}; c.brands.forEach((b) => { if (b.retailers) units[b.brand] = b.units; });
+  $('cMonth').textContent = monthName(c.month);
+  $('cShare').innerHTML = `<div class="between"><b style="font-size:15px">Counter share</b><span class="note num">${fmt(c.retailers_reporting)}${c.retailers_in_scope != null ? ' of ' + fmt(c.retailers_in_scope) : ''} retailers reported</span></div>
+    ${reporting.length ? shareRows(vivo, units) : '<div class="note">No competition data yet this month. Tap “+ Add data” at a retailer to start.</div>'}
+    ${reporting.length && vivo == null ? '<div class="note">vivo’s share appears once live sales load.</div>' : ''}
+    ${reporting.length ? '<div class="note">Only retailers with competition data this month are counted.</div>' : ''}`;
+  $('cBrandStats').innerHTML = c.brands.map((b) => `<div class="card" style="display:flex;flex-direction:column;gap:6px;padding:14px">
+      <b style="font-size:15px">${dot(b.brand)}${esc(b.brand)}</b>
+      <span class="num" style="font-size:20px;font-weight:800">${b.retailers ? fmt(b.units) : '—'} <span class="note" style="font-size:13px;font-weight:500">units</span></span>
+      <span class="note num">${fmt(b.promoters)} promoter${b.promoters === 1 ? '' : 's'} · ${fmt(b.offers)} offer${b.offers === 1 ? '' : 's'}</span>
+      <span class="note num">Branding at ${fmt(b.branding_retailers)} store${b.branding_retailers === 1 ? '' : 's'} · ${fmt(b.demo_units)} demo</span>
+    </div>`).join('');
+  $('cSeg').innerHTML = ['Retailers', 'Activity'].map((s) => `<button role="tab" data-cseg="${s}" aria-selected="${s === cSeg}">${s}</button>`).join('');
+  if (cSeg === 'Retailers') {
+    $('cList').innerHTML = reporting.length ? reporting.map((r) => {
+      const v = vivoBy[r.code];
+      const total = (v || 0) + r.competitor_units;
+      const share = v != null && total ? Math.round(v / total * 100) : null;
+      const top = Object.entries(r.brands).filter(([, u]) => u != null).sort((a, b) => b[1] - a[1])[0];
+      return `<button class="rCard" data-open="${esc(r.code)}">
+        <div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:16px">${esc(r.name)}</b><span class="note">Updated ${esc(whenIso(r.updated_at))} by ${esc(r.updated_by)}</span></div>
+        ${share != null ? `<span class="pill num" style="background:${share >= 30 ? 'var(--good-bg)' : share >= 15 ? 'var(--warn-bg)' : 'var(--bad-bg)'};color:${share >= 30 ? 'var(--good)' : share >= 15 ? 'var(--warn)' : 'var(--bad)'}">vivo ${share}%</span>` : ''}</div>
+        <div class="num" style="display:flex;gap:14px;font-size:13px;color:var(--muted);flex-wrap:wrap">
+          <span>vivo <b style="color:var(--ink)">${v == null ? '—' : fmt(v)}</b></span>
+          <span>Competition <b style="color:var(--ink)">${fmt(r.competitor_units)}</b></span>
+          ${top ? `<span>Top ${dot(top[0])}<b style="color:var(--ink)">${esc(top[0])} ${fmt(top[1])}</b></span>` : ''}
+          ${r.promoters ? `<span>Promoters <b style="color:var(--ink)">${fmt(r.promoters)}</b></span>` : ''}
+        </div></button>`;
+    }).join('') : '<div class="card note">No retailers reported yet this month.</div>';
+  } else {
+    $('cList').innerHTML = (c.activity || []).length ? c.activity.map((a) => `<button class="rCard" data-open="${esc(a.retailer_code)}" style="gap:6px">
+        <div class="between"><b style="font-size:15px">${dot(a.brand)}${esc(a.brand)}</b><span class="note">${esc(whenIso(a.created_at))}</span></div>
+        <span class="note ellipsis">${esc(a.retailer_name)} · ${esc(a.submitted_by)}</span>
+        ${a.offer ? `<span style="font-size:14px">Offer: ${esc(a.offer)}${a.offer_amount ? ` <b class="num">${money(a.offer_amount)}</b>` : ''}</span>` : ''}
+        ${a.launch_model ? `<span style="font-size:14px">New launch: <b>${esc(a.launch_model)}</b>${a.launch_price ? ` at <b class="num">${money(a.launch_price)}</b>` : ''}</span>` : ''}
+      </button>`).join('') : '<div class="card note">No competitor offers or launches logged yet this month.</div>';
+  }
+}
+$('cSeg').addEventListener('click', (e) => { const b = e.target.closest('[data-cseg]'); if (b) { cSeg = b.dataset.cseg; renderCompete(); } });
+$('cList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-open]'); if (!b) return;
+  r360OpenTab = 'Compete';
+  location.hash = '#/r/' + encodeURIComponent(b.dataset.open);
+});
+$('cAdd').addEventListener('click', () => {
+  openSheet(`<h2 style="font-size:18px;font-weight:800">Add competition data</h2>
+    <label class="field"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="cPick" placeholder="Search your retailers" autocomplete="off" aria-label="Search your retailers"></label>
+    <div id="cPickList" class="picker"></div>`, () => {
+    const master = (cache.master || {}).data || [];
+    const draw = () => {
+      const q = $('cPick').value.trim().toLowerCase();
+      const hits = master.filter((r) => !q || (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q)).slice(0, 40);
+      $('cPickList').innerHTML = hits.length ? hits.map((r) => `<button data-code="${esc(r.code)}">${esc(r.name)}<small>${esc(r.town_name || '')}</small></button>`).join('') : '<button disabled>No matching retailer</button>';
+    };
+    $('cPick').oninput = draw;
+    $('cPickList').onclick = (e) => { const b = e.target.closest('[data-code]'); if (b) { closeSheet(); location.hash = '#/c/' + encodeURIComponent(b.dataset.code); } };
+    if (!master.length) { const m = masterLoad(); if (m.pending) m.pending.then(draw); }
+    draw();
+  });
+});
+
+/* entry form */
+let ceCode = null, ceBrands = [];
+function stepper(b, f, v, label) {
+  return `<label class="mini">${label}<div class="stepper"><button type="button" data-step="-1" data-b="${b}" data-f="${f}" aria-label="Decrease ${label}">−</button><input type="number" inputmode="numeric" min="0" data-b="${b}" data-f="${f}" value="${v == null ? '' : v}" placeholder="—" aria-label="${b} ${label}"><button type="button" data-step="1" data-b="${b}" data-f="${f}" aria-label="Increase ${label}">+</button></div></label>`;
+}
+function showCEntry(code) {
+  ceCode = String(code || '').toUpperCase();
+  $('ceErr').classList.add('hidden'); $('ceNotes').value = '';
+  $('ceBrands').innerHTML = '<div class="skeleton" style="height:240px"></div>';
+  $('ceHistory').innerHTML = '';
+  const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === ceCode);
+  $('ceVivo').textContent = row ? `vivo this month: ${fmt(row.sales)} units${row.stock != null ? ' · stock ' + fmt(row.stock) : ''}` : '';
+  api(`/competition/retailers/${encodeURIComponent(ceCode)}`).then((c) => {
+    ceBrands = c.brands;
+    $('ceName').textContent = c.retailer.name;
+    $('ceMonth').textContent = monthName(c.month) + ' · competition';
+    const by = {}; c.latest.forEach((r) => { by[r.brand] = r; });
+    $('ceBrands').innerHTML = c.brands.map((b) => {
+      const r = by[b] || {};
+      const hasLaunch = !!r.launch_model;
+      return `<div class="brandCard" data-brand="${esc(b)}">
+        <h3>${dot(b)}${esc(b)}</h3>
+        ${stepper(b, 'mtd_units', r.mtd_units, 'Units sold this month')}
+        <div class="fieldRow">${stepper(b, 'promoters', r.promoters, 'Promoters')}${stepper(b, 'demo_units', r.demo_units, 'Demo phones')}</div>
+        <div class="mini">Branding / display at counter<div class="yn" data-b="${b}" data-f="branding" data-v="${r.branding == null ? '' : r.branding}">
+          <button type="button" data-yn="true" aria-pressed="${r.branding === true}">Yes</button><button type="button" data-yn="false" aria-pressed="${r.branding === false}">No</button></div></div>
+        <div class="fieldRow" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+          <label class="mini">Offer / scheme<input class="box" data-b="${b}" data-f="offer" value="${esc(r.offer || '')}" placeholder="e.g. ₹2,000 cashback"></label>
+          <label class="mini">Amount (₹)<input class="box num" type="number" inputmode="numeric" min="0" data-b="${b}" data-f="offer_amount" value="${r.offer_amount == null ? '' : r.offer_amount}" placeholder="—"></label>
+        </div>
+        <div class="launch ${hasLaunch ? '' : 'hidden'}"><div class="fieldRow" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+          <label class="mini">New launch model<input class="box" data-b="${b}" data-f="launch_model" value="${esc(r.launch_model || '')}" placeholder="e.g. Galaxy A37"></label>
+          <label class="mini">Price (₹)<input class="box num" type="number" inputmode="numeric" min="0" data-b="${b}" data-f="launch_price" value="${r.launch_price == null ? '' : r.launch_price}" placeholder="—"></label>
+        </div></div>
+        ${hasLaunch ? '' : '<button type="button" class="linkBtn" data-addlaunch>+ Add a new launch</button>'}
+      </div>`;
+    }).join('');
+    $('ceHistory').innerHTML = c.history.length ? c.history.slice(0, 12).map((h) => `<div class="card" style="padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+        <div class="between"><b style="font-size:14px">${dot(h.brand)}${esc(h.brand)} <span class="note num" style="font-weight:500">${h.mtd_units == null ? '' : '· ' + fmt(h.mtd_units) + ' units'}</span></b><span class="note">${esc(whenIso(h.created_at))}</span></div>
+        <span class="note">${esc(h.submitted_by)}${h.offer ? ' · Offer: ' + esc(h.offer) : ''}${h.launch_model ? ' · Launch: ' + esc(h.launch_model) : ''}</span></div>`).join('') : '<div class="note">Nothing entered yet.</div>';
+  }).catch((e) => { $('ceBrands').innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+}
+$('ceBrands').addEventListener('click', (e) => {
+  const st = e.target.closest('[data-step]');
+  if (st) {
+    const inp = $('ceBrands').querySelector(`input[data-b="${st.dataset.b}"][data-f="${st.dataset.f}"]`);
+    const v = Math.max(0, (parseInt(inp.value, 10) || 0) + Number(st.dataset.step));
+    inp.value = v; return;
+  }
+  const yn = e.target.closest('[data-yn]');
+  if (yn) {
+    const box = yn.parentElement;
+    const now = box.dataset.v === yn.dataset.yn ? '' : yn.dataset.yn; // tap again to clear
+    box.dataset.v = now;
+    box.querySelectorAll('[data-yn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.yn === now));
+    return;
+  }
+  const al = e.target.closest('[data-addlaunch]');
+  if (al) { al.previousElementSibling.classList.remove('hidden'); al.remove(); }
+});
+$('ceSave').addEventListener('click', async () => {
+  const btn = $('ceSave'), err = $('ceErr');
+  err.classList.add('hidden');
+  const num = (b, f) => { const el = $('ceBrands').querySelector(`input[data-b="${b}"][data-f="${f}"]`); if (!el || el.value.trim() === '') return null; const n = parseInt(el.value, 10); return isNaN(n) ? null : Math.max(0, n); };
+  const txt = (b, f) => { const el = $('ceBrands').querySelector(`input[data-b="${b}"][data-f="${f}"]`); return el ? el.value.trim() || null : null; };
+  const entries = ceBrands.map((b) => {
+    const yn = $('ceBrands').querySelector(`.yn[data-b="${b}"]`).dataset.v;
+    return { brand: b, mtd_units: num(b, 'mtd_units'), promoters: num(b, 'promoters'), demo_units: num(b, 'demo_units'),
+      branding: yn === '' ? null : yn === 'true', offer: txt(b, 'offer'), offer_amount: num(b, 'offer_amount'),
+      launch_model: txt(b, 'launch_model'), launch_price: num(b, 'launch_price') };
+  }).filter((e) => Object.entries(e).some(([k, v]) => k !== 'brand' && v != null));
+  if (!entries.length) { err.textContent = 'Enter at least one brand’s units or activity.'; err.classList.remove('hidden'); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Saving…';
+  try {
+    await api('/competition', { method: 'POST', json: { retailer_code: ceCode, entries, notes: $('ceNotes').value.trim() } });
+    invalidate('compete');
+    toast('Competition data saved.');
+    r360OpenTab = 'Compete';
+    location.replace('#/r/' + encodeURIComponent(ceCode));
+  } catch (e) {
+    err.textContent = e.message; err.classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Save competition data'; }
+});
 
 /* ---------------- EOD ---------------- */
 function showEod() {
