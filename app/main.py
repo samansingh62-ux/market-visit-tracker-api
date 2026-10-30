@@ -1857,6 +1857,74 @@ def _clear_perf_cache() -> None:
         _perf_cache.clear()
 
 
+_INSIGHTS_TTL_SECONDS = int(os.getenv("INSIGHTS_CACHE_TTL_SECONDS", "180"))
+_insights_cache: dict = {}
+_insights_lock = __import__("threading").Lock()
+
+
+@app.get("/insights")
+def insights(user: dict = Depends(get_dashboard_user)):
+    """Sales, model, stock and highlight insights for the user's own area."""
+    today = date.today()
+    scope = _scope(user)
+    key = (str(user.get("role") or ""), str(user.get("name") or ""), today.isoformat())
+    now = time.monotonic()
+    with _insights_lock:
+        hit = _insights_cache.get(key)
+        if hit and now - hit[0] < _INSIGHTS_TTL_SECONDS:
+            return hit[1]
+        for k in [k for k, v in _insights_cache.items() if now - v[0] >= _INSIGHTS_TTL_SECONDS]:
+            _insights_cache.pop(k, None)
+
+    month = today.strftime("%Y-%m")
+    scope_rows = crud.get_performance_scope_rows(
+        month, tl=scope.get("tl"), ss=scope.get("ss"), rds=scope.get("rds"), kam=scope.get("kam"),
+    )
+    codes = [str(r.get("code") or "").strip().upper() for r in scope_rows if r.get("code")]
+    headers = {"Content-Type": "application/json"}
+    if VWORK_LIVE_API_KEY:
+        headers["X-API-Key"] = VWORK_LIVE_API_KEY
+    payload = {"store_codes": alignment.store_codes(codes, scope) if scope else []}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+            response = _vwork_request(client, "POST", f"{VWORK_LIVE_API_URL}/api/v1/insights",
+                                      params=scope, json=payload, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Insights unavailable: {exc}") from exc
+
+    result = {**data, "user": {"name": user.get("name", "Manager"), "role": user.get("role", "MANAGER")},
+              "retailers_in_scope": len(codes)}
+    with _insights_lock:
+        _insights_cache[key] = (time.monotonic(), result)
+    return result
+
+
+@app.get("/competition/trend")
+def competition_trend(months: int = Query(default=3, ge=1, le=12), user: dict = Depends(get_dashboard_user)):
+    """Competitor units per brand and per retailer for recent months (latest entry per month)."""
+    codes = _scoped_retailer_codes(user)
+    first = datetime.now(ZoneInfo("Asia/Kolkata")).date().replace(day=1)
+    out = []
+    for k in range(months):
+        y, m = first.year, first.month - k
+        while m <= 0:
+            m += 12
+            y -= 1
+        ym = f"{y:04d}-{m:02d}"
+        rows = crud.latest_competition(ym, codes)
+        brands = {b: 0 for b in COMPETITOR_BRANDS}
+        retailers: dict = {}
+        for r in rows:
+            if r.get("mtd_units") is None or r["brand"] not in brands:
+                continue
+            brands[r["brand"]] += int(r["mtd_units"])
+            retailers.setdefault(r["retailer_code"], {})[r["brand"]] = int(r["mtd_units"])
+        out.append({"month": ym, "brands": brands, "retailers": retailers, "retailers_reporting": len(retailers)})
+    return {"brands": COMPETITOR_BRANDS, "months": list(reversed(out))}
+
+
 @app.get("/performance-dashboard")
 def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     """Cached per user for a short time; the home screen, EOD remarks and

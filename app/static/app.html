@@ -168,6 +168,27 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 .yn button{border:0;border-radius:9px;background:transparent;font-weight:700;color:var(--muted);font-size:14px}
 .yn button[aria-pressed="true"]{background:#fff;color:var(--ink)}
 .linkBtn{border:0;background:none;color:var(--brand);font-weight:700;font-size:14px;padding:6px 0;text-align:left}
+
+/* insights */
+.kpiGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{background:#F7F9FC;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kpi>span{font-size:12px;font-weight:600;color:var(--muted)}
+.kpi>b{font-size:24px;line-height:1}
+.dl{font-size:12px;color:var(--muted)}
+.up{color:var(--good);font-weight:700}.down{color:var(--bad);font-weight:700}.flat{color:var(--muted);font-weight:700}
+.insightBox{background:#EEF3FF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.insight{background:#fff;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.insight i{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.chart{position:relative}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.tbl{display:grid;gap:6px;align-items:center;font-size:14px}
+.tile{background:#fff;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:4px;color:var(--ink);min-width:0}
+.tile>span:first-child{font-size:12px;color:var(--muted)}
+.tile b{font-size:17px}
+.heroDelta{flex:1;background:#17284A;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.heroDelta span{font-size:11px;color:#C9D3EA}
+.heroDelta b{font-size:15px}
 </style>
 </head>
 <body>
@@ -217,7 +238,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
     </div>
 
     <div id="eodAlert"></div>
-    <div id="dosAlert"></div>
+    <div id="homeHighlights"></div>
 
     <div class="sectionHead"><h2>Visit today</h2><a href="#/retailers">See all</a></div>
     <div id="todayList" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -360,6 +381,19 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   <div class="bottomBar"><div><button class="btn" id="ceSave">Save competition data</button></div></div>
 </section>
 
+<!-- ============ INSIGHTS ============ -->
+<section id="s-insights" class="screen withNav hidden" aria-label="Insights">
+  <div class="scroll">
+    <div class="between" style="align-items:flex-end">
+      <div class="stat" style="gap:2px"><span id="insAsOf" style="font-size:13px;font-weight:600;color:var(--muted)">Live from V-Work</span><h1 style="font-size:26px;font-weight:800">Insights</h1></div>
+      <span id="insScope" class="pill" style="background:#fff;box-shadow:inset 0 0 0 1px #D3DAE5;color:var(--ink);font-size:13px;padding:8px 12px"></span>
+    </div>
+    <div class="seg" role="tablist" id="insTabs" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+    <div id="insBody" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div class="updated" id="insUpdated"></div>
+  </div>
+</section>
+
 <!-- ============ EOD REMARKS ============ -->
 <section id="s-eod" class="screen hidden" aria-label="End of day remarks">
   <div class="topbar">
@@ -378,7 +412,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   <a href="#/visit" data-nav="visit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Log visit</a>
   <a href="#/retailers" data-nav="retailers"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>Retailers</a>
   <a href="#/compete" data-nav="compete"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 8h4l-2 6H3z"/><path d="M15 8h4l2 6h-6z"/><path d="M5 8l7-2 7 2"/><path d="M8 21h8"/></svg>Compete</a>
-  <a href="#/team" data-nav="team"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</a>
+  <a href="#/insights" data-nav="insights"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Insights</a>
 </nav>
 
 <div id="sheetRoot"></div>
@@ -479,8 +513,8 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry'];
-const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'team', compete: 'compete' };
+const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights'];
+const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'insights', compete: 'compete', insights: 'insights' };
 
 function route() {
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('?')[0].split('/');
@@ -494,13 +528,13 @@ function route() {
   const navOn = !!NAV_SCREENS[name];
   $('nav').classList.toggle('hidden', !navOn);
   document.querySelectorAll('[data-nav]').forEach((a) => {
-    if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    if (a.dataset.nav === NAV_SCREENS[name]) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   closeSheet();
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg) })[name]();
+  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -603,19 +637,11 @@ function showHome() {
     $('heroBody').innerHTML = `<div class="lite" style="font-size:14px;line-height:1.5">Live sales couldn’t load: ${esc(e.message)}</div><button class="btn soft" style="height:44px;margin-top:10px" onclick="invalidate('perf');showHome()">Try again</button>`;
   });
 
-  whenLoaded(load('trends', '/performance-trends', 15 * 60e3), (data) => {
-    const rows = (data.watchlist_variants || []).filter((r) => Number(r.sales || 0) > 0 && r.dos != null && Number(r.dos) > 25)
-      .sort((a, b) => Number(b.dos) - Number(a.dos));
-    if (!rows.length) { $('dosAlert').innerHTML = ''; return; }
-    const names = rows.slice(0, 3).map((r) => [r.family, r.variant].filter(Boolean).join(' ')).join(', ');
-    $('dosAlert').innerHTML = `<button class="alert warn" id="dosBtn">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg>
-      <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><b style="font-size:15px">${rows.length} model${rows.length > 1 ? 's' : ''} above 25 days of stock</b><span style="font-size:13px" class="ellipsis">${esc(names)} — push these first</span></div>${chevron}</button>`;
-    $('dosBtn').onclick = () => openSheet(`<h2 style="font-size:18px;font-weight:800">High stock models</h2>
-      <p class="note" style="margin:0">Running models with MTD sales and more than 25 days of Good Phone stock.</p>
-      <div class="card" style="padding:6px 16px">${rows.map((r) => `<div class="kv"><div style="display:flex;flex-direction:column;gap:2px"><b>${esc(r.family || '—')}</b><span class="note">${esc(r.variant || '')} · sold ${fmt(r.sales)} · stock ${fmt(r.stock)}</span></div><span class="pill num" style="background:var(--bad-bg);color:var(--bad);align-self:center">${fmt1(r.dos)} days</span></div>`).join('')}</div>
-      <button class="btn dark" onclick="closeSheet()">Got it</button>`);
-  });
+  const ins = insightsLoad();
+  if (!ins.saved) $('homeHighlights').innerHTML = '<div class="skeleton" style="height:170px"></div>';
+  whenLoaded(ins, renderHomeInsights, () => { $('homeHighlights').innerHTML = ''; });
+  const cmp = load('compete', '/competition/summary', 2 * 60e3);
+  if (cmp.pending) cmp.pending.then(() => cache.insights && renderHomeInsights(cache.insights.data)).catch(() => {});
 
   if (FIELD_ROLES.includes(user.role)) {
     whenLoaded(load('eod', '/eod-remarks/retailers', 5 * 60e3), (data) => {
@@ -669,6 +695,7 @@ function renderHero(perf, at) {
         ${s.target ? `<div class="num" style="margin-left:auto;font-size:20px;font-weight:800;color:#8FB0FF">${fmt1(pct)}%</div>` : ''}
       </div>
       ${s.target ? `<div class="bar"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}
+      <div id="heroDeltas" style="display:flex;gap:8px"></div>
       <div class="grid3" style="gap:8px">
         <div class="heroTile"><span>Gap</span><b class="num">${s.target ? fmt(s.gap) : '—'}</b></div>
         <div class="heroTile"><span>Need / day</span><b class="num" style="color:#FFC46B">${s.target ? fmt(Math.ceil(s.required_per_day || 0)) : '—'}</b></div>
@@ -677,6 +704,7 @@ function renderHero(perf, at) {
       <div class="num lite" style="font-size:13px">Value ${money(s.sales_value)} · ASP ${money(s.asp)} · ${fmt(s.zero_sales_retailers)} retailer${s.zero_sales_retailers === 1 ? '' : 's'} with no sale</div>
     </div>`;
   $('homeUpdated').textContent = ago(at);
+  if (cache.insights) renderHomeInsights(cache.insights.data);
 }
 
 $('avatarBtn').addEventListener('click', () => openSheet(`
@@ -1281,6 +1309,291 @@ $('ceSave').addEventListener('click', async () => {
     err.textContent = e.message; err.classList.remove('hidden');
   } finally { btn.disabled = false; btn.textContent = 'Save competition data'; }
 });
+
+/* ---------------- INSIGHTS ---------------- */
+const insightsLoad = () => load('insights', '/insights', 3 * 60e3);
+let insTab = 'Sales', insPeriod = 'month', insHidden = {};
+const LINE_COLORS = ['#2457E6', '#7B57E0', '#1F9D61', '#E08A1E', '#5B6B85'];
+const TONE = { good: 'var(--good-bar)', bad: 'var(--bad-bar)', info: 'var(--brand)' };
+
+function pctInfo(v) {
+  if (v == null || isNaN(v)) return { cls: 'flat', t: '—' };
+  const r = Math.round(v * 10) / 10;
+  return { cls: r > 0 ? 'up' : r < 0 ? 'down' : 'flat', t: (r > 0 ? '▲ ' : r < 0 ? '▼ ' : '') + Math.abs(r).toFixed(Math.abs(r) >= 10 ? 0 : 1) + '%' };
+}
+const deltaLine = (label, v) => { const p = pctInfo(v); return `<span class="dl num">${label} <span class="${p.cls}">${p.t}</span></span>`; };
+const fmtDay = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+const retailerName = (code) => {
+  const r = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === code) || (((cache.master || {}).data) || []).find((x) => x.code === code);
+  return r ? r.name : code;
+};
+
+/* polyline points with gaps for missing values; returns array of point strings (one per segment) */
+function linePts(values, max, w = 300, h = 100) {
+  const n = values.length, segs = [];
+  let cur = [];
+  values.forEach((v, i) => {
+    if (v == null) { if (cur.length) segs.push(cur); cur = []; return; }
+    cur.push(`${((i + 0.5) * w / n).toFixed(1)},${(h - Math.min(v, max) / max * h).toFixed(1)}`);
+  });
+  if (cur.length) segs.push(cur);
+  return segs.map((s) => s.join(' '));
+}
+const polyl = (values, max, color, width, dash) => linePts(values, max).map((p) => `<polyline points="${p}" fill="none" stroke="${color}" stroke-width="${width}" ${dash ? 'stroke-dasharray="4 3"' : ''} stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`).join('');
+
+/* ---- Home highlights ---- */
+function renderHomeInsights(d) {
+  if (!d || !$('homeHighlights')) return;
+  const m = d.periods && d.periods.month;
+  const hd = $('heroDeltas');
+  if (hd && m) {
+    hd.innerHTML = [['vs last week', m.wow.units_pct], ['vs last month', m.mom.units_pct], ['vs last year', m.yoy.units_pct]].map(([l, v]) => {
+      const p = pctInfo(v);
+      return `<div class="heroDelta"><span>${l}</span><b class="num" style="color:${p.cls === 'up' ? '#7EE0A8' : p.cls === 'down' ? '#FF9B91' : '#C9D3EA'}">${p.t}</b></div>`;
+    }).join('');
+  }
+  const l14 = d.last14 || [];
+  const max = Math.max(1, ...l14.map((x) => x.units || 0));
+  const top = (d.insights || [])[0];
+  const topModel = (d.models || [])[0];
+  const grow = (d.models || []).filter((x) => x.mtd >= 10 && x.mom_pct != null).sort((a, b) => b.mom_pct - a.mom_pct)[0];
+  const high = d.stock ? d.stock.act_on.filter((a) => a.flag === 'high') : null;
+  const share = marketNow();
+  $('homeHighlights').innerHTML = `
+    <a class="card" href="#/insights/Sales" style="display:flex;flex-direction:column;gap:10px;color:var(--ink)">
+      <div class="between"><b style="font-size:16px">Last 14 days</b><span style="font-size:13px;font-weight:700;color:var(--brand)">All insights ›</span></div>
+      <div style="height:70px;display:flex;align-items:flex-end;gap:4px">${l14.map((x, i) => `<div title="${fmtDay(x.date)}: ${x.units ?? '—'}" style="flex:1;height:${Math.max(3, Math.round((x.units || 0) / max * 100))}%;border-radius:3px 3px 0 0;background:${i === l14.length - 1 ? 'var(--brand)' : '#B7CCFF'}"></div>`).join('')}</div>
+      ${top ? `<div style="display:flex;gap:8px;align-items:flex-start;border-top:1px solid #EEF1F6;padding-top:10px"><i style="width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;background:${TONE[top.tone] || TONE.info}"></i><span style="font-size:14px;line-height:1.45"><b>${esc(top.title)}.</b> ${esc(top.body)}</span></div>` : ''}
+    </a>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px">
+      <a class="tile" href="#/insights/Models"><span>Top model</span><b>${topModel ? esc(topModel.model) : '—'}</b><span class="num note">${topModel ? `${fmt(topModel.mtd)} MTD · ${fmt1(topModel.share)}% share` : ''}</span></a>
+      <a class="tile" href="#/insights/Models"><span>Fastest growing</span><b>${grow ? esc(grow.model) : '—'}</b><span class="num ${grow ? 'up' : 'note'}" style="font-size:12px">${grow ? '▲ ' + Math.round(grow.mom_pct) + '% vs last month' : 'Not enough data yet'}</span></a>
+      <a class="tile" href="#/insights/Stock" style="${high && high.length ? 'background:var(--warn-bg);color:#7A3E06' : ''}"><span style="${high && high.length ? 'color:#7A3E06' : ''}">Stock watch</span><b>${high == null ? '—' : high.length ? high.length + ' model' + (high.length > 1 ? 's' : '') : 'All healthy'}</b><span style="font-size:12px">${high && high.length ? 'above 25 days of stock' : d.stock ? fmt1(d.stock.dos) + ' days overall' : ''}</span></a>
+      <a class="tile" href="#/insights/Market"><span>Counter share</span><b class="num">${share ? 'vivo ' + share.vivo + '%' : '—'}</b><span class="num note" style="font-size:12px">${share ? share.reporting + ' retailers reported' : 'Add competition data'}</span></a>
+    </div>`;
+}
+
+/* vivo share this month from competition entries + insights retailer units */
+function marketNow() {
+  const c = (cache.compete || {}).data, d = (cache.insights || {}).data;
+  if (!c || !d || !(c.retailers || []).length) return null;
+  const units = (d.retailer_units_by_month || {})[c.month] || {};
+  const vivo = c.retailers.reduce((a, r) => a + Number(units[r.code] || 0), 0);
+  const comp = c.retailers.reduce((a, r) => a + r.competitor_units, 0);
+  return vivo + comp ? { vivo: Math.round(vivo * 100 / (vivo + comp)), reporting: c.retailers_reporting } : null;
+}
+
+/* ---- Insights screen ---- */
+function showInsights(arg) {
+  if (['Sales', 'Models', 'Stock', 'Market'].includes(arg)) insTab = arg;
+  $('insScope').textContent = `${user.role} · ${firstName(user.name)}`;
+  const l = insightsLoad();
+  if (!l.saved) {
+    renderInsTabs();
+    $('insBody').innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px"><b>Crunching this month’s numbers…</b><span class="note">The first load of the day pulls a lot of V-Work history and can take up to a minute. After that it’s quick.</span><div class="skeleton" style="height:160px"></div></div><div class="skeleton" style="height:220px"></div>`;
+  }
+  whenLoaded(l, renderInsights, (e) => {
+    $('insBody').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" onclick="invalidate('insights');showInsights()">Try again</button>`;
+  });
+  const p = perfLoad(); if (p.pending) p.pending.then(() => renderInsights()).catch(() => {});
+  const c = load('compete', '/competition/summary', 2 * 60e3); if (c.pending) c.pending.then(() => renderInsights()).catch(() => {});
+  const t = load('ctrend', '/competition/trend?months=3', 10 * 60e3); if (t.pending) t.pending.then(() => renderInsights()).catch(() => {});
+}
+function renderInsTabs() {
+  $('insTabs').innerHTML = ['Sales', 'Models', 'Stock', 'Market'].map((t) => `<button role="tab" data-ins="${t}" aria-selected="${t === insTab}">${t}</button>`).join('');
+}
+function renderInsights() {
+  if ($('s-insights').classList.contains('hidden')) return;
+  renderInsTabs();
+  const d = (cache.insights || {}).data; if (!d) return;
+  $('insAsOf').textContent = `Live from V-Work · ${fmtDay(d.as_of)}`;
+  const body = { Sales: insSales, Models: insModels, Stock: insStock, Market: insMarket }[insTab](d);
+  $('insBody').innerHTML = body + ((d.source && d.source.days_failed && d.source.days_failed.length) ? `<div class="note">V-Work didn’t return ${d.source.days_failed.length} day${d.source.days_failed.length > 1 ? 's' : ''} of history; comparisons may be slightly off until it refreshes.</div>` : '');
+  $('insUpdated').textContent = ago((cache.insights || {}).at);
+}
+$('insTabs').addEventListener('click', (e) => { const b = e.target.closest('[data-ins]'); if (b) { insTab = b.dataset.ins; history.replaceState(null, '', '#/insights/' + insTab); renderInsights(); window.scrollTo(0, 0); } });
+$('insBody').addEventListener('click', (e) => {
+  const p = e.target.closest('[data-period]'); if (p) { insPeriod = p.dataset.period; renderInsights(); return; }
+  const h = e.target.closest('[data-hide]'); if (h) { insHidden[h.dataset.hide] = !insHidden[h.dataset.hide]; renderInsights(); }
+});
+
+function insSales(d) {
+  const P = d.periods[insPeriod];
+  const perf = (cache.perf || {}).data;
+  const s = perf ? perf.summary : null;
+  const cur = P.current;
+  const k = (label, value, key) => `<div class="kpi"><span>${label}</span><b class="num">${value}</b>${key ? `<div style="display:flex;flex-direction:column;gap:2px">${deltaLine('WoW', P.wow[key])}${deltaLine('MoM', P.mom[key])}${deltaLine('YoY', P.yoy[key])}</div>` : ''}</div>`;
+  const kpis = [
+    k('Units sold', fmt(cur.units), 'units_pct'),
+    k('Sales value', money(cur.value), 'value_pct'),
+    k('ASP', money(cur.asp), 'asp_pct'),
+    k('Productive retailers', `${fmt(cur.productive)}${d.retailers_in_scope ? ' / ' + fmt(d.retailers_in_scope) : ''}`, 'productive_pct'),
+    insPeriod === 'month' && s ? k('Achievement', s.target ? fmt1(s.achievement_pct) + '%' : '—') : '',
+    insPeriod === 'month' && s ? k('Need per day', s.target ? fmt(Math.ceil(s.required_per_day || 0)) : '—') : ''
+  ].join('');
+  const note = { day: 'Today vs same day last week, month, year', week: 'Last 7 days vs the same 7 days', month: 'Month to date vs same days' }[insPeriod];
+
+  const daily = d.daily || [];
+  const vals = daily.map((x) => x.units), avg = daily.map((x) => x.avg7), ly = daily.map((x) => x.ly_avg7);
+  const max = Math.max(5, ...vals.filter((v) => v != null), ...avg.filter((v) => v != null), ...ly.filter((v) => v != null)) * 1.1;
+  const ticks = [Math.round(max), Math.round(max / 2), 0];
+  const chart = `<div class="chart" style="height:170px">
+      <div style="position:absolute;inset:0 0 18px 28px;display:flex;align-items:flex-end;gap:2px">${daily.map((x, i) => `<div title="${fmtDay(x.date)}: ${x.units ?? '—'}" style="flex:1;height:${x.units == null ? 0 : Math.max(1, x.units / max * 100)}%;background:${i === daily.length - 1 ? 'var(--brand)' : '#9DB8FF'};border-radius:3px 3px 0 0"></div>`).join('')}</div>
+      <svg viewBox="0 0 300 100" preserveAspectRatio="none" style="position:absolute;left:28px;top:0;width:calc(100% - 28px);height:152px;overflow:visible" aria-hidden="true">${polyl(avg, max, '#0E1B33', 1.8)}${polyl(ly, max, '#E08A1E', 1.8, true)}</svg>
+      <div class="num" style="position:absolute;left:0;top:0;bottom:18px;display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:#6B7A93">${ticks.map((t) => `<span>${t}</span>`).join('')}</div>
+      <div class="num" style="position:absolute;left:28px;right:0;bottom:0;display:flex;justify-content:space-between;font-size:10px;color:#6B7A93"><span>${daily.length ? fmtDay(daily[0].date) : ''}</span><span>${daily.length ? fmtDay(daily[daily.length - 1].date) : ''}</span></div>
+    </div>`;
+
+  const series = (d.series || []).slice(0, 6);
+  const smax = Math.max(1, ...series.map((x) => x.units));
+  const ins = d.insights || [];
+
+  let team = '';
+  if (perf && perf.hierarchy) {
+    const own = { TL: 'tl', SS: 'ss', RDS: 'rds' }[user.role];
+    const lvl = ['tl', 'ss', 'rds'].find((x) => x !== own && (perf.hierarchy[x] || []).filter((g) => g.name !== 'Unassigned' && g.target).length);
+    if (lvl) {
+      const rows = perf.hierarchy[lvl].filter((g) => g.name !== 'Unassigned' && g.target).sort((a, b) => b.achievement_pct - a.achievement_pct).slice(0, 6);
+      team = `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+        <div class="between"><h2 style="font-size:17px;font-weight:800">By ${lvl.toUpperCase()}</h2><a href="#/team" style="font-size:13px;font-weight:700">Team view ›</a></div>
+        ${rows.map((g) => { const p = g.achievement_pct; const c = p >= 90 ? ['var(--good-bar)', 'var(--good)'] : p >= 70 ? ['var(--bar)', 'var(--brand-ink)'] : ['var(--warn-bar)', 'var(--warn)'];
+          return `<div style="display:flex;flex-direction:column;gap:6px"><div class="between" style="font-size:14px"><span style="font-weight:600" class="ellipsis">${esc(g.name)}</span><b class="num" style="color:${c[1]}">${fmt1(p)}%</b></div><div class="bar"><i style="width:${Math.min(100, p)}%;background:${c[0]}"></i></div><span class="num note" style="font-size:12px">${fmt(g.sales)} / ${fmt(g.target)} units</span></div>`; }).join('')}
+      </div>`;
+    }
+  }
+
+  return `
+    <div style="display:flex;gap:8px">${[['day', 'Day'], ['week', 'Week'], ['month', 'Month']].map(([k2, l]) => `<button class="chip dark" style="flex:1;height:38px" data-period="${k2}" aria-pressed="${k2 === insPeriod}">${l}</button>`).join('')}</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div class="between"><h2 style="font-size:17px;font-weight:800">Sales overview</h2><span class="note" style="font-size:12px">${note}</span></div>
+      <div class="kpiGrid">${kpis}</div>
+      ${P.wow_note ? `<span class="note" style="font-size:12px">WoW here: ${esc(P.wow_note.toLowerCase())}.</span>` : ''}
+    </div>
+    <div class="insightBox">
+      <div class="row" style="gap:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2457E6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg><h2 style="font-size:17px;font-weight:800">What changed</h2></div>
+      ${ins.length ? ins.map((x) => `<div class="insight"><i style="background:${TONE[x.tone] || TONE.info}"></i><div style="display:flex;flex-direction:column;gap:3px"><b style="font-size:14px;line-height:1.4">${esc(x.title)}</b><span class="note" style="font-size:13px">${esc(x.body)}</span></div></div>`).join('') : '<div class="insight note">Nothing unusual this month so far.</div>'}
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="between"><h2 style="font-size:17px;font-weight:800">Daily sell-out</h2><span class="num note" style="font-size:12px">This month · units</span></div>
+      ${chart}
+      <div class="legend"><span><i style="width:10px;height:10px;border-radius:2px;background:#4C7DFF"></i>Daily units</span><span><i style="width:14px;height:2px;background:#0E1B33"></i>7-day average</span><span><i style="width:14px;border-top:2px dashed #E08A1E"></i>Last year, 7-day avg</span></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="between"><h2 style="font-size:17px;font-weight:800">By series</h2><span class="note" style="font-size:12px">MTD units · vs last year</span></div>
+      ${series.length ? series.map((x) => { const p = pctInfo(x.yoy_pct); return `<div style="display:grid;grid-template-columns:56px minmax(0,1fr) 48px 60px;align-items:center;gap:10px"><b>${esc(x.series)}</b><div class="bar" style="height:12px"><i style="width:${Math.round(x.units / smax * 100)}%;background:var(--bar)"></i></div><span class="num" style="font-weight:700;text-align:right">${fmt(x.units)}</span><span class="num ${p.cls}" style="font-size:12px;text-align:right">${p.t}</span></div>`; }).join('') : '<div class="note">No sales yet this month.</div>'}
+    </div>
+    ${team}`;
+}
+
+function insModels(d) {
+  const models = d.models || [];
+  const total = models.reduce((a, m) => a + m.mtd, 0);
+  const cols = 'minmax(0,1.6fr) 0.8fr 0.9fr 0.9fr 0.9fr';
+  const table = `<div class="card" style="display:flex;flex-direction:column;gap:2px">
+    <div class="between" style="padding-bottom:8px"><h2 style="font-size:17px;font-weight:800">Top selling models</h2><span class="note" style="font-size:12px">Units</span></div>
+    <div class="tbl num" style="grid-template-columns:${cols};font-size:11px;font-weight:700;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line)"><span>Model</span><span style="text-align:right">Today</span><span style="text-align:right">MTD</span><span style="text-align:right">Share</span><span style="text-align:right">MoM</span></div>
+    ${models.map((m) => { const p = pctInfo(m.mom_pct); return `<div class="tbl num" style="grid-template-columns:${cols};padding:9px 0;border-bottom:1px solid #EEF1F6"><span class="ellipsis" style="font-weight:600">${esc(m.model)}</span><span style="text-align:right">${fmt(m.today)}</span><b style="text-align:right">${fmt(m.mtd)}</b><span style="text-align:right">${fmt1(m.share)}%</span><span class="${m.mom_pct == null ? 'flat' : p.cls}" style="text-align:right;font-size:12px">${m.mom_pct == null ? 'New' : p.t}</span></div>`; }).join('') || '<div class="note">No sales yet this month.</div>'}
+    ${models.length ? `<div class="tbl num" style="grid-template-columns:${cols};padding:9px 0;font-weight:800"><span>Top ${models.length}</span><span></span><span style="text-align:right">${fmt(total)}</span><span></span><span></span></div>` : ''}
+  </div>`;
+
+  const tr = d.model_trend || { days: [], lines: [] };
+  const lmax = Math.max(3, ...tr.lines.flatMap((l) => l.units.filter((v) => v != null))) * 1.1;
+  const trend = tr.lines.length ? `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div class="between"><h2 style="font-size:17px;font-weight:800">Model trend</h2><span class="note" style="font-size:12px">Daily units · tap to hide</span></div>
+    <svg viewBox="0 0 300 100" preserveAspectRatio="none" style="width:100%;height:180px;overflow:visible" role="img" aria-label="Daily units per model this month">
+      <line x1="0" y1="100" x2="300" y2="100" stroke="#E3E8F0" vector-effect="non-scaling-stroke"/><line x1="0" y1="50" x2="300" y2="50" stroke="#EEF1F6" vector-effect="non-scaling-stroke"/>
+      ${tr.lines.map((l, i) => insHidden[l.model] ? '' : polyl(l.units, lmax, LINE_COLORS[i % 5], i === 0 ? 2.6 : 1.8)).join('')}
+    </svg>
+    <div class="num" style="display:flex;justify-content:space-between;font-size:10px;color:#6B7A93;margin-top:-6px"><span>${tr.days.length ? fmtDay(tr.days[0]) : ''}</span><span>${tr.days.length ? fmtDay(tr.days[tr.days.length - 1]) : ''}</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${tr.lines.map((l, i) => `<button class="chip" data-hide="${esc(l.model)}" aria-pressed="false" style="height:32px;font-size:12px;display:flex;align-items:center;gap:6px;${insHidden[l.model] ? 'opacity:.45' : ''}"><i style="width:10px;height:10px;border-radius:3px;background:${LINE_COLORS[i % 5]}"></i>${esc(l.model)}</button>`).join('')}</div>
+  </div>` : '';
+
+  const npl = d.new_launches || [];
+  const spark = (arr) => { const m = Math.max(1, ...arr); return arr.map((v, i) => `${(i / Math.max(1, arr.length - 1) * 80).toFixed(1)},${(26 - v / m * 24).toFixed(1)}`).join(' '); };
+  const launches = `<div class="card" style="display:flex;flex-direction:column;gap:4px">
+    <div class="between" style="padding-bottom:6px"><h2 style="font-size:17px;font-weight:800">New launches</h2><span class="note" style="font-size:12px">This month</span></div>
+    ${npl.length ? npl.map((n) => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #EEF1F6"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b style="font-size:15px">${esc(n.model)}</b><span class="num note" style="font-size:12px">First sale ${n.first_seen ? fmtDay(n.first_seen) : '—'} · ${fmt1(n.per_day)}/day${n.stock != null ? ' · stock ' + fmt(n.stock) : ''}</span></div><svg viewBox="0 0 80 28" style="width:80px;height:28px" aria-hidden="true"><polyline points="${spark(n.daily)}" fill="none" stroke="#2457E6" stroke-width="2" stroke-linejoin="round"/></svg><b class="num" style="font-size:16px;width:44px;text-align:right">${fmt(n.mtd)}</b></div>`).join('') : '<div class="note" style="padding:6px 0 10px">No newly launched models selling this month.</div>'}
+  </div>`;
+  return table + trend + launches;
+}
+
+function insStock(d) {
+  const st = d.stock;
+  if (!st) return '<div class="card note">Stock data isn’t available from V-Work right now. Pull down later or tap Refresh in your profile.</div>';
+  const diff = st.dos != null && st.dos_week_ago != null ? Math.round(st.dos - st.dos_week_ago) : null;
+  const hero = `<div class="hero" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+    <div class="stat"><span style="color:#C9D3EA">Stock</span><b class="num" style="font-size:24px">${fmt(st.total)}</b><span style="font-size:12px;color:#C9D3EA">units</span></div>
+    <div class="stat"><span style="color:#C9D3EA">Selling</span><b class="num" style="font-size:24px">${fmt1(st.avg_daily)}</b><span style="font-size:12px;color:#C9D3EA">per day</span></div>
+    <div class="stat"><span style="color:#C9D3EA">Days of stock</span><b class="num" style="font-size:24px;color:#FFC46B">${st.dos == null ? '—' : Math.round(st.dos)}</b><span class="num" style="font-size:12px;color:#C9D3EA">${diff == null ? '' : diff === 0 ? 'same as last week' : (diff > 0 ? '▲ ' : '▼ ') + Math.abs(diff) + ' vs last week'}</span></div>
+  </div>`;
+  const ser = st.by_series.slice(0, 6);
+  const cap = 80;
+  const chart = `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div class="between"><h2 style="font-size:17px;font-weight:800">Days of stock by series</h2><span class="note" style="font-size:12px">Line = 25 days</span></div>
+    <div style="position:relative;height:190px;display:flex;align-items:flex-end;gap:14px;padding:0 4px 22px">
+      <div style="position:absolute;left:0;right:0;bottom:calc(22px + 168px * ${25 / cap});border-top:2px dashed #E08A1E"></div>
+      ${ser.map((x) => { const v = x.dos == null ? cap : Math.min(cap, x.dos); const hi = x.dos == null || x.dos > 25; return `<div style="flex:1;height:100%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center"><div class="num" style="position:absolute;bottom:calc(${v / cap * 100}% + 4px);font-size:12px;font-weight:800;color:${hi ? 'var(--bad)' : 'var(--brand-ink)'}">${x.dos == null ? 'no sale' : Math.round(x.dos)}</div><div style="width:100%;height:${v / cap * 100}%;border-radius:6px 6px 0 0;background:${hi ? '#F2B8B2' : '#B7CCFF'}"></div><span style="position:absolute;bottom:-20px;font-size:12px;font-weight:700">${esc(x.series)}</span></div>`; }).join('')}
+    </div>
+    <div class="num" style="display:grid;grid-template-columns:repeat(${Math.max(1, ser.length)},minmax(0,1fr));gap:14px;padding:0 4px;font-size:11px;color:var(--muted);text-align:center">${ser.map((x) => `<span>${fmt(x.stock)} in stock</span>`).join('')}</div>
+  </div>`;
+  const act = `<div class="card" style="padding:6px 16px">
+    <div class="between" style="padding:10px 0 6px"><h2 style="font-size:17px;font-weight:800">Models to act on</h2><span class="note" style="font-size:12px">Highest risk first</span></div>
+    ${st.act_on.length ? st.act_on.map((m) => `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #EEF1F6"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b style="font-size:15px">${esc(m.model)}</b><span class="num note" style="font-size:12px">Sells ${fmt1(m.per_day)}/day · stock ${fmt(m.stock)} · ${esc(m.action)}</span></div><span class="pill num" style="background:${m.flag === 'high' ? 'var(--bad-bg)' : 'var(--warn-bg)'};color:${m.flag === 'high' ? 'var(--bad)' : 'var(--warn)'}">${m.dos == null ? 'No sales' : Math.round(m.dos) + ' days ' + (m.flag === 'high' ? '▲' : '▼')}</span></div>`).join('') : '<div class="note" style="padding:6px 0 12px">Every model is between 7 and 25 days of stock.</div>'}
+  </div>`;
+  const ret = st.retailers.length ? `<div class="card" style="padding:6px 16px">
+    <div style="padding:10px 0 6px"><h2 style="font-size:17px;font-weight:800">Retailers holding most stock</h2></div>
+    ${st.retailers.map((r) => `<a href="#/r/${encodeURIComponent(r.code)}" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #EEF1F6;color:var(--ink)"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b class="ellipsis" style="font-size:15px">${esc(retailerName(r.code))}</b><span class="num note" style="font-size:12px">Stock ${fmt(r.stock)} · sold ${fmt(r.mtd)} MTD</span></div><b class="num" style="font-size:15px;color:var(--bad)">${r.dos == null ? 'No sales' : Math.round(r.dos) + ' days'}</b></a>`).join('')}
+  </div>` : '';
+  return hero + chart + act + ret;
+}
+
+function insMarket(d) {
+  const c = (cache.compete || {}).data, t = (cache.ctrend || {}).data;
+  if (!c || !t) return '<div class="skeleton" style="height:200px"></div>';
+  const ru = d.retailer_units_by_month || {};
+  const brands = ['vivo', ...t.brands];
+  const shares = t.months.filter((m) => m.retailers_reporting > 0).map((m) => {
+    const vu = Object.keys(m.retailers).reduce((a, code) => a + Number((ru[m.month] || {})[code] || 0), 0);
+    const units = { vivo: vu, ...m.brands };
+    const tot = Object.values(units).reduce((a, b) => a + b, 0);
+    const pct = {}; brands.forEach((b) => { pct[b] = tot ? Math.round(units[b] * 100 / tot) : 0; });
+    return { month: m.month, pct, reporting: m.retailers_reporting, vivoKnown: ru[m.month] != null };
+  });
+  if (!shares.length || shares[shares.length - 1].month !== c.month) {
+    return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b>No competition data yet this month</b><span class="note">Counter share appears once the team adds competitor units at their retailers.</span><a class="btn soft" href="#/compete">Go to Compete</a></div>';
+  }
+  const now = shares[shares.length - 1], prev = shares.length > 1 ? shares[shares.length - 2] : null;
+  const legend = brands.map((b) => { const dl = prev ? now.pct[b] - prev.pct[b] : null; return `<div style="display:flex;align-items:center;gap:8px;font-size:14px"><i style="width:10px;height:10px;border-radius:3px;background:${BRAND_COLOR[b]}"></i><span style="flex:1;font-weight:${b === 'vivo' ? 800 : 600}">${esc(b)}</span><b class="num">${now.pct[b]}%</b>${dl == null ? '' : `<span class="num ${dl > 0 ? 'up' : dl < 0 ? 'down' : 'flat'}" style="font-size:12px;width:36px;text-align:right">${dl > 0 ? '▲' : dl < 0 ? '▼' : ''}${Math.abs(dl)}</span>`}</div>`; }).join('');
+  const shareCard = `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="between"><h2 style="font-size:17px;font-weight:800">Counter share · ${esc(monthName(now.month).split(' ')[0])}</h2><span class="num" style="font-size:13px;font-weight:800;color:var(--brand-ink)">vivo ${now.pct.vivo}%</span></div>
+    <div style="display:flex;height:22px;border-radius:8px;overflow:hidden;gap:2px">${brands.filter((b) => now.pct[b]).map((b) => `<div style="width:${now.pct[b]}%;background:${BRAND_COLOR[b]}"></div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px">${legend}</div>
+    <span class="note" style="font-size:12px">${now.reporting} retailer${now.reporting === 1 ? '' : 's'} reported this month${prev ? ' · change vs ' + monthName(prev.month).split(' ')[0] : ''}. Competitor units come from team entries; vivo units from V-Work for the same retailers.</span>
+  </div>`;
+  const trend = shares.length > 1 ? `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <div class="between"><h2 style="font-size:17px;font-weight:800">Share trend</h2><span class="note" style="font-size:12px">By month</span></div>
+    <svg viewBox="0 0 300 100" preserveAspectRatio="none" style="width:100%;height:160px;overflow:visible" role="img" aria-label="Monthly counter share">${brands.map((b) => polyl(shares.map((x) => x.pct[b]), 60, BRAND_COLOR[b], b === 'vivo' ? 3 : 1.8)).join('')}</svg>
+    <div class="num" style="display:flex;justify-content:space-around;font-size:11px;color:#6B7A93">${shares.map((x) => `<span>${esc(monthName(x.month).split(' ')[0].slice(0, 3))}</span>`).join('')}</div>
+  </div>` : `<div class="card note">The share trend starts building from next month, once there are two months of competition data.</div>`;
+
+  const cur = ru[c.month] || {};
+  const losing = c.retailers.map((r) => {
+    const v = Number(cur[r.code] || 0), tot = v + r.competitor_units;
+    const top2 = Object.entries(r.brands).filter(([, u]) => u != null).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    return { ...r, vivo: v, share: tot ? Math.round(v * 100 / tot) : null, detail: top2.map(([b, u]) => `${b} ${u}`).concat([`vivo ${v}`]).join(' · ') };
+  }).filter((r) => r.share != null).sort((a, b) => a.share - b.share).slice(0, 5);
+  const losingCard = `<div class="card" style="padding:6px 16px">
+    <div class="between" style="padding:10px 0 6px"><h2 style="font-size:17px;font-weight:800">Where vivo is losing</h2><span class="note" style="font-size:12px">Lowest share</span></div>
+    ${losing.map((r) => `<a href="#/r/${encodeURIComponent(r.code)}" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #EEF1F6;color:var(--ink)"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><b class="ellipsis" style="font-size:15px">${esc(r.name)}</b><span class="num note" style="font-size:12px">${esc(r.detail)}</span></div><span class="pill num" style="background:${r.share >= 30 ? 'var(--good-bg)' : 'var(--bad-bg)'};color:${r.share >= 30 ? 'var(--good)' : 'var(--bad)'}">vivo ${r.share}%</span></a>`).join('')}
+  </div>`;
+  const weekAgo = Date.now() - 7 * 86400e3;
+  const moves = (c.activity || []).filter((a) => new Date(a.created_at).getTime() >= weekAgo).slice(0, 5);
+  const movesCard = `<div class="card" style="padding:6px 16px">
+    <div style="padding:10px 0 6px"><h2 style="font-size:17px;font-weight:800">Competitor moves this week</h2></div>
+    ${moves.length ? moves.map((a) => `<div style="display:flex;gap:10px;padding:11px 0;border-top:1px solid #EEF1F6"><i style="width:10px;height:10px;border-radius:3px;margin-top:5px;flex-shrink:0;background:${BRAND_COLOR[a.brand]}"></i><div style="display:flex;flex-direction:column;gap:3px"><b style="font-size:14px">${esc(a.brand)}: ${a.offer ? esc(a.offer) + (a.offer_amount ? ' ' + money(a.offer_amount) : '') : 'launched ' + esc(a.launch_model) + (a.launch_price ? ' at ' + money(a.launch_price) : '')}</b><span class="note" style="font-size:12px">${esc(a.retailer_name)} · ${esc(a.submitted_by)} · ${esc(whenIso(a.created_at))}</span></div></div>`).join('') : '<div class="note" style="padding:6px 0 12px">No competitor offers or launches logged in the last 7 days.</div>'}
+  </div>`;
+  return shareCard + trend + losingCard + movesCard;
+}
 
 /* ---------------- EOD ---------------- */
 function showEod() {
