@@ -708,7 +708,7 @@ function getGPS(timeout = 15000) {
 function setGpsText() {
   const line = $('gpsLine');
   if (gps) { line.style.color = 'var(--good)'; $('gpsText').textContent = `Location captured · ±${Math.round(gps.accuracy || 0)} m`; }
-  else { line.style.color = 'var(--bad)'; $('gpsText').innerHTML = 'Location is off. <a href="#" id="gpsRetry">Turn on and retry</a>'; $('gpsRetry').onclick = async (e) => { e.preventDefault(); $('gpsText').textContent = 'Getting your location…'; await getGPS(); setGpsText(); findNearby(); }; }
+  else { line.style.color = 'var(--bad)'; $('gpsText').innerHTML = 'Location is off. <a href="#" id="gpsRetry">Turn on and retry</a>'; $('gpsRetry').onclick = async (e) => { e.preventDefault(); $('gpsText').textContent = 'Getting your location…'; await getGPS(); setGpsText(); findNearby(false); }; }
 }
 
 function showVisit(code) {
@@ -731,17 +731,19 @@ function showVisit(code) {
     if (!visitState.retailer) showSearch();
   }).catch((e) => toast(e.message, true));
 
-  getGPS().then(() => { setGpsText(); if (!code) findNearby(); });
+  getGPS().then(() => { setGpsText(); if (!code) findNearby(true); });
 }
 
-async function findNearby() {
+// autoPick: only on first opening the screen. After the user taps Change,
+// nearby retailers are offered as a list but never selected for them.
+async function findNearby(autoPick) {
   if (!gps || visitState.retailer) return;
   try {
     const near = await api(`/retailers/nearby?lat=${gps.latitude}&lng=${gps.longitude}&radius_m=400&limit=4`);
     if (visitState.retailer || !near.length) return;
     const master = (cache.master || {}).data || [];
     const full = (n) => master.find((x) => x.code === n.code) || n;
-    if (near[0].distance_m <= 150) { pickRetailer(full(near[0]), near[0].distance_m); return; }
+    if (autoPick && near[0].distance_m <= 150) { pickRetailer(full(near[0]), near[0].distance_m); return; }
     $('nearbyList').innerHTML = `<div class="note" style="margin:4px 0 6px">Near you</div>` + near.map((n) =>
       `<button class="listCard" style="padding:12px 14px;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:8px" data-code="${esc(n.code)}" data-dist="${n.distance_m}">
         <div style="flex:1;min-width:0"><b class="ellipsis" style="display:block;font-size:15px">${esc(n.name)}</b><span class="note">${fmt(n.distance_m)} m away · ${esc(n.town_name || '')}</span></div>${chevron}</button>`).join('');
@@ -772,7 +774,7 @@ function pickRetailer(r, dist) {
       <div class="stat"><span>MTD</span><b class="num" style="font-size:16px">${fmt(row.sales)}${row.target ? ' / ' + fmt(row.target) : ''}</b></div>
       <div class="stat"><span>Stock</span><b class="num" style="font-size:16px">${row.stock == null ? '—' : fmt(row.stock)}</b></div>
       <div class="stat"><span>Last visit</span><b style="font-size:16px">${esc(daysLabel(row.days_since_visit))}</b></div></div>` : ''}`;
-  $('changeRetailer').onclick = () => { visitState.retailer = null; showSearch(); $('retailerQuery').focus(); if (gps) findNearby(); };
+  $('changeRetailer').onclick = () => { visitState.retailer = null; $('nearbyList').innerHTML = ''; $('retailerQuery').value = ''; $('retailerPicker').classList.add('hidden'); showSearch(); $('retailerQuery').focus(); if (gps) findNearby(false); };
 }
 
 $('retailerQuery').addEventListener('input', () => {

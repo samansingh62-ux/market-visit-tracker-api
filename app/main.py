@@ -633,7 +633,9 @@ def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="You can only log visits for retailers assigned to you.")
     payload.submitted_by = user.get("name", "Manager")
     payload.submitted_role = user.get("role", "MANAGER")
-    return crud.create_visit(payload)
+    visit = crud.create_visit(payload)
+    _clear_perf_cache()  # last-visit dates on the dashboard change
+    return visit
 
 
 @app.get("/visits", response_model=List[VisitOut])
@@ -1845,8 +1847,36 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
     }
 
 
+_PERF_CACHE_TTL_SECONDS = int(os.getenv("PERF_CACHE_TTL_SECONDS", "120"))
+_perf_cache: dict = {}
+_perf_cache_lock = __import__("threading").Lock()
+
+
+def _clear_perf_cache() -> None:
+    with _perf_cache_lock:
+        _perf_cache.clear()
+
+
 @app.get("/performance-dashboard")
 def performance_dashboard(user: dict = Depends(get_dashboard_user)):
+    """Cached per user for a short time; the home screen, EOD remarks and
+    reports all reuse it instead of each rebuilding it from V-Work."""
+    key = (str(user.get("role") or ""), str(user.get("name") or ""), date.today().isoformat())
+    now = time.monotonic()
+    with _perf_cache_lock:
+        hit = _perf_cache.get(key)
+        if hit and now - hit[0] < _PERF_CACHE_TTL_SECONDS:
+            return hit[1]
+        # Drop stale entries so the cache can't grow without bound.
+        for k in [k for k, v in _perf_cache.items() if now - v[0] >= _PERF_CACHE_TTL_SECONDS]:
+            _perf_cache.pop(k, None)
+    result = _build_performance_dashboard(user)
+    with _perf_cache_lock:
+        _perf_cache[key] = (time.monotonic(), result)
+    return result
+
+
+def _build_performance_dashboard(user: dict):
     """Hierarchy-aware retailer performance for TL, SS, RDS, KAM and management."""
     today = date.today()
     month = today.strftime("%Y-%m")
