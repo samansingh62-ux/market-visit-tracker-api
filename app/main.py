@@ -353,7 +353,7 @@ def mobile_icon():
 
 @app.get("/app/sw.js", include_in_schema=False)
 def mobile_service_worker():
-    return FileResponse(STATIC_DIR / "sw.js", media_type="text/javascript", headers={**_APP_NO_CACHE, "Service-Worker-Allowed": "/app/"})
+    return FileResponse(STATIC_DIR / "sw.js", media_type="text/javascript", headers={**_APP_NO_CACHE, "Service-Worker-Allowed": "/app"})
 
 
 def _distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
