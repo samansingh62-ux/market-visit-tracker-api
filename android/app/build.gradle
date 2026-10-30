@@ -42,7 +42,9 @@ android {
         release {
             minifyEnabled false
             def ks = System.getenv('ANDROID_KEYSTORE_FILE')
-            signingConfig (ks && file(ks).exists()) ? signingConfigs.release : signingConfigs.debug
+            def useStableKey = ks != null && file(ks).exists()
+            def chosenSigning = useStableKey ? signingConfigs.release : signingConfigs.debug
+            signingConfig = chosenSigning
         }
     }
 
