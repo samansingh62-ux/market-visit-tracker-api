@@ -47,7 +47,15 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: gradle assembleRelease --no-daemon --stacktrace
+        run: |
+          set -o pipefail
+          if ! gradle assembleRelease --no-daemon 2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
+            # Surface the failure reason as annotations so it shows on the run summary.
+            grep -E "error:|e: |What went wrong|^> |AAPT|Execution failed|Could not" "$RUNNER_TEMP/gradle.log" | head -25 | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+            exit 1
+          fi
 
       - name: Name the APK
         run: cp android/app/build/outputs/apk/release/app-release.apk MarketVisit.apk
