@@ -172,6 +172,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 /* notifications & chat */
 .hdrBtn{position:relative;background:#fff;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
 .badge{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}
+.badge.navBadge{top:0;right:calc(50% - 26px)}
 .badge.dot{min-width:10px;width:10px;height:10px;padding:0;top:4px;right:calc(50% - 16px)}
 .nItem{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;padding:14px 16px;border:0;text-align:left;width:100%;color:var(--ink)}
 .nItem.unread{box-shadow:inset 3px 0 0 var(--brand)}
@@ -256,7 +257,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
         <h1 id="homeHello" style="font-size:22px;font-weight:800">Hi</h1>
       </div>
       <div class="row" style="gap:8px">
-        <a class="iconBtn hdrBtn" href="#/chat" aria-label="Chat"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.1A8.5 8.5 0 1 1 21 12z"/></svg><span class="badge hidden" data-badge="chat"></span></a>
+        <a class="iconBtn hdrBtn" href="#/insights" aria-label="Insights"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></a>
         <a class="iconBtn hdrBtn" href="#/notifications" aria-label="Notifications"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="badge hidden" data-badge="notif"></span></a>
         <button class="avatar" id="avatarBtn" aria-label="Profile and settings">—</button>
       </div>
@@ -438,10 +439,9 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 </section>
 
 <!-- ============ CHAT LIST ============ -->
-<section id="s-chats" class="screen hidden" aria-label="Chats">
+<section id="s-chats" class="screen withNav hidden" aria-label="Chats">
   <div class="topbar">
-    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-    <h1 style="flex:1">Chats</h1>
+    <h1 style="flex:1;padding-left:4px">Chats</h1>
     <button class="chip" id="newChat" style="height:36px;background:var(--brand);color:#fff;box-shadow:none;font-weight:700">+ New chat</button>
   </div>
   <div class="scroll" style="padding-top:4px">
@@ -481,11 +481,11 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 
 <!-- bottom navigation -->
 <nav class="nav hidden" id="nav" aria-label="Main">
-  <a href="#/home" data-nav="home" style="position:relative"><span class="badge dot hidden" data-badge="any"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#/home" data-nav="home" style="position:relative"><span class="badge dot hidden" data-badge="notif"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
   <a href="#/visit" data-nav="visit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Log visit</a>
   <a href="#/retailers" data-nav="retailers"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>Retailers</a>
   <a href="#/compete" data-nav="compete"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 8h4l-2 6H3z"/><path d="M15 8h4l2 6h-6z"/><path d="M5 8l7-2 7 2"/><path d="M8 21h8"/></svg>Compete</a>
-  <a href="#/insights" data-nav="insights"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Insights</a>
+  <a href="#/chat" data-nav="chats" style="position:relative"><span class="badge navBadge hidden" data-badge="chat"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.1A8.5 8.5 0 1 1 21 12z"/></svg>Chat</a>
 </nav>
 
 <div id="sheetRoot"></div>
@@ -589,7 +589,7 @@ function logout(message) {
 /* ---------------- router ---------------- */
 let afterRoute = null;
 const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
-const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'insights', compete: 'compete', insights: 'insights' };
+const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
   const parts = (location.hash || '#/home').replace(/^#\/?/, '').split('?')[0].split('/');
