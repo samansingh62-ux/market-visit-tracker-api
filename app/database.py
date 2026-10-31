@@ -487,6 +487,15 @@ def init_db():
         for name, (role, pin_hash) in pin_seeds.items():
             conn.execute("UPDATE users SET pin_hash = %s WHERE name = %s AND role = %s", (pin_hash, name, role))
 
+        # Zone-wide CEO login. The PIN hash lives only in the CEO_PIN_HASH environment variable.
+        ceo_pin_hash = os.getenv("CEO_PIN_HASH", "").strip()
+        if ceo_pin_hash:
+            conn.execute("""
+                INSERT INTO users (name, role, username, pin_hash, active)
+                VALUES (%s, 'CEO', 'ceo', %s, TRUE)
+                ON CONFLICT (name, role) DO UPDATE SET pin_hash = EXCLUDED.pin_hash, active = TRUE
+            """, (os.getenv("CEO_NAME", "Evan").strip() or "Evan", ceo_pin_hash))
+
         # Apply the explicit SS-to-TL role correction without losing credentials or history.
         conn.execute("""
             UPDATE users AS tl_user
