@@ -245,11 +245,25 @@ def send_push(user_ids: Iterable[int], title: str, body: str, link: str = "#/hom
     sent = 0
     with httpx.Client(timeout=15.0) as client:
         for tok in tokens:
+            is_chat = str(tag).startswith("chat")
             msg = {"message": {
                 "token": tok,
-                # data-only so the app always builds the notification and knows where to open
+                # A notification payload is shown by the phone itself even when the app is closed
+                # (many vivo/Oppo/Xiaomi phones block data-only wake-ups). The data part carries
+                # the link: tapping opens the app with it, and an open app builds its own.
+                "notification": {"title": title[:120], "body": body[:400]},
                 "data": {"title": title[:120], "body": body[:400], "link": link or "#/home", "tag": tag},
-                "android": {"priority": "HIGH"},
+                "android": {
+                    "priority": "HIGH",
+                    "notification": {
+                        "channel_id": "chat" if is_chat else "updates",
+                        "tag": tag,
+                        "icon": "ic_stat_notify",
+                        "color": "#2457E6",
+                        "default_sound": True,
+                        "notification_priority": "PRIORITY_HIGH" if is_chat else "PRIORITY_DEFAULT",
+                    },
+                },
             }}
             try:
                 r = client.post(url, json=msg, headers={"Authorization": f"Bearer {access}"})
