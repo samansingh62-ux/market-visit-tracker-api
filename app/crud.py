@@ -318,6 +318,9 @@ def list_users_admin() -> list:
                 u.username,
                 u.active,
                 u.whatsapp_number,
+                to_char(u.last_seen_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_seen_at,
+                to_char(u.last_login_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_login_at,
+                u.last_client,
                 COUNT(r.code) AS assigned_retailers
             FROM users u
             LEFT JOIN retailers r
@@ -340,7 +343,10 @@ def list_users_admin() -> list:
                 u.kam,
                 u.username,
                 u.active,
-                u.whatsapp_number
+                u.whatsapp_number,
+                u.last_seen_at,
+                u.last_login_at,
+                u.last_client
             ORDER BY u.role, u.name
         """).fetchall()
 

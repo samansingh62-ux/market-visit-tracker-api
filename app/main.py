@@ -17,7 +17,7 @@ import httpx
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, File, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
@@ -582,11 +582,33 @@ def nearby_retailers(
     return out[:limit]
 
 
+def _client(request: Request) -> str:
+    return engage.client_label(request.headers.get("user-agent", ""), request.headers.get("referer", ""))
+
+
+@app.middleware("http")
+async def _track_last_active(request: Request, call_next):
+    """Keep each signed-in user's 'last active' time (written at most every 5 minutes)."""
+    response = await call_next(request)
+    auth_header = request.headers.get("authorization", "")
+    if response.status_code < 400 and auth_header.lower().startswith("bearer "):
+        try:
+            from .auth import decode_token
+            sub = decode_token(auth_header[7:].strip()).get("sub")
+            if sub:
+                from starlette.concurrency import run_in_threadpool
+                await run_in_threadpool(engage.touch_seen, sub, _client(request))
+        except Exception:
+            pass
+    return response
+
+
 @app.post("/auth/login", response_model=LoginOut)
-def login(payload: LoginRequest):
+def login(payload: LoginRequest, request: Request):
     user = crud.get_user_by_username(payload.username)
     if not user or not user.get("password_hash") or not verify_password(payload.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
+    engage.record_login(user, "password", _client(request))
     token = create_token(user)
     safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "kam", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
@@ -604,10 +626,11 @@ def pin_users():
 
 
 @app.post("/auth/pin-login", response_model=LoginOut)
-def pin_login(payload: PinLoginRequest):
+def pin_login(payload: PinLoginRequest, request: Request):
     user = crud.get_user_by_pin(payload.pin)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid PIN.")
+    engage.record_login(user, "PIN", _client(request))
     token = create_token(user)
     safe_user = {k: user.get(k) for k in ("id", "name", "role", "tl", "ss", "rds", "kam", "active")}
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
@@ -1096,6 +1119,12 @@ async def admin_upload_targets(
         "filename": file.filename,
         "message": "Monthly retailer targets imported successfully.",
     }
+
+
+@app.get("/admin/logins", dependencies=[Depends(require_admin_key)])
+def admin_logins(days: int = Query(default=7, ge=1, le=90)):
+    """Recent sign-ins: who, when, PIN or password, and from the Android app, phone browser or website."""
+    return engage.recent_logins(days)
 
 
 @app.get("/admin/users",

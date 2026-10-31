@@ -91,6 +91,9 @@ class AdminUserOut(BaseModel):
     active: bool
     assigned_retailers: int
     whatsapp_number: Optional[str] = None
+    last_seen_at: Optional[str] = None
+    last_login_at: Optional[str] = None
+    last_client: Optional[str] = None
 
 
 class WhatsappNumberUpdate(BaseModel):

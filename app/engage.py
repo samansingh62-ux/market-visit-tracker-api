@@ -36,6 +36,21 @@ def init_tables() -> None:
                 read_at TEXT
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS login_events (
+                id BIGSERIAL PRIMARY KEY,
+                user_id BIGINT,
+                name TEXT NOT NULL,
+                role TEXT NOT NULL,
+                method TEXT NOT NULL,
+                client TEXT NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_login_events_time ON login_events(created_at DESC)")
+        conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ")
+        conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ")
+        conn.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_client TEXT")
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_notifications_dedupe ON notifications(user_id, dedupe_key) WHERE dedupe_key IS NOT NULL")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, id DESC)")
         conn.execute("""
@@ -434,3 +449,62 @@ def thread_info(thread_id: int) -> Optional[dict]:
             "SELECT u.id, u.name, u.role FROM chat_members m JOIN users u ON u.id = m.user_id WHERE m.thread_id = %s ORDER BY u.name",
             (thread_id,)).fetchall()]
         return info
+
+
+# ---------------------------------------------------------------- sign-ins and last active
+_seen_lock = threading.Lock()
+_seen_at: dict = {}
+SEEN_EVERY_SECONDS = 300
+
+
+def client_label(user_agent: str, referer: str) -> str:
+    """Android app, the phone app opened in a browser, or the full website."""
+    ua = user_agent or ""
+    if "MarketVisitApp/" in ua:
+        return "Android app"
+    if "/app" in (referer or ""):
+        return "Phone browser"
+    return "Website"
+
+
+def record_login(user: dict, method: str, client: str) -> None:
+    try:
+        with database.get_conn() as conn:
+            conn.execute(
+                "INSERT INTO login_events (user_id, name, role, method, client) VALUES (%s,%s,%s,%s,%s)",
+                (user.get("id"), user.get("name") or "", user.get("role") or "", method, client),
+            )
+            conn.execute(
+                "UPDATE users SET last_login_at = now(), last_seen_at = now(), last_client = %s WHERE id = %s",
+                (client, user.get("id")),
+            )
+        with _seen_lock:
+            _seen_at[user.get("username")] = time.time()
+    except Exception as exc:
+        log.warning("login record failed: %s", exc)
+
+
+def touch_seen(username: str, client: str) -> None:
+    """Mark a signed-in user active; written at most every few minutes per user."""
+    if not username:
+        return
+    now = time.time()
+    with _seen_lock:
+        if now - _seen_at.get(username, 0) < SEEN_EVERY_SECONDS:
+            return
+        _seen_at[username] = now
+    try:
+        with database.get_conn() as conn:
+            conn.execute("UPDATE users SET last_seen_at = now(), last_client = %s WHERE username = %s", (client, username))
+    except Exception as exc:
+        log.warning("last-seen update failed: %s", exc)
+
+
+def recent_logins(days: int = 7, limit: int = 300) -> list[dict]:
+    with database.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT name, role, method, client, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS at "
+            "FROM login_events WHERE created_at >= now() - make_interval(days => %s) ORDER BY created_at DESC LIMIT %s",
+            (days, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
