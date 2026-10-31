@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "642062370359",
+    "project_id": "market-visit-27862",
+    "storage_bucket": "market-visit-27862.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642062370359:android:f9658fd1383d24fdfea1b2",
+        "android_client_info": {
+          "package_name": "com.zonea.marketvisit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoypScXLLyTgrFc-P9iweS0YSW13NoVes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
