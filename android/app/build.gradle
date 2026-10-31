@@ -2,6 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
+// Push notifications switch on once the Firebase config file is in place.
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
+}
+
 // Each GitHub Actions run gets a higher version number so phones see it as an update.
 def runNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
 
@@ -56,4 +61,6 @@ android {
 
 dependencies {
     implementation 'androidx.core:core:1.13.1'
+    implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    implementation 'com.google.firebase:firebase-messaging'
 }

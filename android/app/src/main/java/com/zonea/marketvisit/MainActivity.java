@@ -12,7 +12,9 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Build;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -27,8 +29,11 @@ import android.widget.TextView;
 
 import androidx.core.content.FileProvider;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 /**
  * Thin Android shell around the Market Visit phone app.
@@ -41,6 +46,9 @@ public class MainActivity extends Activity {
     private static final int REQ_FILE = 1;
     private static final int REQ_LOCATION = 2;
     private static final int REQ_CAMERA = 3;
+    private static final int REQ_NOTIFY = 4;
+    static final String EXTRA_LINK = "link";
+    private static WeakReference<MainActivity> current = new WeakReference<>(null);
 
     private WebView web;
     private View offlineView;
@@ -58,6 +66,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         appHost = Uri.parse(BuildConfig.APP_URL).getHost();
+        current = new WeakReference<>(this);
+        PushService.ensureChannels(this);
 
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.parseColor("#F4F6FA"));
@@ -71,6 +81,7 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(false);
         s.setMediaPlaybackRequiresUserGesture(true);
         s.setUserAgentString(s.getUserAgentString() + " MarketVisitApp/" + BuildConfig.VERSION_NAME);
+        web.addJavascriptInterface(new Bridge(), "AndroidApp");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -142,7 +153,65 @@ public class MainActivity extends Activity {
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
         } else {
-            web.loadUrl(BuildConfig.APP_URL);
+            web.loadUrl(BuildConfig.APP_URL + linkFrom(getIntent()));
+        }
+
+        askNotificationPermission();
+        fetchPushToken();
+    }
+
+    /** "#/chat/5" style link carried by a tapped notification, or "" if none. */
+    private static String linkFrom(Intent intent) {
+        String link = intent == null ? null : intent.getStringExtra(EXTRA_LINK);
+        return (link != null && link.startsWith("#")) ? link : "";
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String link = linkFrom(intent);
+        if (link.isEmpty()) return;
+        String url = web.getUrl();
+        if (url != null && url.startsWith(BuildConfig.APP_URL)) {
+            web.evaluateJavascript("location.hash = " + JSONObject.quote(link) + ";", null);
+        } else {
+            web.loadUrl(BuildConfig.APP_URL + link);
+        }
+    }
+
+    private void askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIFY);
+        }
+    }
+
+    /** Ask Firebase for this phone's push address; quietly skipped if Firebase isn't set up in this build. */
+    private void fetchPushToken() {
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    PushService.saveToken(this, task.getResult());
+                    notifyTokenChanged();
+                }
+            });
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** Tell the web app a (new) push token is available so it can register it with the server. */
+    static void notifyTokenChanged() {
+        MainActivity a = current.get();
+        if (a == null) return;
+        a.runOnUiThread(() -> a.web.evaluateJavascript("window.onPushToken && window.onPushToken();", null));
+    }
+
+    /** Small bridge the web app can call: window.AndroidApp.getPushToken(). */
+    private class Bridge {
+        @JavascriptInterface
+        public String getPushToken() {
+            return PushService.savedToken(MainActivity.this);
         }
     }
 

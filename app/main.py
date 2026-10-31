@@ -1,6 +1,7 @@
 """Market Visit Tracker API with GTM hierarchy and retailer intelligence."""
 
 import asyncio
+import logging
 import calendar
 import csv
 import io
@@ -23,6 +24,7 @@ from fastapi.responses import FileResponse, StreamingResponse, Response
 from . import crud, database
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
+from . import engage, engage_routes
 from .auth import get_current_user, get_dashboard_user, hash_password, require_admin_key, require_manager, verify_password, create_token
 from .schemas import (
     AdminUserOut,
@@ -294,10 +296,19 @@ def _festive_scheme_payout(club_value, scheme_sales):
     }
 
 
+app.include_router(engage_routes.router)
+
+
 @app.on_event("startup")
 def on_startup():
     database.init_db()
     whatsapp_mcp.init_tables()
+    engage.init_tables()
+
+
+@app.on_event("startup")
+async def start_notification_scheduler():
+    app.state.notification_task = asyncio.create_task(_notification_scheduler())
 
 
 @app.on_event("startup")
@@ -432,7 +443,43 @@ def submit_competition(payload: CompetitionSubmit, user: dict = Depends(get_curr
         submitted_by=str(user.get("name") or "Manager"),
         submitted_role=str(user.get("role") or "MANAGER"),
     )
+    try:
+        _notify_competitor_moves(code, str(retailer.get("name") or code), saved, user)
+    except Exception:
+        pass  # alerts are best-effort; the data is saved
     return {"saved": len(saved), "entries": [_competition_row_out(r) for r in saved]}
+
+
+def _retailer_audience(code: str) -> list[int]:
+    """User ids of everyone whose TL/SS/RDS/KAM area includes this retailer."""
+    users = engage.active_users()
+    idx = {(u["role"], canonical_name(u["name"])): u["id"] for u in users}
+    ids = set()
+    for a in alignment.assignments(code):
+        for role in ("TL", "SS", "RDS", "KAM"):
+            uid = idx.get((role, canonical_name(a.get(role.lower()))))
+            if uid:
+                ids.add(uid)
+    return sorted(ids)
+
+
+def _notify_competitor_moves(code: str, name: str, saved: list, user: dict) -> None:
+    moves = [r for r in saved if r.get("offer") or r.get("launch_model")]
+    if not moves:
+        return
+    sender = engage.user_by_username(str(user.get("sub") or ""))
+    audience = [u for u in _retailer_audience(code) if not sender or u != sender["id"]]
+    for r in moves:
+        if r.get("offer"):
+            title = f"{r['brand']} offer at {name}"
+            body = r["offer"] + (f" (₹{int(r['offer_amount']):,})" if r.get("offer_amount") else "")
+        else:
+            title = f"{r['brand']} launched {r['launch_model']}"
+            body = f"Seen at {name}" + (f" · ₹{int(r['launch_price']):,}" if r.get("launch_price") else "")
+        body += f" · logged by {user.get('name')}"
+        for uid in audience:
+            engage.add_notification(uid, "competition", title, body, f"#/r/{code}",
+                                    dedupe_key=f"comp:{r['id']}")
 
 
 @app.get("/competition/retailers/{retailer_code}")
@@ -1418,6 +1465,114 @@ def _claim_zone_broadcast(trigger: str = "MANUAL") -> Optional[dict]:
         audience="TL",
         trigger=trigger,
     )
+
+
+def _hhmm(env: str, default: str) -> int:
+    try:
+        h, m = (os.getenv(env, default) or default).split(":")
+        return int(h) * 60 + int(m)
+    except Exception:
+        h, m = default.split(":")
+        return int(h) * 60 + int(m)
+
+
+def _as_token_user(u: dict) -> dict:
+    return {"sub": None, "name": u["name"], "role": u["role"], "tl": u.get("tl"), "ss": u.get("ss"), "rds": u.get("rds")}
+
+
+def _job_target_update(day: str) -> None:
+    """Evening: each person's MTD vs target, gap and need per day."""
+    for u in engage.active_users():
+        try:
+            perf = performance_dashboard(_as_token_user(u))
+            s = perf.get("summary") or {}
+            if not s.get("target"):
+                continue
+            title = f"{s.get('sales', 0):,} / {s.get('target', 0):,} units · {s.get('achievement_pct', 0)}%"
+            body = (f"Today {s.get('ftd_sales', 0)} sold. Gap {s.get('gap', 0):,}, need "
+                    f"{int(-(-float(s.get('required_per_day') or 0) // 1))}/day for {perf.get('period', {}).get('days_remaining', '')} days.")
+            engage.add_notification(u["id"], "target", title, body, "#/insights/Sales", dedupe_key=f"target:{day}")
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("target notification failed for %s: %s", u.get("name"), exc)
+
+
+def _job_eod_reminder(day: str) -> None:
+    """Remind TL/SS/RDS who still have low-sale retailers without an EOD remark."""
+    for u in engage.active_users(("TL", "SS", "RDS")):
+        try:
+            data = eod_remark_retailers(_as_token_user(u))
+            pending = [r for r in data.get("retailers") or [] if not r.get("remark")]
+            if not pending:
+                continue
+            names = ", ".join(str(r.get("name") or "") for r in pending[:3])
+            engage.add_notification(u["id"], "eod", f"{len(pending)} end-of-day remark{'s' if len(pending) != 1 else ''} to add",
+                                    f"{names}{' and more' if len(pending) > 3 else ''}.", "#/eod", dedupe_key=f"eod:{day}")
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("EOD reminder failed for %s: %s", u.get("name"), exc)
+
+
+def _job_stock_sales(day: str) -> None:
+    """Morning: retailers high on stock / out of stock, and retailers that stopped selling."""
+    stopped: set = set()
+    try:
+        headers = {"Content-Type": "application/json"}
+        if VWORK_LIVE_API_KEY:
+            headers["X-API-Key"] = VWORK_LIVE_API_KEY
+        with httpx.Client(timeout=httpx.Timeout(600.0, connect=10.0)) as client:
+            r = _vwork_request(client, "POST", f"{VWORK_LIVE_API_URL}/api/v1/insights", json={"store_codes": []}, headers=headers)
+        r.raise_for_status()
+        stopped = {str(c).upper() for c in (r.json().get("stopped_selling") or [])}
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning("zone insights for alerts failed: %s", exc)
+    for u in engage.active_users():
+        try:
+            perf = performance_dashboard(_as_token_user(u))
+            rows = perf.get("retailers") or []
+            high = [x for x in rows if x.get("status") == "High Stock" or (x.get("dos") or 0) > 45]
+            oos = [x for x in rows if x.get("status") == "Out of Stock"]
+            if high or oos:
+                parts = []
+                if high:
+                    parts.append(f"{len(high)} high on stock")
+                if oos:
+                    parts.append(f"{len(oos)} out of stock on selling models")
+                names = ", ".join(str(x.get("name")) for x in (oos + high)[:3])
+                engage.add_notification(u["id"], "stock", "Stock alert: " + " · ".join(parts), names + ".",
+                                        "#/insights/Stock", dedupe_key=f"stock:{day}")
+            mine = [x for x in rows if str(x.get("code") or "").upper() in stopped]
+            if mine:
+                names = ", ".join(str(x.get("name")) for x in mine[:3])
+                engage.add_notification(u["id"], "sales", f"{len(mine)} retailer{'s' if len(mine) != 1 else ''} stopped selling this week",
+                                        f"{names}{' and more' if len(mine) > 3 else ''}. They sold the week before.",
+                                        "#/retailers", dedupe_key=f"stopped:{day}")
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("stock/sales alert failed for %s: %s", u.get("name"), exc)
+
+
+NOTIFICATION_JOBS = (
+    ("stock_sales", "NOTIFY_STOCK_TIME", "10:00", _job_stock_sales),
+    ("eod", "NOTIFY_EOD_TIME", "19:00", _job_eod_reminder),
+    ("target", "NOTIFY_TARGET_TIME", "19:30", _job_target_update),
+)
+
+
+async def _notification_scheduler():
+    """Runs each daily job once, at or after its time (IST)."""
+    while True:
+        try:
+            now = datetime.now(IST)
+            today = now.date().isoformat()
+            minutes = now.hour * 60 + now.minute
+            for kind, env, default, fn in NOTIFICATION_JOBS:
+                start = _hhmm(env, default)
+                # only within 3 hours of the slot, so a restart late at night doesn't send stale alerts
+                if start <= minutes < start + 180 and engage.claim_run(kind, today):
+                    await asyncio.to_thread(fn, today)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("notification scheduler error: %s", exc)
+        await asyncio.sleep(60)
 
 
 async def _whatsapp_broadcast_scheduler():

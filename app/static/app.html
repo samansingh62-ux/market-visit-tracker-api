@@ -169,6 +169,32 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 .yn button[aria-pressed="true"]{background:#fff;color:var(--ink)}
 .linkBtn{border:0;background:none;color:var(--brand);font-weight:700;font-size:14px;padding:6px 0;text-align:left}
 
+/* notifications & chat */
+.hdrBtn{position:relative;background:#fff;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.badge{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}
+.badge.dot{min-width:10px;width:10px;height:10px;padding:0;top:4px;right:calc(50% - 16px)}
+.nItem{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;padding:14px 16px;border:0;text-align:left;width:100%;color:var(--ink)}
+.nItem.unread{box-shadow:inset 3px 0 0 var(--brand)}
+.nIcon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.chatRow{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:12px 14px;border:0;width:100%;text-align:left;color:var(--ink)}
+.ava{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;background:var(--brand-soft);color:var(--brand)}
+.ava.grp{background:#E6F5EE;color:var(--good)}
+.unreadPill{min-width:22px;height:22px;border-radius:11px;background:var(--brand);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px}
+#s-chat{background:#EEF1F6}
+.msgs{flex:1;display:flex;flex-direction:column;gap:6px;padding:12px 12px calc(96px + var(--safe-bottom));max-width:640px;width:100%;margin:0 auto}
+.bub{max-width:80%;padding:8px 12px;border-radius:16px;font-size:15px;line-height:1.4;background:#fff;align-self:flex-start;word-wrap:break-word;white-space:pre-wrap}
+.bub.mine{align-self:flex-end;background:#DCE6FF}
+.bub .who{font-size:12px;font-weight:800;color:var(--brand-ink);margin-bottom:2px}
+.bub .t{font-size:11px;color:var(--muted);text-align:right;margin-top:3px}
+.bub img{display:block;max-width:100%;border-radius:12px;margin:-2px -6px 4px;min-height:80px;background:#E3E8F0}
+.rCardMsg{display:flex;gap:10px;align-items:center;background:var(--brand-soft);border-radius:12px;padding:10px;color:var(--ink);margin:2px -4px 4px}
+.dayLbl{align-self:center;font-size:12px;font-weight:700;color:var(--muted);background:#fff;padding:4px 10px;border-radius:999px;margin:6px 0}
+.composer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 10px calc(10px + var(--safe-bottom));z-index:20}
+.composer>div{max-width:640px;margin:0 auto;display:flex;align-items:flex-end;gap:6px}
+.composer textarea{flex:1;border:0;border-radius:20px;padding:11px 14px;background:#F4F6FA;resize:none;max-height:120px;font-size:16px;outline:none}
+.sendBtn{width:44px;height:44px;border-radius:50%;border:0;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sendBtn[disabled]{background:#9DB1E8}
+
 /* insights */
 .kpiGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .kpi{background:#F7F9FC;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -229,7 +255,11 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
         <div id="homeDate" style="font-size:13px;font-weight:600;color:var(--muted)">—</div>
         <h1 id="homeHello" style="font-size:22px;font-weight:800">Hi</h1>
       </div>
-      <button class="avatar" id="avatarBtn" aria-label="Profile and settings">—</button>
+      <div class="row" style="gap:8px">
+        <a class="iconBtn hdrBtn" href="#/chat" aria-label="Chat"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.1A8.5 8.5 0 1 1 21 12z"/></svg><span class="badge hidden" data-badge="chat"></span></a>
+        <a class="iconBtn hdrBtn" href="#/notifications" aria-label="Notifications"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="badge hidden" data-badge="notif"></span></a>
+        <button class="avatar" id="avatarBtn" aria-label="Profile and settings">—</button>
+      </div>
     </div>
 
     <div class="hero" id="heroCard">
@@ -394,6 +424,49 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   </div>
 </section>
 
+<!-- ============ NOTIFICATIONS ============ -->
+<section id="s-notifications" class="screen hidden" aria-label="Notifications">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Notifications</h1>
+    <button class="chip" id="markAllRead" style="height:36px">Mark all read</button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div id="pushNote"></div>
+    <div id="notifList" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</section>
+
+<!-- ============ CHAT LIST ============ -->
+<section id="s-chats" class="screen hidden" aria-label="Chats">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Chats</h1>
+    <button class="chip" id="newChat" style="height:36px;background:var(--brand);color:#fff;box-shadow:none;font-weight:700">+ New chat</button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div id="chatList" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</section>
+
+<!-- ============ CONVERSATION ============ -->
+<section id="s-chat" class="screen hidden" aria-label="Conversation">
+  <div class="topbar" style="background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:15;max-width:none">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div id="chatAva" class="ava" style="width:38px;height:38px;font-size:13px"></div>
+    <button id="chatHead" style="flex:1;min-width:0;border:0;background:none;text-align:left;padding:0">
+      <b id="chatTitle" class="ellipsis" style="display:block;font-size:16px"></b><span id="chatSub" class="note ellipsis" style="display:block;font-size:12px"></span>
+    </button>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="composer"><div>
+    <label class="iconBtn" aria-label="Send a photo" style="color:var(--muted)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><input type="file" accept="image/*" id="chatPhoto" style="display:none"></label>
+    <button class="iconBtn" id="chatRetailer" aria-label="Share a retailer" style="color:var(--muted)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg></button>
+    <textarea id="chatInput" rows="1" placeholder="Message" aria-label="Message"></textarea>
+    <button class="sendBtn" id="chatSend" aria-label="Send" disabled><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div></div>
+</section>
+
 <!-- ============ EOD REMARKS ============ -->
 <section id="s-eod" class="screen hidden" aria-label="End of day remarks">
   <div class="topbar">
@@ -408,7 +481,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 
 <!-- bottom navigation -->
 <nav class="nav hidden" id="nav" aria-label="Main">
-  <a href="#/home" data-nav="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#/home" data-nav="home" style="position:relative"><span class="badge dot hidden" data-badge="any"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
   <a href="#/visit" data-nav="visit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Log visit</a>
   <a href="#/retailers" data-nav="retailers"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>Retailers</a>
   <a href="#/compete" data-nav="compete"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 8h4l-2 6H3z"/><path d="M15 8h4l2 6h-6z"/><path d="M5 8l7-2 7 2"/><path d="M8 21h8"/></svg>Compete</a>
@@ -504,6 +577,8 @@ function invalidate(...keys) {
 }
 
 function logout(message) {
+  const pt = pushToken();
+  if (pt && token) api('/devices/remove', { method: 'POST', json: { token: pt } }).catch(() => {});
   token = null; user = null;
   store.del('mvt_app_token'); store.del('mvt_app_user');
   Object.keys(cache).forEach((k) => delete cache[k]);
@@ -513,7 +588,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights'];
+const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'insights', compete: 'compete', insights: 'insights' };
 
 function route() {
@@ -523,6 +598,8 @@ function route() {
   if (token && name === 'login') { location.replace('#/home'); return; }
   if (name === 'r') name = 'r360';
   if (name === 'c') name = 'centry';
+  if (name === 'chat' && !parts[1]) name = 'chats';
+  if (name !== 'chat') stopChatPoll();
   if (!SCREENS.includes(name)) name = 'home';
   SCREENS.forEach((s) => $('s-' + s).classList.toggle('hidden', s !== name));
   const navOn = !!NAV_SCREENS[name];
@@ -534,7 +611,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg) })[name]();
+  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -598,6 +675,7 @@ async function doLogin() {
       : await api('/auth/pin-login', { method: 'POST', json: { pin } });
     token = out.access_token; user = out.user;
     store.set('mvt_app_token', token); store.set('mvt_app_user', user);
+    registerPush();
     location.hash = '#/home';
   } catch (err) {
     pin = ''; renderPin();
@@ -632,6 +710,7 @@ function showHome() {
   $('homeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + (user.role || '');
   $('homeHello').textContent = 'Hi, ' + firstName(user.name);
   $('avatarBtn').textContent = initials(user.name);
+  refreshCounts();
 
   whenLoaded(perfLoad(), renderHero, (e) => {
     $('heroBody').innerHTML = `<div class="lite" style="font-size:14px;line-height:1.5">Live sales couldn’t load: ${esc(e.message)}</div><button class="btn soft" style="height:44px;margin-top:10px" onclick="invalidate('perf');showHome()">Try again</button>`;
@@ -1595,6 +1674,238 @@ function insMarket(d) {
   return shareCard + trend + losingCard + movesCard;
 }
 
+/* ---------------- PUSH (Android app bridge) ---------------- */
+function pushToken() {
+  try { return window.AndroidApp && window.AndroidApp.getPushToken ? window.AndroidApp.getPushToken() : null; } catch { return null; }
+}
+let pushSent = null;
+function registerPush() {
+  const t = pushToken();
+  if (!t || !token || pushSent === t) return;
+  api('/devices', { method: 'POST', json: { token: t, platform: 'android' } }).then(() => { pushSent = t; }).catch(() => {});
+}
+window.onPushToken = () => registerPush();   // called by the Android app when Firebase hands it a token
+
+/* ---------------- unread counts ---------------- */
+let counts = { unread: 0, chat_unread: 0 };
+function paintBadges() {
+  document.querySelectorAll('[data-badge]').forEach((b) => {
+    const n = b.dataset.badge === 'chat' ? counts.chat_unread : b.dataset.badge === 'notif' ? counts.unread : counts.unread + counts.chat_unread;
+    b.classList.toggle('hidden', !n);
+    if (!b.classList.contains('dot')) b.textContent = n > 99 ? '99+' : n;
+  });
+}
+async function refreshCounts() {
+  if (!token || document.visibilityState === 'hidden') return;
+  try { counts = await api('/notifications/counts'); paintBadges(); } catch { /* offline or not a team login */ }
+}
+setInterval(refreshCounts, 30000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { refreshCounts(); registerPush(); } });
+
+/* ---------------- NOTIFICATIONS ---------------- */
+const N_ICON = {
+  target: ['🎯', 'var(--brand-soft)'], eod: ['📝', 'var(--warn-bg)'], stock: ['📦', 'var(--hi-bg)'],
+  sales: ['📉', 'var(--bad-bg)'], competition: ['⚔️', '#EEF1F6']
+};
+async function showNotifications() {
+  $('notifList').innerHTML = '<div class="skeleton" style="height:76px"></div><div class="skeleton" style="height:76px"></div>';
+  try {
+    const d = await api('/notifications?limit=100');
+    counts = { unread: d.unread, chat_unread: d.chat_unread }; paintBadges();
+    $('pushNote').innerHTML = !d.push_enabled ? '' : pushToken() ? '' : '<div class="card note" style="margin-bottom:8px">Install the latest Market Visit Android app to get these on your phone even when the app is closed.</div>';
+    $('notifList').innerHTML = d.items.length ? d.items.map((n) => {
+      const ic = N_ICON[n.kind] || ['🔔', 'var(--brand-soft)'];
+      return `<button class="nItem ${n.read_at ? '' : 'unread'}" data-nid="${n.id}" data-link="${esc(n.link || '')}">
+        <div class="nIcon" style="background:${ic[1]}" aria-hidden="true">${ic[0]}</div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+          <div class="between"><b style="font-size:15px;line-height:1.35">${esc(n.title)}</b></div>
+          ${n.body ? `<span class="note" style="font-size:13px">${esc(n.body)}</span>` : ''}
+          <span class="note" style="font-size:12px">${esc(whenIso(n.created_at))}</span>
+        </div></button>`;
+    }).join('') : `<div class="card" style="display:flex;flex-direction:column;gap:6px"><b>No notifications yet</b><span class="note">You’ll get your daily target update in the evening, EOD reminders, stock and sales alerts, and competitor moves at your retailers.</span></div>`;
+  } catch (e) { $('notifList').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+$('notifList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-nid]'); if (!b) return;
+  api('/notifications/read', { method: 'POST', json: { ids: [Number(b.dataset.nid)] } }).then(refreshCounts).catch(() => {});
+  if (b.dataset.link) location.hash = b.dataset.link.replace(/^#?/, '#');
+});
+$('markAllRead').addEventListener('click', async () => {
+  try { await api('/notifications/read', { method: 'POST', json: {} }); showNotifications(); } catch (e) { toast(e.message, true); }
+});
+
+/* ---------------- CHAT LIST ---------------- */
+async function showChats() {
+  if (!cache.chats) $('chatList').innerHTML = [1, 2, 3].map(() => '<div class="skeleton" style="height:68px"></div>').join('');
+  else drawChats();
+  try { cache.chats = { at: Date.now(), data: await api('/chat/threads') }; drawChats(); refreshCounts(); }
+  catch (e) { $('chatList').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+function drawChats() {
+  const rows = (cache.chats || {}).data || [];
+  $('chatList').innerHTML = rows.length ? rows.map((t) => `<a class="chatRow" href="#/chat/${t.id}">
+      <div class="ava ${t.kind === 'group' ? 'grp' : ''}">${t.kind === 'group' ? '👥' : esc(initials(t.title))}</div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div class="between"><b class="ellipsis" style="font-size:15px">${esc(t.title)}</b><span class="note" style="font-size:12px;flex-shrink:0">${t.last_message_at ? esc(whenIso(t.last_message_at)) : ''}</span></div>
+        <div class="between"><span class="note ellipsis" style="font-size:13px">${t.last ? (t.kind === 'group' && t.last.sender ? esc(firstName(t.last.sender)) + ': ' : '') + esc(t.last.text) : esc(t.subtitle)}</span>${t.unread ? `<span class="unreadPill num">${t.unread}</span>` : ''}</div>
+      </div></a>`).join('') : '<div class="card note">No chats yet. Tap “New chat” to message someone.</div>';
+}
+$('newChat').addEventListener('click', () => openSheet(`<h2 style="font-size:18px;font-weight:800">New chat</h2>
+  <label class="field"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="peopleQ" placeholder="Search name or role (TL, SS, KAM, RDS)" autocomplete="off" aria-label="Search people"></label>
+  <div id="peopleList" class="picker" style="max-height:52vh"></div>`, async () => {
+  let people = [];
+  const draw = () => {
+    const q = $('peopleQ').value.trim().toLowerCase();
+    const hits = people.filter((p) => !q || (p.name + ' ' + p.role).toLowerCase().includes(q));
+    $('peopleList').innerHTML = hits.length ? hits.map((p) => `<button data-uid="${p.id}">${esc(p.name)}<small>${esc(p.role)}</small></button>`).join('') : '<button disabled>No one matches</button>';
+  };
+  $('peopleQ').oninput = draw;
+  $('peopleList').onclick = async (e) => {
+    const b = e.target.closest('[data-uid]'); if (!b) return;
+    try { const t = await api('/chat/direct', { method: 'POST', json: { user_id: Number(b.dataset.uid) } }); closeSheet(); location.hash = '#/chat/' + t.id; }
+    catch (err) { toast(err.message, true); }
+  };
+  $('peopleList').innerHTML = '<button disabled>Loading…</button>';
+  try { people = await api('/chat/people'); draw(); } catch (err) { $('peopleList').innerHTML = `<button disabled>${esc(err.message)}</button>`; }
+}));
+
+/* ---------------- CONVERSATION ---------------- */
+let chat = { id: null, me: null, last: 0, first: 0, timer: null, kind: 'direct', members: [] };
+const photoUrls = {};
+function stopChatPoll() { if (chat.timer) { clearInterval(chat.timer); chat.timer = null; } }
+const timeOf = (iso) => new Date(iso).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+const dayOf = (iso) => { const d = new Date(iso), t = new Date(); const y = new Date(Date.now() - 864e5);
+  return d.toDateString() === t.toDateString() ? 'Today' : d.toDateString() === y.toDateString() ? 'Yesterday' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); };
+
+async function showChat(id) {
+  stopChatPoll();
+  chat = { id: Number(id), me: null, last: 0, first: 0, timer: null, kind: 'direct', members: [], lastDay: null };
+  $('msgs').innerHTML = '<div class="skeleton" style="height:60px;width:60%"></div>';
+  $('chatTitle').textContent = ''; $('chatSub').textContent = ''; $('chatAva').textContent = '';
+  $('chatInput').value = ''; $('chatSend').disabled = true;
+  try {
+    const d = await api(`/chat/threads/${chat.id}`);
+    Object.assign(chat, { me: d.me, kind: d.kind, members: d.members });
+    $('chatTitle').textContent = d.title;
+    const other = d.members.find((m) => m.id !== d.me);
+    $('chatSub').textContent = d.kind === 'group' ? `${d.members.length} members` : (other ? other.role : '');
+    $('chatAva').className = 'ava' + (d.kind === 'group' ? ' grp' : ''); $('chatAva').style.cssText = 'width:38px;height:38px;font-size:13px';
+    $('chatAva').textContent = d.kind === 'group' ? '👥' : initials(d.title);
+    $('msgs').innerHTML = d.messages.length ? '' : '<div class="dayLbl">Say hello 👋</div>';
+    appendMessages(d.messages, true);
+    chat.timer = setInterval(pollChat, 4000);
+  } catch (e) { $('msgs').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+async function pollChat() {
+  if (!chat.id || document.visibilityState === 'hidden') return;
+  try { const d = await api(`/chat/threads/${chat.id}?after=${chat.last}`); appendMessages(d.messages, false); } catch { /* retry next tick */ }
+}
+function msgHtml(m) {
+  const mine = m.sender_id === chat.me;
+  let inner = '';
+  if (m.kind === 'photo') inner += `<img data-photo="${m.id}" alt="Photo from ${esc(m.sender_name)}">`;
+  if (m.kind === 'retailer') inner += `<a class="rCardMsg" href="#/r/${encodeURIComponent(m.retailer_code)}"><span style="font-size:20px" aria-hidden="true">🏪</span><span style="flex:1;min-width:0"><b class="ellipsis" style="display:block;font-size:14px">${esc(m.retailer_name || m.retailer_code)}</b><span class="note" style="font-size:12px">Open Retailer 360 ›</span></span></a>`;
+  if (m.body) inner += `<div>${esc(m.body)}</div>`;
+  return `<div class="bub ${mine ? 'mine' : ''}" data-mid="${m.id}">${!mine && chat.kind === 'group' ? `<div class="who">${esc(m.sender_name)}</div>` : ''}${inner}<div class="t">${timeOf(m.created_at)}</div></div>`;
+}
+function appendMessages(list, initial) {
+  if (!list.length) return;
+  const nearBottom = initial || (window.innerHeight + window.scrollY >= document.body.scrollHeight - 160);
+  const box = $('msgs');
+  if (initial) box.innerHTML = '';
+  let html = '';
+  list.forEach((m) => {
+    if (box.querySelector(`[data-mid="${m.id}"]`)) return;
+    const day = dayOf(m.created_at);
+    if (day !== chat.lastDay) { html += `<div class="dayLbl">${day}</div>`; chat.lastDay = day; }
+    html += msgHtml(m);
+  });
+  box.insertAdjacentHTML('beforeend', html);
+  chat.last = Math.max(chat.last, ...list.map((m) => m.id));
+  loadPhotos();
+  if (nearBottom) window.scrollTo(0, document.body.scrollHeight);
+  api(`/chat/threads/${chat.id}/read`, { method: 'POST', json: { last_id: chat.last } }).then(refreshCounts).catch(() => {});
+}
+async function loadPhotos() {
+  for (const img of document.querySelectorAll('#msgs img[data-photo]:not([src])')) {
+    const id = img.dataset.photo;
+    if (photoUrls[id]) { img.src = photoUrls[id]; continue; }
+    try {
+      const r = await fetch(`/chat/photos/${id}`, { headers: { Authorization: 'Bearer ' + token } });
+      if (r.ok) { photoUrls[id] = URL.createObjectURL(await r.blob()); img.src = photoUrls[id]; img.onload = () => { if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 400) window.scrollTo(0, document.body.scrollHeight); }; }
+    } catch { /* leave placeholder */ }
+  }
+}
+$('msgs').addEventListener('click', (e) => {
+  const img = e.target.closest('img[data-photo]');
+  if (img && img.src) openSheet(`<img src="${img.src}" alt="Photo" style="width:100%;border-radius:14px"><button class="btn dark" onclick="closeSheet()">Close</button>`);
+});
+$('chatInput').addEventListener('input', () => {
+  const t = $('chatInput'); t.style.height = 'auto'; t.style.height = Math.min(120, t.scrollHeight) + 'px';
+  $('chatSend').disabled = !t.value.trim();
+});
+async function sendChat(payload) {
+  try { const m = await api(`/chat/threads/${chat.id}/messages`, { method: 'POST', json: payload }); appendMessages([m], false); window.scrollTo(0, document.body.scrollHeight); return true; }
+  catch (e) { toast(e.message, true); return false; }
+}
+$('chatSend').addEventListener('click', async () => {
+  const t = $('chatInput'), body = t.value.trim(); if (!body) return;
+  $('chatSend').disabled = true; t.value = ''; t.style.height = 'auto';
+  if (!(await sendChat({ kind: 'text', body }))) { t.value = body; $('chatSend').disabled = false; }
+});
+$('chatPhoto').addEventListener('change', async () => {
+  const f = $('chatPhoto').files[0]; $('chatPhoto').value = '';
+  if (!f) return;
+  openSheet(`<h2 style="font-size:18px;font-weight:800">Send photo</h2><img src="${URL.createObjectURL(f)}" alt="Selected photo" style="width:100%;max-height:50vh;object-fit:contain;border-radius:14px;background:#000">
+    <input class="box" id="photoCaption" placeholder="Add a caption (optional)"><button class="btn" id="photoSend">Send</button>`, () => {
+    $('photoSend').onclick = async () => {
+      $('photoSend').disabled = true; $('photoSend').innerHTML = '<span class="spin"></span> Sending…';
+      try {
+        const small = await shrinkImage(f);
+        const fd = new FormData(); fd.append('file', small, 'photo.jpg'); fd.append('caption', $('photoCaption').value.trim());
+        const r = await fetch(`/chat/threads/${chat.id}/photo`, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
+        if (!r.ok) { let d = {}; try { d = await r.json(); } catch {} throw new Error(d.detail || 'Photo failed to send.'); }
+        closeSheet(); appendMessages([await r.json()], false);
+      } catch (e) { toast(e.message, true); $('photoSend').disabled = false; $('photoSend').textContent = 'Send'; }
+    };
+  });
+});
+function shrinkImage(file) {
+  return new Promise((resolve) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      let w = img.width, h = img.height; const max = 1600;
+      if (Math.max(w, h) > max) { if (w >= h) { h = Math.round(h * max / w); w = max; } else { w = Math.round(w * max / h); h = max; } }
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob((b) => { URL.revokeObjectURL(url); resolve(b || file); }, 'image/jpeg', 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+$('chatRetailer').addEventListener('click', () => openSheet(`<h2 style="font-size:18px;font-weight:800">Share a retailer</h2>
+  <label class="field"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="shareQ" placeholder="Search your retailers" autocomplete="off" aria-label="Search retailers"></label>
+  <input class="box" id="shareNote" placeholder="Add a note (optional)">
+  <div id="shareList" class="picker" style="max-height:40vh"></div>`, () => {
+  const master = (cache.master || {}).data || [];
+  const draw = () => {
+    const q = $('shareQ').value.trim().toLowerCase();
+    const hits = master.filter((r) => !q || (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q)).slice(0, 40);
+    $('shareList').innerHTML = hits.length ? hits.map((r) => `<button data-code="${esc(r.code)}">${esc(r.name)}<small>${esc(r.town_name || '')}</small></button>`).join('') : '<button disabled>No matching retailer</button>';
+  };
+  $('shareQ').oninput = draw;
+  $('shareList').onclick = async (e) => {
+    const b = e.target.closest('[data-code]'); if (!b) return;
+    if (await sendChat({ kind: 'retailer', retailer_code: b.dataset.code, body: $('shareNote').value.trim() })) closeSheet();
+  };
+  if (!master.length) { const m = masterLoad(); if (m.pending) m.pending.then(draw); }
+  draw();
+}));
+$('chatHead').addEventListener('click', () => {
+  if (chat.kind !== 'group') return;
+  openSheet(`<h2 style="font-size:18px;font-weight:800">${esc($('chatTitle').textContent)}</h2><div class="card" style="padding:6px 16px">${chat.members.map((m) => `<div class="kv"><span>${esc(m.name)}</span><span class="note">${esc(m.role)}</span></div>`).join('')}</div><button class="btn dark" onclick="closeSheet()">Close</button>`);
+});
+
 /* ---------------- EOD ---------------- */
 function showEod() {
   $('eodList').innerHTML = '<div class="skeleton" style="height:150px"></div>';
@@ -1628,7 +1939,7 @@ $('eodList').addEventListener('click', async (e) => {
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('/app/sw.js', { scope: '/app' }).catch(() => {});
 }
-if (token) masterLoad();
+if (token) { masterLoad(); registerPush(); refreshCounts(); }
 route();
 </script>
 </body>
