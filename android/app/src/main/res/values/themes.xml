@@ -2,6 +2,7 @@
 <resources>
     <color name="ink">#0E1B33</color>
     <color name="brand">#2457E6</color>
+    <color name="ic_launcher_background">#E8542E</color>
     <color name="bg">#F4F6FA</color>
 
     <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
