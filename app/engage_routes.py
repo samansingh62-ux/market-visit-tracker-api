@@ -15,7 +15,8 @@ from .auth import get_current_user
 
 router = APIRouter()
 
-ROLE_ORDER = {"CEO": -1, "KAM": 0, "SS": 1, "TL": 2, "RDS": 3}
+CHAT_ROLES = ("TL", "SS", "RDS", "KAM", "ADMIN", "CEO")
+ROLE_ORDER = {"CEO": -2, "ADMIN": -1, "KAM": 0, "SS": 1, "TL": 2, "RDS": 3}
 
 
 def me(user: dict = Depends(get_current_user)) -> dict:
@@ -150,7 +151,7 @@ def _notify_members(thread_id: int, info: dict, sender: dict, preview: str) -> N
 @router.get("/chat/people")
 def chat_people(search: Optional[str] = None, who: dict = Depends(me)):
     q = (search or "").strip().lower()
-    people = [u for u in engage.active_users() if u["id"] != who["id"]]
+    people = [u for u in engage.active_users(CHAT_ROLES) if u["id"] != who["id"]]
     if q:
         people = [u for u in people if q in u["name"].lower() or q in u["role"].lower()]
     people.sort(key=lambda u: (ROLE_ORDER.get(u["role"], 9), u["name"]))
@@ -188,7 +189,7 @@ def chat_threads(who: dict = Depends(me)):
 def chat_direct(payload: DirectIn, who: dict = Depends(me)):
     if payload.user_id == who["id"]:
         raise HTTPException(status_code=400, detail="Pick someone else to chat with.")
-    if not any(u["id"] == payload.user_id for u in engage.active_users()):
+    if not any(u["id"] == payload.user_id for u in engage.active_users(CHAT_ROLES)):
         raise HTTPException(status_code=404, detail="That person isn't an active user.")
     return {"id": engage.ensure_direct_thread(who["id"], payload.user_id)}
 

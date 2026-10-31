@@ -622,7 +622,7 @@ def get_user_by_name_role(name: str, role: str) -> Optional[dict]:
 def get_user_by_pin(pin: str) -> Optional[dict]:
     with database.get_conn() as conn:
         rows = conn.execute(
-            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS','CEO') AND pin_hash IS NOT NULL"
+            "SELECT * FROM users WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS','CEO','ADMIN') AND pin_hash IS NOT NULL"
         ).fetchall()
         matches = []
         for row in rows:
@@ -1062,7 +1062,7 @@ def create_missing_rds_pins(role: str = "RDS", names: tuple | None = None) -> li
         conn.execute("SELECT pg_advisory_xact_lock(724091)")
         users = [dict(row) for row in conn.execute(
             "SELECT id, name, username, role, pin_hash FROM users "
-            "WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS','CEO') FOR UPDATE"
+            "WHERE active = TRUE AND role IN ('TL','SS','KAM','RDS','CEO','ADMIN') FOR UPDATE"
         ).fetchall()]
         hashes = [u["pin_hash"] for u in users if u.get("pin_hash")]
         issued = set()

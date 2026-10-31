@@ -751,7 +751,7 @@ async function checkConnection(){
   setStatus(false,'Disconnected');
   return false;
 }
-async function api(path,opt={}){let h={};if(managerMode&&adminKey)h['X-API-Key']=adminKey;else if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}if(r.status===401&&!managerMode){token='';user=null;sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Session expired');msg('authMsg','Your session expired. Please log in again.');}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
+async function api(path,opt={}){let h={};if(managerMode&&adminKey&&adminKey!==PIN_ADMIN)h['X-API-Key']=adminKey;else if(token)h.Authorization='Bearer '+token;if(opt.body)h['Content-Type']='application/json';let r=await fetch(path,{...opt,headers:{...h,...(opt.headers||{})}});if(!r.ok){let d=r.statusText;try{d=(await r.json()).detail||d}catch{}if(r.status===401&&!managerMode){token='';user=null;sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Session expired');msg('authMsg','Your session expired. Please log in again.');}throw Error(r.status+' '+d)}return r.headers.get('content-type')?.includes('json')?r.json():r}
 async function pinLogin(){
   let pin=$('pin').value.trim();
   if(!/^[0-9]{4}$/.test(pin))return msg('authMsg','Enter your 4-digit PIN.');
@@ -815,6 +815,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   setPerfTabLayout('visits');
   if($('welcomeModal').classList.contains('hidden'))openHighDosWarning();
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
+  if(user.role==='ADMIN'){adminKey=PIN_ADMIN;loadAdminUsers().catch(()=>{})}
 }
 function logout(){closeHighDosWarning();token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
@@ -928,7 +929,7 @@ let eodRetailers=[];
 
 async function loadEodRetailers(){
   if(!$('eodRetailer'))return;
-  const management=user?.role==='MANAGER';
+  const management=['MANAGER','ADMIN','CEO'].includes(user?.role);
   $('eodManagementExport').classList.toggle('hidden',!management);
   $('eodEntryFields').classList.toggle('hidden',management);
   $('eodSave').classList.toggle('hidden',management);
@@ -1079,14 +1080,14 @@ async function performanceDashboard(){
     perfData=await api('/performance-dashboard');
     let role=perfData.user?.role||'';
     let options=[];
-    if(role==='MANAGER'){
+    if(['MANAGER','ADMIN','CEO'].includes(role)){
       options=[
         ...(perfData.hierarchy?.tl||[]).map(x=>x.name),
         ...(perfData.hierarchy?.ss||[]).map(x=>x.name),
         ...(perfData.hierarchy?.rds||[]).map(x=>x.name),
       ];
     }
-    $('perfHierarchyFilterWrap').style.display=role==='MANAGER'?'block':'none';
+    $('perfHierarchyFilterWrap').style.display=['MANAGER','ADMIN','CEO'].includes(role)?'block':'none';
     $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
     renderPerfTables();
   }catch(e){
@@ -1214,7 +1215,7 @@ async function openVisitPhotos(visit){
     let photos=await api('/visits/'+visit.id+'/photos');
     if(!photos.length){$('visitPhotoGrid').innerHTML='<div class="meta">No photos attached to this visit.</div>';return}
     let headers={};
-    if(managerMode&&adminKey)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
+    if(managerMode&&adminKey&&adminKey!==PIN_ADMIN)headers['X-API-Key']=adminKey;else if(token)headers.Authorization='Bearer '+token;
     let cards=[];
     for(let p of photos){
       let response=await fetch(p.url,{headers});
@@ -1297,7 +1298,7 @@ async function priorities(){
     body.innerHTML='<tr><td colspan="8">Priority list unavailable: '+esc(e.message)+'</td></tr>';
   }
 }
-async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(user.role!=='MANAGER')$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
+async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(!['MANAGER','ADMIN','CEO'].includes(user.role))$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));let recent=a.filter(r=>r.priority==='Recently Visited').length,due=a.filter(r=>r.priority==='Due 8–14 Days').length,overdue=a.filter(r=>r.priority==='Overdue 15+ Days'||r.priority==='Never Visited').length;$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('dkNever').textContent=$('mn').textContent;$('covRecent').textContent=recent;$('covDue').textContent=due;$('covOverdue').textContent=overdue;let totalH=Math.max(1,recent+due+overdue);$('barRecent').style.width=(recent*100/totalH)+'%';$('barDue').style.width=(due*100/totalH)+'%';$('barOverdue').style.width=(overdue*100/totalH)+'%';$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
 let kamAreaUsers=[];
 
@@ -1456,9 +1457,10 @@ async function sendKamWaAll(){
 }
 
 let adminKey='';
+const PIN_ADMIN='__pin_admin__'; // an ADMIN signed in by PIN: admin calls use their login token
 let adminUsers=[];
 
-function adminHeaders(){return {'X-API-Key':adminKey}}
+function adminHeaders(){return adminKey===PIN_ADMIN?{Authorization:'Bearer '+token}:{'X-API-Key':adminKey}}
 
 async function uploadTargets(){
   let month=$('targetMonth').value, file=$('targetFile').files[0];
@@ -1517,16 +1519,17 @@ async function loadAdminUsers(){
     if(!r.ok)throw Error(d.detail||'Unable to load users.');
     adminUsers=d;
     managerMode=true;
-    user={name:'Manager',role:'MANAGER',active:true};
+    const pinAdmin=adminKey===PIN_ADMIN;
+    if(!pinAdmin)user={name:'Manager',role:'MANAGER',active:true};
     $('authPanel').classList.add('hidden');
-    $('managerPanel').classList.remove('hidden');
+    if(!pinAdmin)$('managerPanel').classList.remove('hidden');
     $('managerNav').classList.remove('hidden');
     $('app').classList.remove('hidden');
-    $('topUserName').textContent='Manager';
-    $('topUserRole').textContent='Management';
-    $('avatarInitials').textContent='MG';
-    $('userMeta').innerHTML='<b>Manager</b> · Management &nbsp; <span class="muted">Full NESA dashboard access is enabled in management mode.</span>';
-    setStatus(true,'Manager');
+    $('topUserName').textContent=pinAdmin?user.name:'Manager';
+    $('topUserRole').textContent=pinAdmin?'Admin · Zone A':'Management';
+    $('avatarInitials').textContent=pinAdmin?(user.name||'A').slice(0,2).toUpperCase():'MG';
+    $('userMeta').innerHTML=pinAdmin?`<b>${esc(user.name)}</b> · Admin &nbsp; <span class="muted">Full Zone A access, including Management (users, PINs, targets, WhatsApp).</span>`:'<b>Manager</b> · Management &nbsp; <span class="muted">Full NESA dashboard access is enabled in management mode.</span>';
+    setStatus(true,pinAdmin?'Admin':'Manager');
     openHighDosWarning();
     renderAdminUsers();
     renderWaRecipients();
