@@ -2193,6 +2193,33 @@ def _build_performance_dashboard(user: dict):
         str(x.get("retailer_code") or "").strip().upper(): x
         for x in live_rows if x.get("retailer_code")
     }
+    # Chain stores (Reliance/JMD, Croma...) are listed per store: use V-Work's store-level totals.
+    sales_days = max((today - today.replace(day=1)).days + 1, 1)
+    for st_row in store_sales:
+        sc = str(st_row.get("store_code") or "").strip().upper()
+        if not sc or not alignment.is_chain_store(sc):
+            continue
+        mtd = int(st_row.get("sales") or 0)
+        stock_units = int(st_row.get("stock") or 0)
+        avg = round(mtd / sales_days, 2)
+        live_by_code[sc] = {
+            "mtd_sales": mtd,
+            "mtd_sales_value": float(st_row.get("sales_value") or 0),
+            "mtd_asp": float(st_row.get("asp") or 0),
+            "ftd_sales": int(st_row.get("ftd_sales") or 0),
+            "ftd_sales_value": float(st_row.get("ftd_sales_value") or 0),
+            "ftd_asp": float(st_row.get("ftd_asp") or 0),
+            # V-Work reports Good Phone stock per store for chains; no rows means none held.
+            "stock_matched": True,
+            "good_phone_stock": stock_units,
+            "stock_match_basis": "store_code",
+            "avg_daily_sales": avg,
+            "dos": round(stock_units / avg, 1) if avg > 0 else None,
+        }
+    for row in rows:
+        code = str(row.get("code") or "").strip().upper()
+        if alignment.is_chain_store(code) and code not in live_by_code:
+            live_by_code[code] = {"stock_matched": True, "good_phone_stock": 0, "stock_match_basis": "store_code"}
 
     scheme_by_code = {
         str(x.get("retailer_code") or "").strip().upper(): x

@@ -28,9 +28,28 @@ class Alignment:
             self.stores[code] = row
             self.retailers.setdefault(row["retailer_code"], []).append(row)
             self.names.setdefault(norm(row["store_name"]), []).append(row)
+        # Chain retailers (stores under more than one SS or KAM, e.g. Reliance/JMD, Croma)
+        # are worked store by store: each store is its own "unit" in the app.
+        self.chains = {
+            code for code, rs in self.retailers.items()
+            if len({canonical_name(r.get("ss")) for r in rs}) > 1 or len({canonical_name(r.get("kam")) for r in rs}) > 1
+        }
+        self.units = {}
+        for row in rows:
+            self.units.setdefault(self.unit_code(row), []).append(row)
+
+    def unit_code(self, row):
+        """The code the app lists: the store code for chain stores, else the retailer code."""
+        rc = str(row["retailer_code"]).strip().upper()
+        return str(row["store_code"]).strip().upper() if rc in self.chains else rc
+
+    def is_chain_store(self, code):
+        row = self.stores.get(str(code or "").strip().upper())
+        return bool(row) and str(row["retailer_code"]).strip().upper() in self.chains
 
     def assignments(self, code, scope=None):
-        rows = self.retailers.get(str(code).strip().upper(), [])
+        code = str(code).strip().upper()
+        rows = self.units.get(code) or self.retailers.get(code, [])
         return [r for r in rows if self.matches(r, scope or {})]
 
     def matches(self, row, scope):
@@ -39,7 +58,8 @@ class Alignment:
     def store_codes(self, retailer_codes=None, scope=None):
         codes = None if retailer_codes is None else set(retailer_codes)
         return [r["store_code"] for r in self.rows
-                if (codes is None or r["retailer_code"] in codes) and self.matches(r, scope or {})]
+                if (codes is None or r["retailer_code"] in codes or str(r["store_code"]).strip().upper() in codes)
+                and self.matches(r, scope or {})]
 
     def enrich(self, record):
         out = dict(record)

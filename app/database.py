@@ -522,6 +522,15 @@ def init_db():
         """)
 
 
+def chain_store_name(store_name):
+    """'Reliance Retail Jio- Itanagar (Store)' -> 'Reliance Retail Jio- Itanagar'."""
+    name = str(store_name or "").strip()
+    name = name[:-len("(Store)")].strip() if name.endswith("(Store)") else name
+    if name.startswith("Infiniti Retail Limited"):  # Croma's legal name
+        name = "Croma" + name[len("Infiniti Retail Limited"):]
+    return name
+
+
 def apply_alignment(conn):
     """Transactional master update, retaining store grain and every shared assignment."""
     from .alignment import alignment, canonical_name
@@ -534,16 +543,18 @@ def apply_alignment(conn):
         )
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_store_alignment_retailer ON store_alignment(retailer_code)")
+    conn.execute("ALTER TABLE store_alignment ADD COLUMN IF NOT EXISTS unit_code TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_store_alignment_unit ON store_alignment(unit_code)")
     conn.execute("CREATE TABLE IF NOT EXISTS alignment_retailer_backup_20261008 AS SELECT * FROM retailers")
     conn.execute("DELETE FROM store_alignment")
     with conn.cursor() as cur:
         cur.executemany("""
             INSERT INTO store_alignment
-            (store_code, store_name, retailer_code, retailer_name, kam, ss, tl, rds, ss_id, tl_id, source_month)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'2026-10')
+            (store_code, store_name, retailer_code, retailer_name, kam, ss, tl, rds, ss_id, tl_id, source_month, unit_code)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'2026-10',%s)
         """, [(r["store_code"], r["store_name"], r["retailer_code"], r["retailer_name"],
                canonical_name(r["kam"]), canonical_name(r["ss"]), canonical_name(r["tl"]),
-               canonical_name(r["rds"]), r["ss_id"], r["tl_id"]) for r in alignment.rows])
+               canonical_name(r["rds"]), r["ss_id"], r["tl_id"], alignment.unit_code(r)) for r in alignment.rows])
         cur.executemany("""
             INSERT INTO retailers (code,name,tl,ss,rds,kam,zone,club,status,town_name,district_name)
             VALUES (%s,%s,%s,%s,%s,%s,'Zone A',%s,'Active',%s,%s)
@@ -554,5 +565,20 @@ def apply_alignment(conn):
                canonical_name(rows[0]["ss"]), canonical_name(rows[0]["rds"]),
                canonical_name(rows[0]["kam"]), rows[0]["club"] or "",
                rows[0]["town_name"] or "", rows[0]["district_name"] or "")
-              for code, rows in alignment.retailers.items()])
-    conn.execute("UPDATE retailers SET status='Outside current alignment' WHERE code NOT IN (SELECT retailer_code FROM store_alignment)")
+              for code, rows in alignment.retailers.items() if code not in alignment.chains])
+        # Each chain store is listed on its own, named as the store.
+        chain_units = []
+        for code in sorted(alignment.chains):
+            for r in alignment.retailers[code]:
+                name = chain_store_name(r["store_name"])
+                chain_units.append((str(r["store_code"]).strip().upper(), name, canonical_name(r["tl"]),
+                                    canonical_name(r["ss"]), canonical_name(r["rds"]), canonical_name(r["kam"]),
+                                    r["club"] or "", r["town_name"] or "", r["district_name"] or ""))
+        cur.executemany("""
+            INSERT INTO retailers (code,name,tl,ss,rds,kam,zone,club,status,town_name,district_name)
+            VALUES (%s,%s,%s,%s,%s,%s,'Zone A',%s,'Active',%s,%s)
+            ON CONFLICT (code) DO UPDATE SET name=EXCLUDED.name, tl=EXCLUDED.tl, ss=EXCLUDED.ss,
+                rds=EXCLUDED.rds, kam=EXCLUDED.kam, club=EXCLUDED.club,
+                status='Active', town_name=EXCLUDED.town_name, district_name=EXCLUDED.district_name
+        """, chain_units)
+    conn.execute("UPDATE retailers SET status='Outside current alignment' WHERE code NOT IN (SELECT unit_code FROM store_alignment)")
