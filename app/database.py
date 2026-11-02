@@ -582,3 +582,20 @@ def apply_alignment(conn):
                 status='Active', town_name=EXCLUDED.town_name, district_name=EXCLUDED.district_name
         """, chain_units)
     conn.execute("UPDATE retailers SET status='Outside current alignment' WHERE code NOT IN (SELECT unit_code FROM store_alignment)")
+    # Targets are uploaded per retailer; a multi-store retailer's target is shared equally
+    # across its stores (remainder to the first stores) so every total stays the same.
+    conn.execute("DROP VIEW IF EXISTS unit_targets")
+    conn.execute("""
+        CREATE VIEW unit_targets AS
+        WITH units AS (SELECT DISTINCT UPPER(retailer_code) AS retailer_code, unit_code FROM store_alignment),
+        n AS (
+            SELECT retailer_code, unit_code,
+                   COUNT(*) OVER (PARTITION BY retailer_code) AS cnt,
+                   ROW_NUMBER() OVER (PARTITION BY retailer_code ORDER BY unit_code) AS rn
+            FROM units
+        )
+        SELECT t.month, n.unit_code, t.retailer_code, t.retailer_name, t.updated_at,
+               (t.target_volume / n.cnt + CASE WHEN n.rn <= t.target_volume % n.cnt THEN 1 ELSE 0 END)::INTEGER AS target_volume,
+               (t.target_value / n.cnt + CASE WHEN n.rn <= t.target_value % n.cnt THEN 1 ELSE 0 END)::BIGINT AS target_value
+        FROM retailer_targets t JOIN n ON n.retailer_code = UPPER(t.retailer_code)
+    """)

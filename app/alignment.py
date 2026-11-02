@@ -28,12 +28,9 @@ class Alignment:
             self.stores[code] = row
             self.retailers.setdefault(row["retailer_code"], []).append(row)
             self.names.setdefault(norm(row["store_name"]), []).append(row)
-        # Chain retailers (stores under more than one SS or KAM, e.g. Reliance/JMD, Croma)
+        # Retailers with more than one store (Reliance/JMD, Croma, Connecting People...)
         # are worked store by store: each store is its own "unit" in the app.
-        self.chains = {
-            code for code, rs in self.retailers.items()
-            if len({canonical_name(r.get("ss")) for r in rs}) > 1 or len({canonical_name(r.get("kam")) for r in rs}) > 1
-        }
+        self.chains = {code for code, rs in self.retailers.items() if len(rs) > 1}
         self.units = {}
         for row in rows:
             self.units.setdefault(self.unit_code(row), []).append(row)

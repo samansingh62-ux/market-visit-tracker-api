@@ -75,9 +75,9 @@ def get_hierarchy_target_summary(month: str, tl: Optional[str] = None, ss: Optio
             SELECT
                 COALESCE(SUM(t.target_volume), 0) AS target_volume,
                 COALESCE(SUM(t.target_value), 0) AS target_value,
-                COUNT(DISTINCT t.retailer_code) AS target_retailers
-            FROM retailer_targets t
-            JOIN retailers r ON UPPER(r.code) = UPPER(t.retailer_code)
+                COUNT(DISTINCT t.unit_code) AS target_retailers
+            FROM unit_targets t
+            JOIN retailers r ON r.code = t.unit_code
             WHERE {where}
         """, params).fetchone()
         retailers = conn.execute(
@@ -123,8 +123,8 @@ def get_performance_scope_rows(
                 v.last_visit,
                 COALESCE(v.visit_count, 0) AS visit_count
             FROM retailers r
-            LEFT JOIN retailer_targets t
-              ON UPPER(t.retailer_code) = UPPER(r.code) AND t.month = %s
+            LEFT JOIN unit_targets t
+              ON t.unit_code = r.code AND t.month = %s
             LEFT JOIN (
                 SELECT retailer, MAX(visit_date) AS last_visit, COUNT(*) AS visit_count
                 FROM visits
@@ -140,9 +140,9 @@ def get_retailer_target(retailer_code: str, month: str) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute(
             """
-            SELECT month, retailer_code, retailer_name, target_volume, target_value, updated_at
-            FROM retailer_targets
-            WHERE month = %s AND UPPER(retailer_code) = UPPER(%s)
+            SELECT month, unit_code AS retailer_code, retailer_name, target_volume, target_value, updated_at
+            FROM unit_targets
+            WHERE month = %s AND unit_code = UPPER(%s)
             """,
             (month, retailer_code.strip()),
         ).fetchone()
@@ -1040,8 +1040,8 @@ def list_management_eod_remarks(date_from: str, date_to: str) -> list[dict]:
             FROM daily_retailer_remarks d
             LEFT JOIN retailers r
               ON UPPER(TRIM(r.code)) = UPPER(TRIM(d.retailer_code))
-            LEFT JOIN retailer_targets t
-              ON UPPER(TRIM(t.retailer_code)) = UPPER(TRIM(d.retailer_code))
+            LEFT JOIN unit_targets t
+              ON t.unit_code = UPPER(TRIM(d.retailer_code))
              AND t.month = LEFT(d.remark_date, 7)
             LEFT JOIN LATERAL (
                 SELECT MAX(visit_date) AS last_visit, COUNT(*) AS visit_count
