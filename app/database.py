@@ -496,6 +496,20 @@ def init_db():
                 ON CONFLICT (name, role) DO UPDATE SET pin_hash = EXCLUDED.pin_hash, active = TRUE
             """, (os.getenv("ADMIN_NAME", "Saman").strip() or "Saman", admin_pin_hash))
 
+        # More full-access admins: ADMIN_USERS_JSON = [{"name": ..., "username": ..., "pin_hash": ...}].
+        try:
+            extra_admins = json.loads(os.getenv("ADMIN_USERS_JSON", "") or "[]")
+        except Exception:
+            extra_admins = []
+        for adm in extra_admins if isinstance(extra_admins, list) else []:
+            if not isinstance(adm, dict) or not adm.get("name") or not adm.get("pin_hash") or not adm.get("username"):
+                continue
+            conn.execute("""
+                INSERT INTO users (name, role, username, pin_hash, active)
+                VALUES (%s, 'ADMIN', %s, %s, TRUE)
+                ON CONFLICT (name, role) DO UPDATE SET pin_hash = EXCLUDED.pin_hash, active = TRUE
+            """, (str(adm["name"]).strip(), str(adm["username"]).strip(), str(adm["pin_hash"]).strip()))
+
         # Zone-wide CEO login. The PIN hash lives only in the CEO_PIN_HASH environment variable.
         ceo_pin_hash = os.getenv("CEO_PIN_HASH", "").strip()
         if ceo_pin_hash:
