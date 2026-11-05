@@ -987,7 +987,7 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
         ("V80 Maximum Conditional Payout", summary.get("v80_max_total_payout", 0)),
         ("Back Support Base Margin", summary.get("back_support_base_margin", 0)),
         ("Back Support Known Payable", summary.get("back_support_payable_known", 0)),
-        ("Scope", "Full Zone A" if user.get("role") in ("MANAGER", "CEO", "ADMIN") else f"{user.get('role')} hierarchy only"),
+        ("Scope", "Full Zone A" if user.get("role") in ("MANAGER", "CEO", "ADMIN", "VIEWER") else f"{user.get('role')} hierarchy only"),
     ]
     for row in rows:
         ws.append(row)
@@ -1511,7 +1511,7 @@ def _as_token_user(u: dict) -> dict:
 
 def _job_target_update(day: str) -> None:
     """Evening: each person's MTD vs target, gap and need per day (the CEO gets the zone total)."""
-    for u in engage.active_users(("TL", "SS", "RDS", "KAM", "CEO", "ADMIN")):
+    for u in engage.active_users(("TL", "SS", "RDS", "KAM", "CEO", "ADMIN", "VIEWER")):
         try:
             perf = performance_dashboard(_as_token_user(u))
             s = perf.get("summary") or {}
@@ -2348,7 +2348,7 @@ def _build_performance_dashboard(user: dict):
 
     explicit_summary_target = None
     role = str(user.get("role") or "MANAGER").upper()
-    if role in ("MANAGER", "CEO", "ADMIN"):
+    if role in ("MANAGER", "CEO", "ADMIN", "VIEWER"):
         explicit_summary_target = crud.get_explicit_hierarchy_target(month, "ZONE", "Zone A")
     elif role in ("TL", "SS", "RDS"):
         explicit_summary_target = crud.get_explicit_hierarchy_target(

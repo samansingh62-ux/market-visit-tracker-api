@@ -15,8 +15,8 @@ from .auth import get_current_user
 
 router = APIRouter()
 
-CHAT_ROLES = ("TL", "SS", "RDS", "KAM", "ADMIN", "CEO")
-ROLE_ORDER = {"CEO": -2, "ADMIN": -1, "KAM": 0, "SS": 1, "TL": 2, "RDS": 3}
+CHAT_ROLES = ("TL", "SS", "RDS", "KAM", "ADMIN", "CEO", "VIEWER")
+ROLE_ORDER = {"CEO": -3, "ADMIN": -2, "VIEWER": -1, "KAM": 0, "SS": 1, "TL": 2, "RDS": 3}
 
 
 def me(user: dict = Depends(get_current_user)) -> dict:

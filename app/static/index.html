@@ -458,7 +458,7 @@ button{min-height:44px}
 </div>
 <div class="filters">
 <input id="adminSearch" placeholder="Search name or username">
-<select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option><option>KAM</option><option>CEO</option><option>ADMIN</option></select>
+<select id="adminRole"><option value="">All roles</option><option>TL</option><option>SS</option><option>RDS</option><option>KAM</option><option>CEO</option><option>ADMIN</option><option>VIEWER</option></select>
 <select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
 <button id="adminRefresh" class="secondary">Refresh</button>
 <button id="createRdsPins" class="secondary">Create Missing RDS PINs &amp; Download</button>
@@ -931,7 +931,7 @@ let eodRetailers=[];
 
 async function loadEodRetailers(){
   if(!$('eodRetailer'))return;
-  const management=['MANAGER','ADMIN','CEO'].includes(user?.role);
+  const management=['MANAGER','ADMIN','CEO','VIEWER'].includes(user?.role);
   $('eodManagementExport').classList.toggle('hidden',!management);
   $('eodEntryFields').classList.toggle('hidden',management);
   $('eodSave').classList.toggle('hidden',management);
@@ -1082,14 +1082,14 @@ async function performanceDashboard(){
     perfData=await api('/performance-dashboard');
     let role=perfData.user?.role||'';
     let options=[];
-    if(['MANAGER','ADMIN','CEO'].includes(role)){
+    if(['MANAGER','ADMIN','CEO','VIEWER'].includes(role)){
       options=[
         ...(perfData.hierarchy?.tl||[]).map(x=>x.name),
         ...(perfData.hierarchy?.ss||[]).map(x=>x.name),
         ...(perfData.hierarchy?.rds||[]).map(x=>x.name),
       ];
     }
-    $('perfHierarchyFilterWrap').style.display=['MANAGER','ADMIN','CEO'].includes(role)?'block':'none';
+    $('perfHierarchyFilterWrap').style.display=['MANAGER','ADMIN','CEO','VIEWER'].includes(role)?'block':'none';
     $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
     renderPerfTables();
   }catch(e){
@@ -1300,7 +1300,7 @@ async function priorities(){
     body.innerHTML='<tr><td colspan="8">Priority list unavailable: '+esc(e.message)+'</td></tr>';
   }
 }
-async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(!['MANAGER','ADMIN','CEO'].includes(user.role))$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
+async function coverage(){let group=user.role==='TL'?'tl':user.role==='SS'?'ss':user.role==='RDS'?'rds':'tl';$('group').value=group;if(!['MANAGER','ADMIN','CEO','VIEWER'].includes(user.role))$('group').disabled=true;else $('group').disabled=false;let a=await api('/coverage?group_by='+group);$('coverage').innerHTML=a.length?a.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.assigned}</td><td>${r.visited}</td><td>${r.coverage_pct}%<div class="bar"><span style="width:${Math.min(100,r.coverage_pct)}%"></span></div></td><td>${r.total_visits}</td></tr>`).join(''):'<tr><td colspan="5">No coverage data.</td></tr>'}
 async function health(){let p=new URLSearchParams({limit:'2000'});if($('healthZone').value)p.set('zone',$('healthZone').value);if($('priority').value)p.set('priority',$('priority').value);let a=await api('/retailer-health?'+p);let s=$('healthSearch').value.trim().toLowerCase();if(s)a=a.filter(r=>r.name.toLowerCase().includes(s));let recent=a.filter(r=>r.priority==='Recently Visited').length,due=a.filter(r=>r.priority==='Due 8–14 Days').length,overdue=a.filter(r=>r.priority==='Overdue 15+ Days'||r.priority==='Never Visited').length;$('mn').textContent=a.filter(r=>r.priority==='Never Visited').length;$('dkNever').textContent=$('mn').textContent;$('covRecent').textContent=recent;$('covDue').textContent=due;$('covOverdue').textContent=overdue;let totalH=Math.max(1,recent+due+overdue);$('barRecent').style.width=(recent*100/totalH)+'%';$('barDue').style.width=(due*100/totalH)+'%';$('barOverdue').style.width=(overdue*100/totalH)+'%';$('health').innerHTML=a.length?a.map(r=>{let cls=r.priority==='Never Visited'?'danger':r.priority==='Overdue 15+ Days'?'warn':r.priority==='Recently Visited'?'ok':'';return `<tr><td><b>${esc(r.name)}</b><div class="sub">${esc(r.club||'')}</div></td><td>${esc(r.tl)}<br>${esc(r.ss)}<br>${esc(r.rds)}</td><td>${esc(r.zone)}</td><td>${r.visit_count}</td><td>${esc(r.last_visit||'—')}</td><td>${r.days_since_visit??'—'}</td><td><span class="tag ${cls}">${esc(r.priority)}</span></td></tr>`}).join(''):'<tr><td colspan="7">No retailers match the selected filters.</td></tr>'}
 let kamAreaUsers=[];
 
