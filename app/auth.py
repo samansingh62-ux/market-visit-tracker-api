@@ -8,7 +8,7 @@ import secrets
 import time
 from typing import Optional
 
-from fastapi import HTTPException, Security, status
+from fastapi import Header, HTTPException, Security, status
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 
 API_KEY = os.environ.get("API_KEY", "")
@@ -112,18 +112,35 @@ async def get_current_user(
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login required.")
 
 
+# People who also lead the zone: they can switch between the whole of Zone A and their own area.
+# name -> [zone view label, own view label]
+HEAD_VIEWS = {
+    "Ireshwad Mehdi": ["Retail Head", "KAM Arunachal"],
+    "Sailen Das": ["Sales Deputy Head", "KAM"],
+}
+try:
+    HEAD_VIEWS.update(json.loads(os.environ.get("HEAD_VIEWS_JSON", "") or "{}"))
+except Exception:
+    pass
+
+
 async def get_dashboard_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer),
     x_api_key: Optional[str] = Security(api_key_header),
+    x_view: Optional[str] = Header(default=None, alias="X-View"),
 ):
-    """Authenticate field users by bearer token and managers by API key for dashboard reads."""
+    """Authenticate field users by bearer token and managers by API key for dashboard reads.
+    A zone head who picked the zone view reads all of Zone A (view only)."""
     if x_api_key:
         if API_KEY and hmac.compare_digest(x_api_key, API_KEY):
             return {"name": "Manager", "role": "MANAGER", "tl": None, "ss": None, "rds": None}
         if ADMIN_API_KEY and hmac.compare_digest(x_api_key, ADMIN_API_KEY):
             return {"name": "Manager", "role": "MANAGER", "tl": None, "ss": None, "rds": None}
     if credentials:
-        return decode_token(credentials.credentials)
+        payload = decode_token(credentials.credentials)
+        if x_view == "zone" and payload.get("name") in HEAD_VIEWS:
+            return {**payload, "role": "VIEWER", "view": "zone", "home_role": payload.get("role")}
+        return payload
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login required.")
 
 

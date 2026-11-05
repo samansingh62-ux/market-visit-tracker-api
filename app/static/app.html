@@ -262,6 +262,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
         <button class="avatar" id="avatarBtn" aria-label="Profile and settings">—</button>
       </div>
     </div>
+    <div id="viewSwitch" class="hidden" style="display:flex;gap:8px;margin-top:12px" role="group" aria-label="Choose view"></div>
 
     <div class="hero" id="heroCard">
       <div class="between"><div class="lite" style="font-size:14px;font-weight:600" id="heroTitle">Sell-out this month</div><div class="lite" style="font-size:13px;font-weight:600" id="heroDays"></div></div>
@@ -532,10 +533,12 @@ function toast(text, bad) {
 /* ---------------- session + API ---------------- */
 let token = store.get('mvt_app_token');
 let user = store.get('mvt_app_user');
+let view = store.get('mvt_app_view') || 'own';   // zone heads: 'zone' = all of Zone A, 'own' = their area
 
 async function api(path, opt = {}) {
   const headers = { ...(opt.headers || {}) };
   if (token) headers.Authorization = 'Bearer ' + token;
+  if (view === 'zone') headers['X-View'] = 'zone';
   if (opt.json !== undefined) { headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(opt.json); }
   let res;
   try {
@@ -559,28 +562,29 @@ async function api(path, opt = {}) {
 /* cached loaders: show last data instantly, refresh in background */
 const cache = {};
 const inflight = {};
+const cacheId = () => (user && user.id) + (view === 'zone' ? '_zone' : '');
 function load(key, path, maxAgeMs) {
-  const saved = cache[key] || store.get('mvt_cache_' + key + '_' + (user && user.id));
+  const saved = cache[key] || store.get('mvt_cache_' + key + '_' + cacheId());
   if (saved) cache[key] = saved;
   const fresh = saved && (Date.now() - saved.at) < maxAgeMs;
   if (!fresh && !inflight[key]) {
     inflight[key] = api(path).then((data) => {
       cache[key] = { at: Date.now(), data };
-      store.set('mvt_cache_' + key + '_' + (user && user.id), cache[key]);
+      store.set('mvt_cache_' + key + '_' + cacheId(), cache[key]);
       return cache[key];
     }).finally(() => { delete inflight[key]; });
   }
   return { saved, pending: inflight[key] || null };
 }
 function invalidate(...keys) {
-  keys.forEach((k) => { delete cache[k]; store.del('mvt_cache_' + k + '_' + (user && user.id)); });
+  keys.forEach((k) => { delete cache[k]; store.del('mvt_cache_' + k + '_' + cacheId()); });
 }
 
 function logout(message) {
   const pt = pushToken();
   if (pt && token) api('/devices/remove', { method: 'POST', json: { token: pt } }).catch(() => {});
-  token = null; user = null;
-  store.del('mvt_app_token'); store.del('mvt_app_user');
+  token = null; user = null; view = 'own';
+  store.del('mvt_app_token'); store.del('mvt_app_user'); store.del('mvt_app_view');
   Object.keys(cache).forEach((k) => delete cache[k]);
   location.hash = '#/login';
   if (message) setTimeout(() => showLoginError(message), 50);
@@ -705,9 +709,40 @@ function whenLoaded(loader, render, onError) {
 }
 
 /* ---------------- HOME ---------------- */
+/* ---------------- view switch for zone heads ---------------- */
+function viewLabel() {
+  const v = ((cache.views || {}).data || {}).views || [];
+  const cur = v.find((x) => x.key === view);
+  return cur ? cur.label : (user.role || '');
+}
+function renderViewSwitch() {
+  const l = load('views', '/auth/views', 12 * 3600e3);
+  const draw = () => {
+    const v = ((cache.views || {}).data || {}).views || [];
+    const box = $('viewSwitch');
+    if (!v.length) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.innerHTML = v.map((x) => `<button class="chip dark" style="flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1.15" data-view="${x.key}" aria-pressed="${x.key === view}"><b style="font-size:14px">${esc(x.label)}</b><span style="font-size:11px;opacity:.75">${esc(x.note)}</span></button>`).join('');
+    $('homeDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + viewLabel();
+  };
+  draw();
+  if (l.pending) l.pending.then(draw).catch(() => {});
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#viewSwitch [data-view]');
+  if (!b || b.dataset.view === view) return;
+  const keep = cache.views;
+  view = b.dataset.view;
+  store.set('mvt_app_view', view);
+  Object.keys(cache).forEach((k) => delete cache[k]);
+  if (keep) cache.views = keep;
+  showHome();
+});
+
 function showHome() {
   const now = new Date();
-  $('homeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + (user.role || '');
+  $('homeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + viewLabel();
+  renderViewSwitch();
   $('homeHello').textContent = 'Hi, ' + firstName(user.name);
   $('avatarBtn').textContent = initials(user.name);
   refreshCounts();
@@ -1466,7 +1501,7 @@ function marketNow() {
 function showInsights(arg) {
   insAnimKey = '';
   if (['Sales', 'Models', 'Stock', 'Market'].includes(arg)) insTab = arg;
-  $('insScope').textContent = `${user.role} · ${firstName(user.name)}`;
+  $('insScope').textContent = view === 'zone' ? viewLabel() + ' · Zone A' : `${viewLabel()} · ${firstName(user.name)}`;
   const l = insightsLoad();
   if (!l.saved) {
     renderInsTabs();

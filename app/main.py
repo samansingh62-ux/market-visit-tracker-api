@@ -636,6 +636,19 @@ def pin_login(payload: PinLoginRequest, request: Request):
     return {"access_token": token, "token_type": "bearer", "user": safe_user}
 
 
+@app.get("/auth/views")
+def auth_views(user: dict = Depends(get_current_user)):
+    """View switch for zone heads: the whole of Zone A, or their own KAM area."""
+    from .auth import HEAD_VIEWS
+    labels = HEAD_VIEWS.get(str(user.get("name") or ""))
+    if not labels:
+        return {"views": []}
+    return {"views": [
+        {"key": "zone", "label": labels[0], "note": "All of Zone A"},
+        {"key": "own", "label": labels[1], "note": "Your area"},
+    ]}
+
+
 @app.get("/auth/me", response_model=UserOut)
 def me(user: dict = Depends(get_current_user)):
     if user.get("role") == "MANAGER":
