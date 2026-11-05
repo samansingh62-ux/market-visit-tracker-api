@@ -553,10 +553,11 @@ def nearby_retailers(
     lng: float = Query(..., ge=-180, le=180),
     radius_m: float = Query(default=500, ge=10, le=5000),
     limit: int = Query(default=5, ge=1, le=20),
+    for_visit: bool = Query(default=False),
     user: dict = Depends(get_dashboard_user),
 ):
     """Assigned retailers near the user, located from earlier geotagged visits."""
-    scope = _scope(user)
+    scope = _visit_scope(user) if for_visit else _scope(user)
     allowed = {
         r["name"]: r
         for r in crud.list_retailers(
@@ -641,12 +642,13 @@ def auth_views(user: dict = Depends(get_current_user)):
     """View switch for zone heads: the whole of Zone A, or their own KAM area."""
     from .auth import HEAD_VIEWS
     labels = HEAD_VIEWS.get(str(user.get("name") or ""))
+    visit_all = _can_visit_all(user)
     if not labels:
-        return {"views": []}
+        return {"views": [], "visit_all": visit_all}
     return {"views": [
         {"key": "zone", "label": labels[0], "note": "All of Zone A"},
         {"key": "own", "label": labels[1], "note": "Your area"},
-    ]}
+    ], "visit_all": visit_all}
 
 
 @app.get("/auth/me", response_model=UserOut)
@@ -673,6 +675,23 @@ def _scope(user: dict) -> dict:
         return {"kam": name}
 
     return {}
+
+
+def _can_visit_all(user: dict) -> bool:
+    from .auth import ZONE_VISIT_USERS
+    return canonical_name(user.get("name")) in ZONE_VISIT_USERS or str(user.get("name") or "") in ZONE_VISIT_USERS
+
+
+def _visit_scope(user: dict) -> dict:
+    """Scope for logging visits: whole zone for ZONE_VISIT_USERS, otherwise the user's own area."""
+    return {} if _can_visit_all(user) else _scope(user)
+
+
+def _can_touch_visit(visit: dict, user: dict) -> bool:
+    if visit.get("submitted_by") and visit.get("submitted_by") == user.get("name"):
+        return True
+    scope = _visit_scope(user)
+    return not scope or _record_matches_scope(visit, scope)
 
 
 def _record_matches_scope(record: dict, scope: dict) -> bool:
@@ -708,7 +727,7 @@ def _require_kam(user: dict) -> dict:
 
 @app.post("/visits", response_model=VisitOut)
 def create_visit(payload: VisitCreate, user: dict = Depends(get_current_user)):
-    scope = _scope(user)
+    scope = _visit_scope(user)
     retailer = crud.lookup_retailer_by_name(payload.retailer)
     if not retailer:
         raise HTTPException(status_code=400, detail="Retailer is not in the master list.")
@@ -740,8 +759,9 @@ def get_visits(retailer: Optional[str] = None, tl: Optional[str] = None, ss: Opt
 
 @app.get("/retailers", response_model=List[RetailerOut])
 def get_retailers(tl: Optional[str] = None, ss: Optional[str] = None, rds: Optional[str] = None,
-                  search: Optional[str] = None, user: dict = Depends(get_dashboard_user)):
-    scope = _scope(user)
+                  search: Optional[str] = None, for_visit: bool = False,
+                  user: dict = Depends(get_dashboard_user)):
+    scope = _visit_scope(user) if for_visit else _scope(user)
     kam = scope.get("kam") if scope else None
     if scope:
         tl, ss, rds = scope.get("tl"), scope.get("ss"), scope.get("rds")
@@ -904,8 +924,7 @@ def visit_photos(visit_id: int, user: dict = Depends(get_dashboard_user)):
     visit = crud.get_visit(visit_id)
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
-    scope = _scope(user)
-    if scope and any(visit.get(k) != v for k, v in scope.items()):
+    if not _can_touch_visit(visit, user):
         raise HTTPException(status_code=403, detail="You cannot access this visit.")
     rows = crud.list_visit_photos(visit_id)
     return [{**r, "url": f"/visits/{visit_id}/photos/{r['id']}"} for r in rows]
@@ -916,8 +935,7 @@ def visit_photo(visit_id: int, photo_id: int, user: dict = Depends(get_dashboard
     photo = crud.get_visit_photo(photo_id)
     if not visit or not photo or photo["visit_id"] != visit_id:
         raise HTTPException(status_code=404, detail="Photo not found.")
-    scope = _scope(user)
-    if scope and any(visit.get(k) != v for k, v in scope.items()):
+    if not _can_touch_visit(visit, user):
         raise HTTPException(status_code=403, detail="You cannot access this photo.")
     return Response(content=photo["data"], media_type=photo["mime_type"])
 
@@ -926,8 +944,7 @@ async def upload_visit_photos(visit_id: int, files: List[UploadFile] = File(...)
     visit = crud.get_visit(visit_id)
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
-    scope = _scope(user)
-    if scope and any(visit.get(k) != v for k, v in scope.items()):
+    if not _can_touch_visit(visit, user):
         raise HTTPException(status_code=403, detail="You cannot upload photos to this visit.")
     existing = crud.list_visit_photos(visit_id)
     if len(existing) + len(files) > 5:

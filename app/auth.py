@@ -123,6 +123,13 @@ try:
 except Exception:
     pass
 
+# Users who may log visits at any Zone A retailer, not only their own area.
+ZONE_VISIT_USERS = {"Ireshwad Mehdi"}
+try:
+    ZONE_VISIT_USERS.update(json.loads(os.environ.get("ZONE_VISIT_USERS_JSON", "") or "[]"))
+except Exception:
+    pass
+
 
 async def get_dashboard_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer),

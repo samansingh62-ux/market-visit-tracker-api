@@ -711,14 +711,14 @@ function whenLoaded(loader, render, onError) {
 /* ---------------- HOME ---------------- */
 /* ---------------- view switch for zone heads ---------------- */
 function viewLabel() {
-  const v = ((cache.views || {}).data || {}).views || [];
+  const v = ((cache.views2 || {}).data || {}).views || [];
   const cur = v.find((x) => x.key === view);
   return cur ? cur.label : (user.role || '');
 }
 function renderViewSwitch() {
-  const l = load('views', '/auth/views', 12 * 3600e3);
+  const l = load('views2', '/auth/views', 12 * 3600e3);
   const draw = () => {
-    const v = ((cache.views || {}).data || {}).views || [];
+    const v = ((cache.views2 || {}).data || {}).views || [];
     const box = $('viewSwitch');
     if (!v.length) { box.classList.add('hidden'); return; }
     box.classList.remove('hidden');
@@ -731,11 +731,11 @@ function renderViewSwitch() {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('#viewSwitch [data-view]');
   if (!b || b.dataset.view === view) return;
-  const keep = cache.views;
+  const keep = cache.views2;
   view = b.dataset.view;
   store.set('mvt_app_view', view);
   Object.keys(cache).forEach((k) => delete cache[k]);
-  if (keep) cache.views = keep;
+  if (keep) cache.views2 = keep;
   showHome();
 });
 
@@ -837,6 +837,10 @@ let gps = null;
 let gpsWatch = null;
 
 function masterLoad() { return load('master', '/retailers', 60 * 60e3); }
+// Some users (e.g. a head) may log visits anywhere in Zone A: the visit picker then uses the full list.
+function visitAll() { return !!(((cache.views2 || {}).data || {}).visit_all); }
+function visitMasterKey() { return visitAll() ? 'vmaster' : 'master'; }
+function visitMasterLoad() { return visitAll() ? load('vmaster', '/retailers?for_visit=1', 60 * 60e3) : masterLoad(); }
 
 function getGPS(timeout = 15000) {
   return new Promise((resolve) => {
@@ -863,8 +867,11 @@ function showVisit(code) {
   $('nearbyList').innerHTML = '';
   $('gpsLine').style.color = 'var(--muted)'; $('gpsText').textContent = 'Getting your location…';
 
-  const m = masterLoad();
-  const ready = m.saved ? Promise.resolve(m.saved.data) : m.pending.then((r) => r.data);
+  const vl = load('views2', '/auth/views', 12 * 3600e3);
+  const ready = (vl.saved ? Promise.resolve() : (vl.pending || Promise.resolve()).catch(() => {})).then(() => {
+    const m = visitMasterLoad();
+    return m.saved ? m.saved.data : m.pending.then((r) => r.data);
+  });
   ready.then((master) => {
     if (code) {
       const r = master.find((x) => String(x.code).toUpperCase() === String(code).toUpperCase());
@@ -881,9 +888,9 @@ function showVisit(code) {
 async function findNearby(autoPick) {
   if (!gps || visitState.retailer) return;
   try {
-    const near = await api(`/retailers/nearby?lat=${gps.latitude}&lng=${gps.longitude}&radius_m=400&limit=4`);
+    const near = await api(`/retailers/nearby?lat=${gps.latitude}&lng=${gps.longitude}&radius_m=400&limit=4${visitAll() ? '&for_visit=1' : ''}`);
     if (visitState.retailer || !near.length) return;
-    const master = (cache.master || {}).data || [];
+    const master = (cache[visitMasterKey()] || {}).data || [];
     const full = (n) => master.find((x) => x.code === n.code) || n;
     if (autoPick && near[0].distance_m <= 150) { pickRetailer(full(near[0]), near[0].distance_m); return; }
     $('nearbyList').innerHTML = `<div class="note" style="margin:4px 0 6px">Near you</div>` + near.map((n) =>
@@ -921,7 +928,7 @@ function pickRetailer(r, dist) {
 
 $('retailerQuery').addEventListener('input', () => {
   const q = $('retailerQuery').value.trim().toLowerCase();
-  const master = (cache.master || {}).data || [];
+  const master = (cache[visitMasterKey()] || {}).data || [];
   const hits = q ? master.filter((r) => (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q)).slice(0, 30) : [];
   const p = $('retailerPicker');
   p.classList.toggle('hidden', !q);
