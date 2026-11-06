@@ -2061,6 +2061,50 @@ def performance_trends(user: dict = Depends(get_dashboard_user)):
     }
 
 
+_range_cache: dict = {}
+_range_lock = __import__("threading").Lock()
+
+
+@app.get("/sales/by-date")
+def sales_by_date(
+    start: str = Query(alias="from"),
+    end: str = Query(alias="to"),
+    user: dict = Depends(get_dashboard_user),
+):
+    """Sell-out for a past date range in the user's area (or the zone view)."""
+    try:
+        d1, d2 = date.fromisoformat(start), date.fromisoformat(end)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Dates must be YYYY-MM-DD.")
+    scope = _scope(user)
+    key = (tuple(sorted(scope.items())), d1.isoformat(), d2.isoformat())
+    now = time.monotonic()
+    with _range_lock:
+        hit = _range_cache.get(key)
+        if hit and now - hit[0] < 300:
+            return hit[1]
+        for k in [k for k, v in _range_cache.items() if now - v[0] >= 300]:
+            _range_cache.pop(k, None)
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+            response = _vwork_request(client, "GET", f"{VWORK_LIVE_API_URL}/api/v1/sales/by-date",
+                                      params={**scope, "startDate": d1.isoformat(), "endDate": d2.isoformat()},
+                                      headers=headers)
+        if response.status_code == 400:
+            raise HTTPException(status_code=400, detail=(response.json() or {}).get("detail") or "Invalid dates.")
+        response.raise_for_status()
+        data = response.json()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Sales for these dates are unavailable: {exc}") from exc
+    result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}}
+    with _range_lock:
+        _range_cache[key] = (time.monotonic(), result)
+    return result
+
+
 _PERF_CACHE_TTL_SECONDS = int(os.getenv("PERF_CACHE_TTL_SECONDS", "120"))
 _perf_cache: dict = {}
 _perf_cache_lock = __import__("threading").Lock()

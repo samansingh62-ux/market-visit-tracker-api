@@ -269,6 +269,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <div id="heroBody"><div class="skeleton" style="height:100px;opacity:.15"></div></div>
     </div>
 
+    <a class="listCard" href="#/sales" id="salesByDateLink">
+      <div class="rank" style="background:var(--brand-soft);color:var(--brand)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Sales by date</b><span class="note">Pick any past dates: day by day, models, counters</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+
     <div id="eodAlert"></div>
     <div id="homeHighlights"></div>
 
@@ -277,6 +281,32 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 
     <div class="grid3" id="quickStats"></div>
     <div class="updated" id="homeUpdated"></div>
+  </div>
+</section>
+
+<!-- ============ SALES BY DATE ============ -->
+<section id="s-sales" class="screen hidden" aria-label="Sales by date">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Sales by date</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="chipScroll" id="salesQuick" role="group" aria-label="Quick dates">
+      <button class="chip" data-q="yesterday">Yesterday</button>
+      <button class="chip" data-q="last7">Last 7 days</button>
+      <button class="chip" data-q="mtd">This month</button>
+      <button class="chip" data-q="lastmonth">Last month</button>
+      <button class="chip" data-q="lymtd">This month last year</button>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">From<input class="box" type="date" id="salesFrom" min="2025-01-01"></label>
+        <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">To<input class="box" type="date" id="salesTo" min="2025-01-01"></label>
+      </div>
+      <button class="btn" id="salesGo" style="height:50px">Show sales</button>
+      <span class="note" id="salesScope"></span>
+    </div>
+    <div id="salesResult" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 </section>
 
@@ -592,7 +622,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
+const SCREENS = ['login', 'home', 'sales', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
@@ -615,7 +645,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
+  ({ login: showLogin, home: showHome, sales: showSales, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -792,6 +822,97 @@ function showHome() {
       <div class="card stat"><span>Coverage</span><b class="num">${total ? Math.round(visited / total * 100) : 0}%</b></div>
       <a class="card stat" href="#/retailers?overdue"><span>Overdue / never</span><b class="num" style="color:var(--bad)">${fmt(overdue)}</b></a>`;
   });
+}
+
+/* ---------------- SALES BY DATE ---------------- */
+const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const shortDay = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+function salesQuick(q) {
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const add = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  if (q === 'yesterday') { const y = add(t, -1); return [y, y]; }
+  if (q === 'last7') return [add(t, -7), add(t, -1)];
+  if (q === 'mtd') return [new Date(t.getFullYear(), t.getMonth(), 1), t];
+  if (q === 'lastmonth') return [new Date(t.getFullYear(), t.getMonth() - 1, 1), new Date(t.getFullYear(), t.getMonth(), 0)];
+  if (q === 'lymtd') return [new Date(t.getFullYear() - 1, t.getMonth(), 1), new Date(t.getFullYear() - 1, t.getMonth(), t.getDate())];
+  return null;
+}
+function showSales() {
+  const today = isoDay(new Date());
+  $('salesFrom').max = today; $('salesTo').max = today;
+  const saved = store.get('mvt_sales_range');
+  if (!$('salesFrom').value) {
+    const def = saved && saved.to <= today ? [saved.from, saved.to] : salesQuick('yesterday').map(isoDay);
+    $('salesFrom').value = def[0]; $('salesTo').value = def[1];
+  }
+  $('salesScope').textContent = 'Showing ' + (view === 'zone' ? 'all of Zone A' : ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) ? 'all of Zone A' : 'your area') + ' · up to 62 days at a time';
+  runSales();
+}
+$('salesQuick').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-q]'); if (!b) return;
+  const r = salesQuick(b.dataset.q).map(isoDay);
+  $('salesFrom').value = r[0]; $('salesTo').value = r[1];
+  runSales();
+});
+$('salesGo').addEventListener('click', () => runSales());
+let salesSeq = 0;
+async function runSales() {
+  const from = $('salesFrom').value, to = $('salesTo').value, today = isoDay(new Date());
+  document.querySelectorAll('#salesQuick [data-q]').forEach((b) => {
+    const r = salesQuick(b.dataset.q).map(isoDay);
+    b.setAttribute('aria-pressed', String(r[0] === from && r[1] === to));
+  });
+  const box = $('salesResult');
+  let msg = '';
+  if (!from || !to) msg = 'Pick both dates.';
+  else if (to < from) msg = 'The To date is before the From date.';
+  else if (to > today) msg = 'The To date can’t be in the future.';
+  else if ((new Date(to) - new Date(from)) / 864e5 + 1 > 62) msg = 'Pick 62 days or fewer.';
+  if (msg) { box.innerHTML = `<div class="err">${esc(msg)}</div>`; return; }
+  store.set('mvt_sales_range', { from, to });
+  const seq = ++salesSeq;
+  const days = (new Date(to) - new Date(from)) / 864e5 + 1;
+  box.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>Loading ${days === 1 ? shortDay(from) : shortDay(from) + ' – ' + shortDay(to)}…</b><span class="note">${days > 10 ? 'A long range reads each day from V-Work and can take up to a minute the first time.' : 'Reading V-Work…'}</span><div class="skeleton" style="height:120px"></div></div>`;
+  $('salesGo').disabled = true;
+  try {
+    const d = await api(`/sales/by-date?from=${from}&to=${to}`);
+    if (seq === salesSeq) renderSales(d);
+  } catch (e) {
+    if (seq === salesSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="runSales()">Try again</button>`;
+  } finally { if (seq === salesSeq) $('salesGo').disabled = false; }
+}
+function renderSales(d) {
+  const t = d.totals || {}, p = d.period || {};
+  const label = p.days === 1 ? new Date(p.start + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : `${shortDay(p.start)} – ${shortDay(p.end)} ${p.end.slice(0, 4)}`;
+  const daily = d.daily || [];
+  const peak = Math.max(1, ...daily.map((x) => x.units));
+  const best = daily.reduce((a, x) => (x.units > (a ? a.units : -1) ? x : a), null);
+  const chart = daily.length > 1 ? `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="between"><b style="font-size:15px">Day by day</b>${best ? `<span class="note">Best: ${shortDay(best.date)} · ${fmt(best.units)}</span>` : ''}</div>
+      <div style="display:flex;align-items:flex-end;gap:${daily.length > 31 ? 1 : 3}px;height:120px" role="img" aria-label="Units sold each day">
+        ${daily.map((x) => `<div title="${shortDay(x.date)}: ${fmt(x.units)} units" style="flex:1;min-width:0;height:${Math.max(2, Math.round(x.units / peak * 120))}px;background:${x === best ? 'var(--brand)' : '#C9D6F5'};border-radius:3px 3px 0 0"></div>`).join('')}
+      </div>
+      <div class="between note" style="font-size:12px"><span>${shortDay(daily[0].date)}</span><span>${shortDay(daily[daily.length - 1].date)}</span></div>
+      <details><summary class="note" style="cursor:pointer">See each day</summary><div style="padding-top:4px">${daily.slice().reverse().map((x) => `<div class="kv"><span>${new Date(x.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</span><b class="num">${fmt(x.units)} <span class="note" style="font-weight:500">· ${money(x.value)}</span></b></div>`).join('')}</div></details>
+    </div>` : '';
+  const models = (d.models || []).slice(0, 10);
+  const team = ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) || view === 'zone' ? { title: 'By KAM', rows: d.kams || [] } : user.role === 'KAM' ? { title: 'By TL', rows: d.tls || [] } : null;
+  const counters = (d.counters || []).slice(0, 30);
+  $('salesResult').innerHTML = `
+    <div class="hero" style="gap:12px">
+      <div class="lite" style="font-size:14px;font-weight:600">${esc(label)}</div>
+      <div style="display:flex;align-items:baseline;gap:8px"><div class="num" style="font-size:40px;font-weight:800;line-height:1">${fmt(t.units)}</div><div class="lite" style="font-size:15px;font-weight:600">units</div></div>
+      <div class="grid3" style="gap:8px">
+        <div class="heroTile"><span>Value</span><b class="num" style="font-size:16px">${money(t.value)}</b></div>
+        <div class="heroTile"><span>${p.days === 1 ? 'ASP' : 'Per day'}</span><b class="num">${p.days === 1 ? money(t.asp) : fmt1(t.per_day)}</b></div>
+        <div class="heroTile"><span>Counters sold</span><b class="num">${fmt(t.counters_selling)}</b></div>
+      </div>
+    </div>
+    ${chart}
+    <div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">Models</div>${models.map((m) => `<div class="kv"><span>${esc(m.model)}</span><b class="num">${fmt(m.units)}</b></div>`).join('') || '<div class="kv note">No sales in these dates.</div>'}</div>
+    ${team && team.rows.length ? `<div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">${team.title}</div>${team.rows.map((r) => `<div class="kv"><span>${esc(r.name)}</span><b class="num">${fmt(r.units)}</b></div>`).join('')}</div>` : ''}
+    ${counters.length ? `<div class="sectionHead"><h2>Top counters</h2><span class="note">${fmt(t.counters_selling)} sold</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">${counters.map((c, i) => `<a class="listCard" href="#/r/${encodeURIComponent(c.code)}"><div class="rank num">${i + 1}</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(c.name)}</b><span class="note ellipsis">${esc([c.tl, c.ss].filter(Boolean).join(' · '))}</span></div><b class="num" style="font-size:17px">${fmt(c.units)}</b></a>`).join('')}</div>` : ''}`;
 }
 
 function renderHero(perf, at) {
