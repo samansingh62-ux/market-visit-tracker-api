@@ -34,9 +34,15 @@ _group_lock = threading.Lock()
 
 def team_groups() -> list[tuple[str, str, list[int]]]:
     """(group_key, title, member ids) built from the alignment: Zone A, each KAM's team, each SS's team."""
-    users = engage.active_users()
+    users = engage.active_users(CHAT_ROLES)
     by_role_name = {(u["role"], canonical_name(u["name"])): u["id"] for u in users}
     groups = [("zone:A", "Zone A · Everyone", [u["id"] for u in users])]
+    # Accounts that look after the whole zone (CEO, admins, view-only and the zone heads)
+    # sit in every team group too, so they can follow and join each team's chat.
+    from .auth import HEAD_VIEWS
+    heads = {canonical_name(n) for n in HEAD_VIEWS}
+    zone_ids = {u["id"] for u in users
+                if str(u["role"]).upper() in ("CEO", "ADMIN", "VIEWER", "MANAGER") or canonical_name(u["name"]) in heads}
     kam_members: dict = {}
     ss_members: dict = {}
     for row in alignment.rows:
@@ -52,11 +58,11 @@ def team_groups() -> list[tuple[str, str, list[int]]]:
     for kam, ids in sorted(kam_members.items()):
         kid = by_role_name.get(("KAM", kam))
         if kid:
-            groups.append((f"kam:{kam}", f"Team {kam}", sorted(ids | {kid})))
+            groups.append((f"kam:{kam}", f"Team {kam}", sorted(ids | {kid} | zone_ids)))
     for ss, ids in sorted(ss_members.items()):
         sid = by_role_name.get(("SS", ss))
         if sid and ids:
-            groups.append((f"ss:{ss}", f"SS {ss} · TLs", sorted(ids | {sid})))
+            groups.append((f"ss:{ss}", f"SS {ss} · TLs", sorted(ids | {sid} | zone_ids)))
     return groups
 
 
