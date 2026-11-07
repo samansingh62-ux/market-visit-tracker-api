@@ -101,6 +101,18 @@ def init_db():
             )
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_retailer_targets_month ON retailer_targets(month)")
+        # Store-level split of a multi-store retailer's target (when the target file gives one).
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS store_targets (
+                month TEXT NOT NULL,
+                store_code TEXT NOT NULL,
+                retailer_code TEXT NOT NULL,
+                target_volume INTEGER NOT NULL DEFAULT 0,
+                target_value BIGINT NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (month, store_code)
+            )
+        """)
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS hierarchy_targets (
@@ -181,6 +193,8 @@ def init_db():
                     for row in hierarchy_seed
                     if isinstance(row, list) and len(row) >= 4 and row[1]
                 ])
+
+        _seed_monthly_targets(conn)
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -550,6 +564,49 @@ def init_db():
         """)
 
 
+def _seed_monthly_targets(conn):
+    """Seed retailer_targets_YYYY-MM.json, store_targets_YYYY-MM.json and hierarchy_targets_YYYY-MM.json
+    for months from Nov 2026 on, only when that month has nothing yet (a later upload is kept)."""
+    import re
+    for path in sorted(APP_DIR.glob("retailer_targets_*.json")):
+        m = re.search(r"(\d{4}-\d{2})", path.name)
+        if not m or m.group(1) < "2026-11":
+            continue
+        month = m.group(1)
+        if int(conn.execute("SELECT COUNT(*) AS c FROM retailer_targets WHERE month = %s", (month,)).fetchone()["c"] or 0):
+            continue
+        rows = json.load(open(path, "r", encoding="utf-8"))
+        with conn.cursor() as cur:
+            cur.executemany("""
+                INSERT INTO retailer_targets (month, retailer_code, retailer_name, target_volume, target_value, updated_at)
+                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP::text)
+                ON CONFLICT (month, retailer_code) DO NOTHING
+            """, [(month, str(r[0]).strip().upper(), (r[3] if len(r) > 3 else "") or "", int(r[1] or 0), int(r[2] or 0))
+                  for r in rows if isinstance(r, list) and len(r) >= 3 and r[0]])
+        store_path = APP_DIR / f"store_targets_{month}.json"
+        if store_path.exists():
+            conn.execute("DELETE FROM store_targets WHERE month = %s", (month,))
+            stores = json.load(open(store_path, "r", encoding="utf-8"))
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    INSERT INTO store_targets (month, store_code, retailer_code, target_volume, target_value, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP::text)
+                    ON CONFLICT (month, store_code) DO NOTHING
+                """, [(month, str(r[0]).strip().upper(), str(r[1]).strip().upper(), int(r[2] or 0), int(r[3] or 0))
+                      for r in stores if isinstance(r, list) and len(r) >= 4 and r[0]])
+        hier_path = APP_DIR / f"hierarchy_targets_{month}.json"
+        if hier_path.exists() and not int(conn.execute(
+                "SELECT COUNT(*) AS c FROM hierarchy_targets WHERE month = %s", (month,)).fetchone()["c"] or 0):
+            hier = json.load(open(hier_path, "r", encoding="utf-8"))
+            with conn.cursor() as cur:
+                cur.executemany("""
+                    INSERT INTO hierarchy_targets (month, level, name, target_volume, target_value, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP::text)
+                    ON CONFLICT (month, level, name) DO NOTHING
+                """, [(month, str(r[0]).upper(), str(r[1]).strip(), int(r[2] or 0), int(r[3] or 0))
+                      for r in hier if isinstance(r, list) and len(r) >= 4 and r[1]])
+
+
 def chain_store_name(store_name):
     """'Reliance Retail Jio- Itanagar (Store)' -> 'Reliance Retail Jio- Itanagar'."""
     name = str(store_name or "").strip()
@@ -610,8 +667,8 @@ def apply_alignment(conn):
                 status='Active', town_name=EXCLUDED.town_name, district_name=EXCLUDED.district_name
         """, chain_units)
     conn.execute("UPDATE retailers SET status='Outside current alignment' WHERE code NOT IN (SELECT unit_code FROM store_alignment)")
-    # Targets are uploaded per retailer; a multi-store retailer's target is shared equally
-    # across its stores (remainder to the first stores) so every total stays the same.
+    # Targets are uploaded per retailer. A multi-store retailer's target goes to its stores as the
+    # target file splits it (store_targets) or, without a split, equally (remainder to the first stores).
     conn.execute("DROP VIEW IF EXISTS unit_targets")
     conn.execute("""
         CREATE VIEW unit_targets AS
@@ -621,9 +678,15 @@ def apply_alignment(conn):
                    COUNT(*) OVER (PARTITION BY retailer_code) AS cnt,
                    ROW_NUMBER() OVER (PARTITION BY retailer_code ORDER BY unit_code) AS rn
             FROM units
-        )
+        ),
+        split AS (SELECT DISTINCT month, retailer_code FROM store_targets)
         SELECT t.month, n.unit_code, t.retailer_code, t.retailer_name, t.updated_at,
-               (t.target_volume / n.cnt + CASE WHEN n.rn <= t.target_volume % n.cnt THEN 1 ELSE 0 END)::INTEGER AS target_volume,
-               (t.target_value / n.cnt + CASE WHEN n.rn <= t.target_value % n.cnt THEN 1 ELSE 0 END)::BIGINT AS target_value
-        FROM retailer_targets t JOIN n ON n.retailer_code = UPPER(t.retailer_code)
+               CASE WHEN sp.retailer_code IS NOT NULL AND n.cnt > 1 THEN COALESCE(s.target_volume, 0)
+                    ELSE (t.target_volume / n.cnt + CASE WHEN n.rn <= t.target_volume % n.cnt THEN 1 ELSE 0 END) END::INTEGER AS target_volume,
+               CASE WHEN sp.retailer_code IS NOT NULL AND n.cnt > 1 THEN COALESCE(s.target_value, 0)
+                    ELSE (t.target_value / n.cnt + CASE WHEN n.rn <= t.target_value % n.cnt THEN 1 ELSE 0 END) END::BIGINT AS target_value
+        FROM retailer_targets t
+        JOIN n ON n.retailer_code = UPPER(t.retailer_code)
+        LEFT JOIN split sp ON sp.month = t.month AND sp.retailer_code = n.retailer_code
+        LEFT JOIN store_targets s ON s.month = t.month AND s.store_code = n.unit_code
     """)

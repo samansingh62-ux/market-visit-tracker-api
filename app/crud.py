@@ -153,6 +153,8 @@ def upsert_retailer_targets(month: str, rows: list) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     with database.get_conn() as conn:
         conn.execute("DELETE FROM retailer_targets WHERE month = %s", (month,))
+        # A new upload replaces any store split from an earlier file (stores then share equally).
+        conn.execute("DELETE FROM store_targets WHERE month = %s", (month,))
         for row in rows:
             conn.execute(
                 """
