@@ -308,7 +308,7 @@ def on_startup():
         from . import engage_routes
         engage_routes.sync_groups(force=True)
     except Exception as exc:
-        logger.warning("Chat group sync at startup failed: %s", exc)
+        logging.getLogger("uvicorn.error").warning("Chat group sync at startup failed: %s", exc)
 
 
 @app.on_event("startup")
