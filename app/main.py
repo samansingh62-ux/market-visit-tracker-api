@@ -304,6 +304,11 @@ def on_startup():
     database.init_db()
     whatsapp_mcp.init_tables()
     engage.init_tables()
+    try:  # bring team chat groups in line with the alignment and accounts right away
+        from . import engage_routes
+        engage_routes.sync_groups(force=True)
+    except Exception as exc:
+        logger.warning("Chat group sync at startup failed: %s", exc)
 
 
 @app.on_event("startup")
