@@ -195,6 +195,7 @@ def init_db():
                 ])
 
         _seed_monthly_targets(conn)
+        _apply_hierarchy_target_updates(conn)
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -605,6 +606,24 @@ def _seed_monthly_targets(conn):
                     ON CONFLICT (month, level, name) DO NOTHING
                 """, [(month, str(r[0]).upper(), str(r[1]).strip(), int(r[2] or 0), int(r[3] or 0))
                       for r in hier if isinstance(r, list) and len(r) >= 4 and r[1]])
+
+
+def _apply_hierarchy_target_updates(conn):
+    """Apply one-off TL/SS/RDS/zone target changes from hierarchy_target_updates.json.
+    Each entry is [month, level, name, volume, value, stamp]; it is written only while the
+    stored row is older than its stamp, so a later upload or edit is never overwritten."""
+    path = APP_DIR / "hierarchy_target_updates.json"
+    if not path.exists():
+        return
+    for month, level, name, vol, val, stamp in json.load(open(path, "r", encoding="utf-8")):
+        conn.execute("""
+            INSERT INTO hierarchy_targets (month, level, name, target_volume, target_value, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (month, level, name) DO UPDATE
+            SET target_volume = EXCLUDED.target_volume, target_value = EXCLUDED.target_value,
+                updated_at = EXCLUDED.updated_at
+            WHERE hierarchy_targets.updated_at < EXCLUDED.updated_at
+        """, (month, str(level).upper(), name, int(vol), int(val), stamp))
 
 
 def chain_store_name(store_name):
