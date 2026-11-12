@@ -362,6 +362,15 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       </div>
     </div>
 
+    <details id="vr360" class="hidden" open>
+      <summary style="cursor:pointer;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;list-style:none">
+        <span style="flex:1;font-size:16px">Retailer 360</span><a id="vr360Full" class="note" style="font-weight:700;color:var(--brand)" href="#/r">Full view</a>
+        <span class="note" id="vr360Toggle" style="font-weight:700">Hide</span>
+      </summary>
+      <div class="seg" role="tablist" id="vr360Tabs" style="grid-template-columns:repeat(5,minmax(0,1fr));margin-top:12px"></div>
+      <div id="vr360Body" style="display:flex;flex-direction:column;gap:12px;margin-top:12px"></div>
+    </details>
+
     <div style="display:flex;flex-direction:column;gap:10px">
       <h2 style="font-size:16px;font-weight:800">What did you find?</h2>
       <div class="chips" id="feedbackChips"></div>
@@ -1165,6 +1174,7 @@ async function findNearby(autoPick) {
 
 function showSearch() {
   $('pickedRetailer').innerHTML = '';
+  clearVR360();
   $('retailerSearch').classList.remove('hidden');
 }
 
@@ -1186,7 +1196,8 @@ function pickRetailer(r, dist) {
       <div class="stat"><span>MTD</span><b class="num" style="font-size:16px">${fmt(row.sales)}${row.target ? ' / ' + fmt(row.target) : ''}</b></div>
       <div class="stat"><span>Stock</span><b class="num" style="font-size:16px">${row.stock == null ? '—' : fmt(row.stock)}</b></div>
       <div class="stat"><span>Last visit</span><b style="font-size:16px">${esc(daysLabel(row.days_since_visit))}</b></div></div>` : ''}`;
-  $('changeRetailer').onclick = () => { visitState.retailer = null; $('nearbyList').innerHTML = ''; $('retailerQuery').value = ''; $('retailerPicker').classList.add('hidden'); showSearch(); $('retailerQuery').focus(); if (gps) findNearby(false); };
+  loadVR360(r.code);
+  $('changeRetailer').onclick = () => { visitState.retailer = null; clearVR360(); $('nearbyList').innerHTML = ''; $('retailerQuery').value = ''; $('retailerPicker').classList.add('hidden'); showSearch(); $('retailerQuery').focus(); if (gps) findNearby(false); };
 }
 
 $('retailerQuery').addEventListener('input', () => {
@@ -1366,10 +1377,18 @@ function showR360(code) {
   api(`/retailers/${encodeURIComponent(r360Code)}/360`).then((d) => { if (r360Code === String(code).toUpperCase()) { r360Data = d; renderR360(); } })
     .catch((e) => { r360Data = { error: e.message }; renderR360(); });
 }
+const R360_TABS = ['Sales', 'Stock', 'Schemes', 'Visits', 'Compete'];
+function r360TabsHtml(active) {
+  return R360_TABS.map((t) => `<button role="tab" aria-selected="${t === active}" data-t="${t}" style="font-size:13px">${t}</button>`).join('');
+}
 function renderR360() {
-  $('r360Tabs').innerHTML = ['Sales', 'Stock', 'Schemes', 'Visits', 'Compete'].map((t) => `<button role="tab" aria-selected="${t === r360Tab}" data-t="${t}" style="font-size:13px">${t}</button>`).join('');
+  $('r360Tabs').innerHTML = r360TabsHtml(r360Tab);
+  $('r360Body').innerHTML = r360Html(r360Tab, r360Data, r360Comp, r360Code, false);
+}
+// Builds one tab of the 360 view. Used by the Retailers tab and, with inVisit,
+// by the card on the Log visit screen (no links that would leave the visit).
+function r360Html(r360Tab, d, r360Comp, r360Code, inVisit) {
   const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
-  const d = r360Data;
   const loading = '<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:120px"></div>';
   const errBox = d && d.error ? `<div class="err">${esc(d.error)}</div>` : '';
   let html = '';
@@ -1411,8 +1430,8 @@ function renderR360() {
     else if (c.error) html = `<div class="err">${esc(c.error)}</div>`;
     else {
       const vivo = row ? row.sales : null;
-      html = competitionCard(c.brands, c.latest, vivo) +
-        `<a class="btn soft" href="#/c/${encodeURIComponent(r360Code)}">${c.latest.length ? 'Update competition data' : 'Add competition data'}</a>`;
+      html = competitionCard(c.brands, c.latest, vivo) + (inVisit ? '' :
+        `<a class="btn soft" href="#/c/${encodeURIComponent(r360Code)}">${c.latest.length ? 'Update competition data' : 'Add competition data'}</a>`);
     }
   } else {
     const visits = d && d.market_visit ? d.market_visit.recent_visits || [] : null;
@@ -1420,9 +1439,45 @@ function renderR360() {
         <div class="between note"><b style="color:var(--ink)">${esc(v.submitted_by)} (${esc(v.submitted_role)})</b><span>${esc(new Date(v.visit_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }))}</span></div>
         ${v.feedback ? `<div style="font-size:14px;line-height:1.45">${esc(v.feedback)}</div>` : ''}${v.suggestions ? `<div class="note">Follow-up: ${esc(v.suggestions)}</div>` : ''}</div>`).join('') : '<div class="card note">No visits logged yet.</div>') : (errBox || loading);
   }
-  $('r360Body').innerHTML = html;
+  return html;
 }
 $('r360Tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-t]'); if (b) { r360Tab = b.dataset.t; renderR360(); } });
+
+/* Retailer 360 on the Log visit screen: loads as soon as a retailer is picked. */
+const vr360Cache = {};
+let vr360 = { code: null, tab: 'Sales', data: null, comp: null };
+function renderVR360() {
+  if (!vr360.code) return;
+  $('vr360Tabs').innerHTML = r360TabsHtml(vr360.tab);
+  $('vr360Body').innerHTML = r360Html(vr360.tab, vr360.data, vr360.comp, vr360.code, true);
+}
+function clearVR360() {
+  vr360 = { code: null, tab: 'Sales', data: null, comp: null };
+  $('vr360').classList.add('hidden');
+  $('vr360Body').innerHTML = '';
+}
+function loadVR360(code) {
+  code = String(code || '').toUpperCase();
+  if (!code) return clearVR360();
+  const hit = vr360Cache[code];
+  const fresh = hit && Date.now() - hit.at < 5 * 60e3;
+  vr360 = { code, tab: 'Sales', data: fresh ? hit.data : null, comp: fresh ? hit.comp : null };
+  $('vr360').classList.remove('hidden');
+  $('vr360Full').href = '#/r/' + encodeURIComponent(code);
+  renderVR360();
+  if (fresh && hit.data && hit.comp) return;
+  const keep = (k, v) => {
+    if (vr360.code !== code) return;              // retailer changed meanwhile
+    vr360[k] = v;
+    if (!v.error) vr360Cache[code] = Object.assign(vr360Cache[code] || {}, { at: Date.now(), [k]: v });
+    renderVR360();
+  };
+  api(`/retailers/${encodeURIComponent(code)}/360`).then((d) => keep('data', d)).catch((e) => keep('data', { error: e.message }));
+  api(`/competition/retailers/${encodeURIComponent(code)}`).then((c) => keep('comp', c)).catch((e) => keep('comp', { error: e.message }));
+}
+$('vr360Tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-t]'); if (b) { e.preventDefault(); vr360.tab = b.dataset.t; renderVR360(); } });
+$('vr360').addEventListener('toggle', () => { $('vr360Toggle').textContent = $('vr360').open ? 'Hide' : 'Show'; });
+$('vr360Full').addEventListener('click', (e) => e.stopPropagation());
 
 /* ---------------- TEAM ---------------- */
 let teamSeg = null, kamRecipients = null;
