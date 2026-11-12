@@ -3087,3 +3087,25 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: November schemes in the dashboard rows (read-only) ----
+def _schk():
+    time.sleep(40)
+    log = logging.getLogger("uvicorn.error")
+    for u in ({"name": "check", "role": "MANAGER"}, {"name": "Bappan Das", "role": "TL"}):
+        try:
+            d = _build_performance_dashboard(u)
+            rows = d.get("retailers") or []
+            none = [r["code"] for r in rows if not r.get("schemes")]
+            zero = [r for r in rows if r.get("schemes") and not r["schemes"]["total"]]
+            chain_zero = [r["code"] for r in zero if str(r["code"]).startswith("NED")]
+            withsales_zero = [(r["code"], r["name"], r.get("sales")) for r in zero if (r.get("sales") or 0) >= 10][:8]
+            log.warning("SCHK %s rows=%s no_schemes=%s zero_total=%s chain_zero=%s scheme=%s", u["role"], len(rows), len(none), len(zero), len(chain_zero), d.get("scheme"))
+            log.warning("SCHK %s sold10+_but_zero=%s sample_none=%s", u["role"], withsales_zero, none[:5])
+        except Exception as exc:
+            log.warning("SCHK failed %r", exc)
+
+
+import threading as _threading_sk
+_threading_sk.Thread(target=_schk, daemon=True).start()
