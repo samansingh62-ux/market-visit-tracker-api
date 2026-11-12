@@ -3087,23 +3087,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: focus models on live data (read-only) ----
-def _fmcheck():
-    import json as _j
-    time.sleep(60)
-    log = logging.getLogger("uvicorn.error")
-    for u in ({"name": "check", "role": "MANAGER"}, {"name": "Polash Roy", "role": "TL"}):
-        try:
-            t0 = time.monotonic()
-            d = focus_models_view(variant="Y11 5G(4+64G)", user=u)
-            x = d["detail"]
-            log.warning("FMCHECK %s %.1fs total=%s rows=%s notmoving=%s nostock=%s vbas=%s zero=%s", u["role"], time.monotonic() - t0,
-                        _j.dumps(d["total"]), _j.dumps([(r["variant"], r["target"], r["mtd"], r["ftd"], r["stock"]) for r in d["models"]]),
-                        len(x["not_moving"]), len(x["no_stock_with_target"]), x["vbas_in_area"], len(x["vbas_zero"]))
-        except Exception as exc:
-            log.warning("FMCHECK %s failed %r", u["role"], exc)
-
-
-import threading as _threading_fm
-_threading_fm.Thread(target=_fmcheck, daemon=True).start()
