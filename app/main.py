@@ -3038,3 +3038,41 @@ async def _lifespan_with_mcp(application):
 
 app.router.lifespan_context = _lifespan_with_mcp
 app.mount("/mcp", whatsapp_mcp.mcp_app)
+
+
+# ---- temporary: November schemes on live data (read-only) ----
+def _novlive():
+    import threading as _th  # noqa: F401
+    import json as _j
+    time.sleep(40)
+    log = logging.getLogger("uvicorn.error")
+    try:
+        perf = _build_performance_dashboard({"name": "check", "role": "MANAGER"})
+        s = perf.get("summary") or {}
+        rows = perf.get("retailers") or []
+        keys = ["scheme_payout", "scheme_eligible_units", "focus_scheme_payout", "clearance_scheme_payout",
+                "additional_scheme_payout", "back_support_base_margin", "back_support_payable_known"]
+        log.warning("NOVLIVE available=%s retailers=%s %s", (perf.get("scheme") or {}).get("available"), len(rows),
+                    _j.dumps({k: s.get(k) for k in keys}))
+        withs = [r for r in rows if r.get("schemes")]
+        clubs = {}
+        for r in withs:
+            t = (r["schemes"]["booster"] or {}).get("type")
+            clubs[t] = clubs.get(t, 0) + 1
+        bs = [r["schemes"]["back_support"] for r in withs]
+        log.warning("NOVLIVE booster_types=%s bs_no_target=%s bs_upgraded=%s bs_ge90=%s unknown_price_units=%s",
+                    clubs, sum(1 for b in bs if b["target_value"] is None), sum(1 for b in bs if b["upgraded"]),
+                    sum(1 for b in bs if (b["achievement_pct"] or 0) >= 90),
+                    sum(int(r["schemes"]["booster"].get("unknown_price_units") or 0) + int(r["schemes"]["back_support"].get("unknown_value_units") or 0) for r in withs))
+        top = sorted(withs, key=lambda r: -r["schemes"]["total"])[:5]
+        for r in top:
+            sc = r["schemes"]
+            log.warning("NOVLIVE top %s | %s | club=%s | total=%s booster=%s focus=%s clr=%s add=%s bs=%s (%s%%)",
+                        r["code"], r["name"], r.get("club"), sc["total"], sc["booster"].get("payout"), sc["focus"]["payout"],
+                        sc["clearance"]["payout"], sc["additional"]["payout"], sc["back_support"]["payable"], sc["back_support"]["achievement_pct"])
+    except Exception as exc:
+        log.warning("NOVLIVE failed %r", exc)
+
+
+import threading as _threading_nov
+_threading_nov.Thread(target=_novlive, daemon=True).start()
