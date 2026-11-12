@@ -1,5 +1,6 @@
-"""Store alignment supplied by Management (November 2026: PO stores under their TL, NPO stores
-directly under the SS with TL "SS Direct (NPO)", so a TL sees only PO outlets)."""
+"""Store alignment supplied by Management (November 2026). PO outlets and NPO outlets with a named
+TL sit under that TL; NPO outlets without one (VBM-Vacant) carry TL "SS Direct (NPO)" and sit
+directly under the SS. The SS sees every outlet in the area; the KAM sees the whole area."""
 import json
 import re
 from pathlib import Path

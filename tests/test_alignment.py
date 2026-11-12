@@ -5,17 +5,19 @@ def test_master_is_unique_at_store_grain_and_retains_shared_retailers():
     assert len(alignment.stores) == 730
     assert len(alignment.retailers) == 589
     shared = [code for code in alignment.retailers if len({(r["kam"], r["ss"], r["tl"]) for r in alignment.assignments(code)}) > 1]
-    assert len(shared) == 53
+    assert len(shared) == 43
     assert len(alignment.assignments("NER177087", {"tl": "Krishna Bhowmick"})) == 4
     assert len(alignment.assignments("NER177087", {"tl": "SS Direct (NPO)"})) == 3
 
 
 def test_npo_outlets_sit_under_the_ss_not_a_tl():
     rows = alignment.rows
-    assert all(r["tl"] == "SS Direct (NPO)" and not r["tl_id"] for r in rows if r["outlet_type"] == "NPO")
-    assert all(r["tl"] != "SS Direct (NPO)" for r in rows if r["outlet_type"] == "PO")
+    # NPO outlets go to the TL named in the file; only those without one sit directly under the SS.
+    assert all(r["tl"] == r["area_tl"] for r in rows if r["outlet_type"] == "PO")
+    assert all(r["tl"] == ("SS Direct (NPO)" if r["area_tl"] == "VBM-Vacant" else r["area_tl"]) for r in rows if r["outlet_type"] == "NPO")
+    assert all(not r["tl_id"] for r in rows if r["tl"] == "SS Direct (NPO)")
     polash_tl = alignment.store_codes(scope={"tl": "Polash Roy"})
-    assert polash_tl and all(alignment.stores[c]["outlet_type"] == "PO" for c in polash_tl)
+    assert polash_tl and all(alignment.stores[c]["area_tl"] == "Polash Roy" for c in polash_tl)
     ss = alignment.store_codes(scope={"ss": "Avisek Das"})
     assert {alignment.stores[c]["outlet_type"] for c in ss} == {"PO", "NPO"}
     assert set(ss) <= set(alignment.store_codes(scope={"kam": "Sailen Das"}))
