@@ -1545,7 +1545,9 @@ function schemesHtml(row) {
   const sb = S.shopboy || {};
   const sbLine = (label, x) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px"><b>${label}</b>${x.next_from ? `<span class="note">${money(x.value_more)} more → ${money(x.next_amount)}</span>` : '<span class="note">Top slab</span>'}</div><b class="num">${money(x.amount)}</b></div>`;
 
-  return card(`<span class="note" style="font-weight:700">November schemes · provisional</span><b class="num" style="font-size:30px;line-height:1">${money(S.total)}</b>
+  const sh = S.shared;
+  return (sh ? `<div class="alert info" style="font-size:13px;line-height:1.45">Schemes are worked out on the whole retailer: <b>${esc(sh.retailer_name || sh.retailer_code)}</b>, all ${sh.stores} stores together. Every store shows the same figures.</div>` : '') +
+    card(`<span class="note" style="font-weight:700">November schemes · provisional</span><b class="num" style="font-size:30px;line-height:1">${money(S.total)}</b>
       <span class="note">Booster + Focus + Clearance + Additional + Back Support. Paid only with 100% V-Work upload and 90% activation; pre-activation above 5% cuts 20%; MOP breach or infiltration voids it.</span>`) +
     card(head('Booster', bSub, b.payout) + bBody) +
     group('Focus Model', S.focus || {}, P.models, true) +

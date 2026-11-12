@@ -2400,6 +2400,19 @@ def _build_performance_dashboard(user: dict):
 
     month_days = calendar.monthrange(today.year, today.month)[1]
     days_remaining = max(month_days - today.day + 1, 1)
+    # Schemes are worked out per retailer (dealer code). A chain retailer's stores are listed one by
+    # one, so each store shows its retailer's figure, counted once in totals (on its first store).
+    chain_of, chain_target, chain_first = {}, {}, {}
+    for row in rows:
+        unit = str(row.get("code") or "").strip().upper()
+        st = alignment.stores.get(unit)
+        if st and alignment.is_chain_store(unit):
+            rc = str(st["retailer_code"]).strip().upper()
+            chain_of[unit] = rc
+            chain_target[rc] = chain_target.get(rc, 0) + int(row.get("target_value") or 0)
+            chain_first.setdefault(rc, unit)
+            chain_first[rc] = min(chain_first[rc], unit)
+
     retailer_rows = []
     for row in rows:
         code = str(row.get("code") or "").strip().upper()
@@ -2415,8 +2428,16 @@ def _build_performance_dashboard(user: dict):
         avg_daily = float((live or {}).get("avg_daily_sales") or 0)
         dos = live.get("dos") if stock_matched else None
         target = int(row.get("target_volume") or 0)
-        nov = schemes_nov.for_retailer(row.get("club"), row.get("target_value"), scheme_by_code.get(code, {}), today) if schemes_ok else None
-        nb, nf, nbs = (nov or {}).get("booster") or {}, (nov or {}).get("focus") or {}, (nov or {}).get("back_support") or {}
+        parent = chain_of.get(code)
+        if schemes_ok and parent:
+            nov = schemes_nov.for_retailer(row.get("club"), chain_target.get(parent), scheme_by_code.get(parent, {}), today)
+            nov["shared"] = {"retailer_code": parent, "retailer_name": (alignment.retailers.get(parent) or [{}])[0].get("retailer_name"),
+                             "stores": len(alignment.retailers.get(parent) or []), "counted_here": chain_first.get(parent) == code}
+        else:
+            nov = schemes_nov.for_retailer(row.get("club"), row.get("target_value"), scheme_by_code.get(code, {}), today) if schemes_ok else None
+        # Totals take a chain retailer's payout once (on its first store); every store still shows it.
+        counted = nov if not (nov and nov.get("shared") and not nov["shared"]["counted_here"]) else {}
+        nb, nf, nbs = (counted or {}).get("booster") or {}, (counted or {}).get("focus") or {}, (counted or {}).get("back_support") or {}
         gap = max(target - sales, 0)
         ach = round((sales / target) * 100, 1) if target > 0 else 0
         req = round(gap / days_remaining, 1) if target > 0 else 0
@@ -2473,7 +2494,7 @@ def _build_performance_dashboard(user: dict):
             "visit_count": int(row.get("visit_count") or 0),
             "status": status,
             # November 2026: "scheme_*" is the Booster (PO / NPO) scheme.
-            "scheme_type": {"PO": "Club / PO", "NPO": "NPO / Non-Club"}.get(nb.get("type"), "Unclassified"),
+            "scheme_type": {"PO": "Club / PO", "NPO": "NPO / Non-Club"}.get(((nov or {}).get("booster") or {}).get("type"), "Unclassified"),
             "scheme_slab": nb.get("slab"),
             "scheme_eligible_units": nb.get("units"),
             "scheme_payout": nb.get("payout"),
@@ -2482,8 +2503,8 @@ def _build_performance_dashboard(user: dict):
             "focus_scheme_units": nf.get("units"),
             "focus_scheme_payout": nf.get("payout"),
             "focus_scheme_detail": nf.get("lines"),
-            "clearance_scheme_payout": ((nov or {}).get("clearance") or {}).get("payout"),
-            "additional_scheme_payout": ((nov or {}).get("additional") or {}).get("payout"),
+            "clearance_scheme_payout": ((counted or {}).get("clearance") or {}).get("payout"),
+            "additional_scheme_payout": ((counted or {}).get("additional") or {}).get("payout"),
             "v80_units": None,
             "v80_slab": None,
             "v80_normal_sales_payout": 0,
@@ -3089,23 +3110,28 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-# ---- temporary: November schemes in the dashboard rows (read-only) ----
-def _schk():
+
+# ---- temporary: November schemes for chain stores (read-only) ----
+def _schk2():
     time.sleep(40)
     log = logging.getLogger("uvicorn.error")
-    for u in ({"name": "check", "role": "MANAGER"}, {"name": "Bappan Das", "role": "TL"}):
-        try:
-            d = _build_performance_dashboard(u)
-            rows = d.get("retailers") or []
-            none = [r["code"] for r in rows if not r.get("schemes")]
-            zero = [r for r in rows if r.get("schemes") and not r["schemes"]["total"]]
-            chain_zero = [r["code"] for r in zero if str(r["code"]).startswith("NED")]
-            withsales_zero = [(r["code"], r["name"], r.get("sales")) for r in zero if (r.get("sales") or 0) >= 10][:8]
-            log.warning("SCHK %s rows=%s no_schemes=%s zero_total=%s chain_zero=%s scheme=%s", u["role"], len(rows), len(none), len(zero), len(chain_zero), d.get("scheme"))
-            log.warning("SCHK %s sold10+_but_zero=%s sample_none=%s", u["role"], withsales_zero, none[:5])
-        except Exception as exc:
-            log.warning("SCHK failed %r", exc)
+    try:
+        d = _build_performance_dashboard({"name": "check", "role": "MANAGER"})
+        rows = d.get("retailers") or []
+        zero = [r for r in rows if r.get("schemes") and not r["schemes"]["total"]]
+        shared = [r for r in rows if (r.get("schemes") or {}).get("shared")]
+        s = d.get("summary") or {}
+        log.warning("SCHK2 rows=%s zero_total=%s shared=%s zero_with_10plus=%s totals=%s", len(rows), len(zero), len(shared),
+                    [(r["code"], r["name"], r.get("sales")) for r in zero if (r.get("sales") or 0) >= 10][:6],
+                    {k: s.get(k) for k in ("scheme_payout", "focus_scheme_payout", "clearance_scheme_payout", "additional_scheme_payout", "back_support_payable_known")})
+        for r in rows:
+            if r["name"].startswith(("Moon Light", "Rainbow")):
+                sc = r["schemes"]
+                log.warning("SCHK2 %s %s total=%s counted=%s booster=%s focus=%s payout_field=%s", r["code"], r["name"], sc["total"],
+                            sc["shared"]["counted_here"], sc["booster"].get("payout"), sc["focus"]["payout"], r.get("scheme_payout"))
+    except Exception as exc:
+        log.warning("SCHK2 failed %r", exc)
 
 
-import threading as _threading_sk
-_threading_sk.Thread(target=_schk, daemon=True).start()
+import threading as _threading_sk2
+_threading_sk2.Thread(target=_schk2, daemon=True).start()
