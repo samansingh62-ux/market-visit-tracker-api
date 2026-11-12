@@ -3039,3 +3039,25 @@ async def _lifespan_with_mcp(application):
 app.router.lifespan_context = _lifespan_with_mcp
 app.mount("/mcp", whatsapp_mcp.mcp_app)
 
+
+
+# ---- temporary: remove Sailen Das's duplicate visits of 12 Nov (approved by Saman) ----
+def _dedupe_sailen():
+    time.sleep(20)
+    log = logging.getLogger("uvicorn.error")
+    dupes = [655, 656, 657, 658, 659, 660, 661, 662, 664, 665, 668]
+    try:
+        with database.get_conn() as conn:
+            n = conn.execute(
+                "DELETE FROM visits WHERE id = ANY(%s) AND submitted_by = 'Sailen Das' "
+                "AND created_at >= '2026-11-12' AND created_at < '2026-11-13' "
+                "AND NOT EXISTS (SELECT 1 FROM visit_photos p WHERE p.visit_id = visits.id)",
+                (dupes,),
+            ).rowcount
+        log.warning("DEDUPE removed %s duplicate visits", n)
+    except Exception as exc:
+        log.warning("DEDUPE failed %r", exc)
+
+
+import threading as _threading_dd
+_threading_dd.Thread(target=_dedupe_sailen, daemon=True).start()
