@@ -2515,9 +2515,43 @@ def _build_performance_dashboard(user: dict):
             "back_support_eligibility": nbs.get("rule"),
             "back_support_unknown_value_units": nbs.get("unknown_value_units"),
             "schemes": nov,
+            "chain_parent": parent,
         })
 
     total_target = sum(x["target"] for x in retailer_rows)
+    # Each chain retailer as one combined counter (its stores together plus the stock V-Work keeps
+    # at retailer level). Listed separately from "retailers" so totals never count it twice.
+    chain_parents = []
+    for parent, first in sorted(chain_first.items()):
+        stores = [x for x in retailer_rows if x.get("chain_parent") == parent]
+        live = live_by_code.get(parent) or {}
+        p_sales = sum(int(x["sales"] or 0) for x in stores)
+        p_target = sum(int(x["target"] or 0) for x in stores)
+        # V-Work's retailer-level stock already includes every store of the retailer.
+        p_stock = int(live["good_phone_stock"] or 0) if "good_phone_stock" in live else sum(int(x["stock"] or 0) for x in stores)
+        avg = p_sales / max((today - today.replace(day=1)).days + 1, 1)
+        visits = [x["days_since_visit"] for x in stores if x.get("days_since_visit") is not None]
+        f = stores[0] if stores else {}
+        chain_parents.append({
+            "code": parent, "is_chain_parent": True,
+            "name": (alignment.retailers.get(parent) or [{}])[0].get("retailer_name") or parent,
+            "store_codes": [x["code"] for x in stores], "store_names": [x["name"] for x in stores],
+            "stores_total": len(alignment.retailers.get(parent) or []),
+            "tl": " | ".join(sorted({x["tl"] for x in stores if x.get("tl")})),
+            "ss": " | ".join(sorted({x["ss"] for x in stores if x.get("ss")})),
+            "rds": f.get("rds"), "kam": f.get("kam"), "club": f.get("club"), "town_name": f.get("town_name"),
+            "target": p_target, "sales": p_sales, "sales_value": round(sum(float(x["sales_value"] or 0) for x in stores), 2),
+            "ftd_sales": sum(int(x["ftd_sales"] or 0) for x in stores),
+            "achievement_pct": round(p_sales * 100 / p_target, 1) if p_target else 0,
+            "required_per_day": round(max(p_target - p_sales, 0) / days_remaining, 1) if p_target else 0,
+            "stock": p_stock, "stock_matched": True, "dos": round(p_stock / avg, 1) if avg > 0 else None,
+            "days_since_visit": min(visits) if visits else None,
+            "visit_count": sum(int(x.get("visit_count") or 0) for x in stores),
+            "status": ("Behind" if p_target and p_sales * 2 < p_target else "High Stock" if avg > 0 and p_stock / avg > 45
+                       else "No Sales" if not p_sales else "On Track"),
+            "schemes": f.get("schemes"),
+        })
+
     total_sales = sum(x["sales"] for x in retailer_rows)
     total_sales_value = sum(float(x.get("sales_value") or 0) for x in retailer_rows)
     total_asp = round(total_sales_value / total_sales, 2) if total_sales > 0 else 0
@@ -2656,6 +2690,7 @@ def _build_performance_dashboard(user: dict):
         "store_sales": store_sales,
         "alignment": live_payload.get("alignment", {}),
         "retailers": retailer_rows,
+        "chain_parents": chain_parents,
     }
 
 
@@ -3110,3 +3145,21 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: chain parents on live data (read-only) ----
+def _cpchk():
+    time.sleep(40)
+    log = logging.getLogger("uvicorn.error")
+    for u in ({"name": "Bappan Das", "role": "TL"}, {"name": "check", "role": "MANAGER"}):
+        try:
+            d = _build_performance_dashboard(u)
+            cp = d.get("chain_parents") or []
+            ml = [(p["code"], p["name"], p["store_codes"], p["sales"], p["target"], p["stock"], (p.get("schemes") or {}).get("total")) for p in cp if "Moon" in p["name"]]
+            log.warning("CPCHK %s parents=%s moon=%s total_sales=%s", u["role"], len(cp), ml, (d.get("summary") or {}).get("total_sales"))
+        except Exception as exc:
+            log.warning("CPCHK failed %r", exc)
+
+
+import threading as _threading_cp
+_threading_cp.Thread(target=_cpchk, daemon=True).start()

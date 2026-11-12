@@ -1448,9 +1448,11 @@ function showRetailers() {
 }
 function renderRetailers() {
   const perf = (cache.perf || {}).data; if (!perf) return;
-  const all = perf.retailers || [];
-  $('retailerTotal').textContent = `${fmt(all.length)} assigned`;
-  $('rFilters').innerHTML = Object.keys(R_FILTERS).map((k) => `<button class="chip dark" data-f="${k}" aria-pressed="${k === rFilter}">${k} <span class="num" style="opacity:.75">${all.filter(R_FILTERS[k]).length}</span></button>`).join('');
+  const units = perf.retailers || [];
+  $('retailerTotal').textContent = `${fmt(units.length)} assigned`;
+  // Chain retailers (Moonlight, Rainbow, Reliance...) also appear once as a whole, above their stores.
+  const all = [...(perf.chain_parents || []), ...units];
+  $('rFilters').innerHTML = Object.keys(R_FILTERS).map((k) => `<button class="chip dark" data-f="${k}" aria-pressed="${k === rFilter}">${k} <span class="num" style="opacity:.75">${units.filter(R_FILTERS[k]).length}</span></button>`).join('');
   const q = $('rSearch').value.trim().toLowerCase();
   const rows = all.filter(R_FILTERS[rFilter]).filter((r) => !q || (r.name + ' ' + (r.town_name || '')).toLowerCase().includes(q));
   $('rList').innerHTML = rows.length ? rows.slice(0, 200).map((r) => {
@@ -1458,7 +1460,7 @@ function renderRetailers() {
     const pct = r.target ? Math.min(100, Math.round(r.sales / r.target * 100)) : 0;
     return `<a class="rCard" href="#/r/${encodeURIComponent(r.code)}">
       <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:16px">${esc(r.name)}</b><span class="note">${esc(r.town_name || '')} · visited ${esc(daysLabel(r.days_since_visit))}</span></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:16px">${esc(r.name)}</b><span class="note">${r.is_chain_parent ? `<b style="color:var(--brand-ink)">Main · all ${r.stores_total} stores</b> · ` : ''}${esc(r.town_name || '')} · visited ${esc(daysLabel(r.days_since_visit))}</span></div>
         <span class="pill" style="background:${s.bg};color:${s.fg}">${s.label}</span>
       </div>
       <div class="row" style="gap:10px"><div class="bar" style="flex:1"><i style="width:${pct}%;background:${s.bar}"></i></div><span class="num" style="font-size:13px;font-weight:700;min-width:64px;text-align:right">${fmt(r.sales)}${r.target ? ' / ' + fmt(r.target) : ''}</span></div>
@@ -1475,6 +1477,11 @@ $('rSearch').addEventListener('input', renderRetailers);
 
 /* ---------------- RETAILER 360 ---------------- */
 let r360Tab = 'Sales', r360Data = null, r360Code = null, r360Comp = null, r360OpenTab = null;
+// A counter from the dashboard: a store/retailer row, or a chain retailer as one combined counter.
+function perfRow(code) {
+  const d = (cache.perf || {}).data || {};
+  return (d.retailers || []).find((x) => x.code === code) || (d.chain_parents || []).find((x) => x.code === code) || null;
+}
 function showR360(code) {
   r360Code = String(code || '').toUpperCase();
   r360Tab = r360OpenTab || 'Sales';
@@ -1484,12 +1491,15 @@ function showR360(code) {
     .catch((e) => { r360Comp = { error: e.message }; renderR360(); });
   $('r360Visit').href = '#/visit/' + encodeURIComponent(r360Code);
   const fill = () => {
-    const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
+    const row = perfRow(r360Code);
     const master = (((cache.master || {}).data) || []).find((x) => x.code === r360Code);
     const base = row || master || {};
     $('r360Name').textContent = base.name || r360Code;
     $('r360Meta').textContent = [base.town_name, base.tl && tlLabel(base.tl), base.ss && 'SS ' + base.ss, base.rds && 'RDS ' + base.rds].filter(Boolean).join(' · ');
+    const parent = row && row.chain_parent ? perfRow(row.chain_parent) : null;
     $('r360Pills').innerHTML = row ? [
+      row.is_chain_parent ? `<span class="pill" style="background:#24365C;color:#fff">All ${row.stores_total} stores</span>` : '',
+      parent ? `<a class="pill" style="background:var(--brand-soft);color:var(--brand-ink)" href="#/r/${encodeURIComponent(parent.code)}">Main: ${esc(parent.name.replace(' (Retailer)', ''))} ›</a>` : '',
       `<span class="pill" style="background:${st(row.status).bg};color:${st(row.status).fg}">${st(row.status).label}</span>`,
       row.dos != null ? `<span class="pill num" style="background:var(--hi-bg);color:var(--hi)">DOS ${fmt1(row.dos)}</span>` : '',
       `<span class="pill" style="background:#24365C;color:#fff">Visited ${esc(daysLabel(row.days_since_visit))}</span>`
@@ -1570,7 +1580,7 @@ function renderR360() {
 // Builds one tab of the 360 view. Used by the Retailers tab and, with inVisit,
 // by the card on the Log visit screen (no links that would leave the visit).
 function r360Html(r360Tab, d, r360Comp, r360Code, inVisit) {
-  const row = (((cache.perf || {}).data || {}).retailers || []).find((x) => x.code === r360Code);
+  const row = perfRow(r360Code);
   const loading = '<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:120px"></div>';
   const errBox = d && d.error ? `<div class="err">${esc(d.error)}</div>` : '';
   let html = '';
