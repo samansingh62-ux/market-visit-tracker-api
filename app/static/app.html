@@ -565,6 +565,8 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 /* ---------------- helpers ---------------- */
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// NPO outlets have no TL: they sit directly under the SS.
+const tlLabel = (tl) => String(tl || '').split(' | ').map((t) => t === 'SS Direct (NPO)' ? 'NPO outlet' : 'TL ' + t).join(' · ');
 const fmt = (n) => (n == null || isNaN(n)) ? '—' : Math.round(Number(n)).toLocaleString('en-IN');
 const fmt1 = (n) => (n == null || isNaN(n)) ? '—' : (Math.round(Number(n) * 10) / 10).toLocaleString('en-IN');
 const money = (v) => {
@@ -1043,7 +1045,7 @@ function renderStockModel(d) {
           <div style="display:flex;flex-direction:column;gap:4px;padding-top:10px;border-top:1px solid #EEF1F6">
             <div class="between" style="gap:8px"><a href="#/r/${encodeURIComponent(h.code)}" class="ellipsis" style="font-weight:700;font-size:15px;color:var(--ink)">${esc(h.name)}</a>${sfPill(h.status)}</div>
             <span class="note num">Stock <b>${fmt(h.stock)}</b> · Sold ${fmt(h.sold)} · ${esc(last(h))}${h.cover_days != null ? ' · ' + fmt(h.cover_days) + ' days cover' : ''}</span>
-            <span class="note">${esc((h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', '))}${h.tl ? ' · TL ' + esc(h.tl) : ''}</span>
+            <span class="note">${esc((h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', '))}${h.tl ? ' · ' + esc(tlLabel(h.tl)) : ''}</span>
           </div>`).join('') : `<span class="note">No return candidates for this variant — every counter holding it has sold it in the last ${d.days} days.</span>`}
         ${v.short.length ? `<details ${v.not_moving_units ? 'open' : ''}><summary style="cursor:pointer;font-weight:700;font-size:14px;padding-top:6px">Selling here, short of stock (${v.short.length})</summary>
           ${v.short.map((x) => `<div class="kv" style="gap:10px"><a href="#/r/${encodeURIComponent(x.code)}" class="ellipsis" style="color:var(--ink);min-width:0">${esc(x.name)}</a><b class="num" style="white-space:nowrap;flex-shrink:0;font-size:13px">Sold ${fmt(x.sold)} · Stock ${fmt(x.stock)}</b></div>`).join('')}
@@ -1057,7 +1059,7 @@ function renderStockModel(d) {
 async function shareReturnList(d, v) {
   const nm = v.holders.filter((h) => h.status === 'Not moving');
   const lines = [`${v.variant}: no sale in the last ${d.days} days (stock as of ${shortDay(d.as_of)})`, '',
-    ...nm.map((h) => `• ${h.name} — ${h.stock} pcs (${(h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', ')})${h.tl ? ' · TL ' + h.tl : ''}`)];
+    ...nm.map((h) => `• ${h.name} — ${h.stock} pcs (${(h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', ')})${h.tl ? ' · ' + tlLabel(h.tl) : ''}`)];
   if (v.short.length) lines.push('', 'Selling, short of stock:', ...v.short.slice(0, 6).map((x) => `• ${x.name} — sold ${x.sold}, stock ${x.stock}`));
   const text = lines.join('\n');
   try {
@@ -1394,7 +1396,7 @@ function showR360(code) {
     const master = (((cache.master || {}).data) || []).find((x) => x.code === r360Code);
     const base = row || master || {};
     $('r360Name').textContent = base.name || r360Code;
-    $('r360Meta').textContent = [base.town_name, base.tl && 'TL ' + base.tl, base.ss && 'SS ' + base.ss, base.rds && 'RDS ' + base.rds].filter(Boolean).join(' · ');
+    $('r360Meta').textContent = [base.town_name, base.tl && tlLabel(base.tl), base.ss && 'SS ' + base.ss, base.rds && 'RDS ' + base.rds].filter(Boolean).join(' · ');
     $('r360Pills').innerHTML = row ? [
       `<span class="pill" style="background:${st(row.status).bg};color:${st(row.status).fg}">${st(row.status).label}</span>`,
       row.dos != null ? `<span class="pill num" style="background:var(--hi-bg);color:var(--hi)">DOS ${fmt1(row.dos)}</span>` : '',

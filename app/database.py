@@ -565,6 +565,12 @@ def init_db():
         """)
 
 
+# Target files re-issued after the month was seeded: month -> stamp of the corrected file.
+TARGET_FILE_RELOADS = {
+    "2026-11": "2026-11-12 11:45:00+00",  # Tertiary dashboard till 11 Nov: new stores, Manipur targets
+}
+
+
 def _seed_monthly_targets(conn):
     """Seed retailer_targets_YYYY-MM.json, store_targets_YYYY-MM.json and hierarchy_targets_YYYY-MM.json
     for months from Nov 2026 on, only when that month has nothing yet (a later upload is kept)."""
@@ -574,15 +580,20 @@ def _seed_monthly_targets(conn):
         if not m or m.group(1) < "2026-11":
             continue
         month = m.group(1)
-        if int(conn.execute("SELECT COUNT(*) AS c FROM retailer_targets WHERE month = %s", (month,)).fetchone()["c"] or 0):
-            continue
+        latest = conn.execute("SELECT COUNT(*) AS c, MAX(updated_at) AS u FROM retailer_targets WHERE month = %s", (month,)).fetchone()
+        reload_stamp = TARGET_FILE_RELOADS.get(month)
+        if int(latest["c"] or 0):
+            # A corrected target file replaces the month only while nothing newer was uploaded.
+            if not reload_stamp or str(latest["u"] or "") >= reload_stamp:
+                continue
+            conn.execute("DELETE FROM retailer_targets WHERE month = %s", (month,))
         rows = json.load(open(path, "r", encoding="utf-8"))
         with conn.cursor() as cur:
             cur.executemany("""
                 INSERT INTO retailer_targets (month, retailer_code, retailer_name, target_volume, target_value, updated_at)
-                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP::text)
+                VALUES (%s, %s, %s, %s, %s, COALESCE(%s::text, CURRENT_TIMESTAMP::text))
                 ON CONFLICT (month, retailer_code) DO NOTHING
-            """, [(month, str(r[0]).strip().upper(), (r[3] if len(r) > 3 else "") or "", int(r[1] or 0), int(r[2] or 0))
+            """, [(month, str(r[0]).strip().upper(), (r[3] if len(r) > 3 else "") or "", int(r[1] or 0), int(r[2] or 0), reload_stamp)
                   for r in rows if isinstance(r, list) and len(r) >= 3 and r[0]])
         store_path = APP_DIR / f"store_targets_{month}.json"
         if store_path.exists():
@@ -655,7 +666,7 @@ def apply_alignment(conn):
         cur.executemany("""
             INSERT INTO store_alignment
             (store_code, store_name, retailer_code, retailer_name, kam, ss, tl, rds, ss_id, tl_id, source_month, unit_code)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'2026-10',%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'2026-11',%s)
         """, [(r["store_code"], r["store_name"], r["retailer_code"], r["retailer_name"],
                canonical_name(r["kam"]), canonical_name(r["ss"]), canonical_name(r["tl"]),
                canonical_name(r["rds"]), r["ss_id"], r["tl_id"], alignment.unit_code(r)) for r in alignment.rows])

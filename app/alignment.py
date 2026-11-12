@@ -1,4 +1,5 @@
-"""October 2026 store and retailer alignment supplied by Management."""
+"""Store alignment supplied by Management (November 2026: PO stores under their TL, NPO stores
+directly under the SS with TL "SS Direct (NPO)", so a TL sees only PO outlets)."""
 import json
 import re
 from pathlib import Path
@@ -95,4 +96,4 @@ class Alignment:
             out[k] = " | ".join(sorted({canonical_name(r.get(k)) for r in rows}))
         return out
 
-alignment = Alignment(json.loads((Path(__file__).parent / "alignment_2026-10.json").read_text()))
+alignment = Alignment(json.loads((Path(__file__).parent / "alignment_2026-11.json").read_text()))

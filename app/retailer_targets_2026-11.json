@@ -1,1 +1,3536 @@
-[["NER00243942", 63, 1900000, "Mobi Flash (Retailer)"], ["NER00310895", 65, 2500000, "Mobile Ghar (Silchar) (Retailer)"], ["NER176243", 250, 8688000, "Moni Mobile Rep Centre-Main (Retailer)"], ["NER176385", 45, 1200000, "Connecting World(Sil)-Main (Retailer)"], ["NER176665", 63, 2000000, "Smart Mobile-Main (Retailer)"], ["NER177670", 45, 1400000, "Mobile Wale-Main (Retailer)"], ["NER177720", 15, 500000, "RTCube (Retailer)"], ["NER177828", 439, 15340000, "Reliance(Retailer) - NE"], ["NER178212", 30, 900000, "Rahul Mobile Center (Retailer)"], ["NER187405", 30, 900000, "M/S. Masum Communication (Retailer)"], ["NER00213573", 30, 900000, "Pema Mobile Shoppe (Retailer)"], ["NER00261909", 10, 300000, "Sikkim Mobile Hub (Retailer)"], ["NER00321977", 3, 100000, "Mahakal Mobile & Electronics (Retailer)"], ["NER176434", 20, 600000, "Ram Niwas Agarwal (Retailer)"], ["NER176459", 3, 100000, "Hayat Enterprise (Retailer)"], ["NER176592", 3, 100000, "Padam Times(Singtam) (Retailer)"], ["NER176691", 33, 1000000, "Abdul Electronics (Retailer)"], ["NER176806", 20, 600000, "R K Jain (Retailer)"], ["NER177203", 20, 600000, "Awasna Enterprise (Retailer)"], ["NER177214", 0, 0, "Shreyas (Retailer)"], ["NER177478", 0, 0, "Sai Enterprise (Retailer)"], ["NER177549", 50, 1500000, "R.S Traders-Showroom Gangtok-ES (Retailer)"], ["NER178116", 37, 1100000, "NG (Retailer)"], ["NER178932", 7, 200000, "Khetaram Murlidhar (Retailer)"], ["NER179006", 53, 1600000, "BK Furniture and Electronics (Retailer)"], ["NER177434", 27, 800000, "Boyz Mobile-Main (Retailer)"], ["NER177990", 27, 800000, "Shiwang Electronics-Main (Retailer)"], ["NER00251895", 0, 0, "G.D Mobile (Diyun) (Retailer)"], ["NER00264961", 0, 0, "Nokia Cell Zone (Retailer)"], ["NER00265657", 0, 0, "M/S Digital World (Retailer)"], ["NER00302683", 0, 0, "C.K Enterprises (Retailer)"], ["NER00321044", 0, 0, "Digital Centre (Namsai) (Retailer)"], ["NER00330626", 0, 0, "M/s Hello Mobiles (Retailer)"], ["NER176373", 0, 0, "Bruwu Electronics (Retailer)"], ["NER176387", 0, 0, "Babu Store (Retailer)"], ["NER176671", 0, 0, "JMD Enterprises(NE) (Retailer)"], ["NER176709", 0, 0, "Chaya Mobile (Retailer)"], ["NER176786", 0, 0, "Sunita Mobile(Namsai) (Retailer)"], ["NER176988", 0, 0, "M/S M & J Enterprises (Retailer)"], ["NER177234", 0, 0, "G R Enterprises (Retailer)"], ["NER177566", 0, 0, "Ms Mari Enterprises (Retailer)"], ["NER177602", 0, 0, "M/s K.B Enterprise (Retailer)"], ["NER177756", 0, 0, "Yadav Electronics (Retailer)"], ["NER177873", 0, 0, "Ms Matbing Enterprises (Retailer)"], ["NER178010", 0, 0, "Baby Electronics (Retailer)"], ["NER178258", 0, 0, "Ms T L Enterprises (Retailer)"], ["NER178392", 0, 0, "Sah Computer (Retailer)"], ["NER178402", 0, 0, "Ms Electronic Solution (Retailer)"], ["NER178664", 0, 0, "Ete Hi-Choice (Retailer)"], ["NER178940", 0, 0, "Nokia House (Retailer)"], ["NER178976", 0, 0, "M/s Jini Smart Tech (Retailer)"], ["NER178988", 0, 0, "J K Electronic (Retailer)"], ["NER179012", 0, 0, "M/S B.M. Electrical And Electronics (Retailer)"], ["NER179341", 0, 0, "Bruwu Watch n Electronics (Retailer)"], ["NER179453", 0, 0, "Jaiswal Electronics(NE) (Retailer)"], ["NER184792", 0, 0, "Hoda Electronics (Retailer)"], ["NER184794", 0, 0, "Rajen Watch And Electronics-Main (Retailer)"], ["NER197525", 0, 0, "Khushi Steel (Retailer)"], ["NER00281905", 100, 3000000, "Galaxy Mobile (Silchar) (Retailer)"], ["NER00293235", 62, 1600000, "Salamiya Enterprise (Retailer)"], ["NER176576", 80, 3000000, "MMC-Main (Retailer)"], ["NER176808", 150, 5500000, "Time Sound Center-Main (Retailer)"], ["NER177195", 100, 3000000, "Mamon Mobile And Electronic (Retailer)"], ["NER177452", 62, 1600000, "Moon Light-Main (Retailer)"], ["NER178365", 30, 700000, "Laskar Mobile Point (Retailer)"], ["NER178559", 62, 1400000, "Ijaj Mobile And Electronics (Retailer)"], ["NER178658", 30, 500000, "HiFi Telecom (Retailer)"], ["NER00212314", 45, 1050000, "Tahmina Electicals & Electronics (Retailer)"], ["NER00212317", 40, 1200000, "Maa Electronic & Mobile Point (Retailer)"], ["NER00245678", 25, 700000, "Tech City (Retailer)"], ["NER00291208", 15, 400000, "E K Traders (Retailer)"], ["NER00307770", 40, 1200000, "Muthasir Electronics (Retailer)"], ["NER00332603", 10, 200000, "Ali Store (Retailer)"], ["NER176644", 45, 1500000, "Western Point (Retailer)"], ["NER176966", 65, 1500000, "J H Electronic And Mobile Point-Main (Retailer)"], ["NER177028", 70, 2000000, "Eastern Electro Vision(Mirza) (Retailer)"], ["NER177845", 40, 1100000, "J K S Store (Retailer)"], ["NER178022", 50, 1550000, "Zoom Electronics ( Chaygaon ) (Retailer)"], ["NER178163", 40, 1000000, "Jitu Electronics And Mobiles (Retailer)"], ["NER178346", 160, 3500000, "J A Electronics(Goroimari) (Retailer)"], ["NER207537", 40, 950000, "JM Mobiles Goroimari (Retailer)"], ["NER00218525", 0, 0, "M/S Ardh Sainik Canteen (Retailer)"], ["NER00245294", 0, 0, "M/S B.B Enterprise (Retailer)"], ["NER00255104", 0, 0, "M/S Kabak Enterprise (Retailer)"], ["NER00263147", 0, 0, "R B Enterprise (Retailer)"], ["NER176245", 0, 0, "Mobile Zone(Ziro) (Retailer)"], ["NER176600", 0, 0, "Alisha Enterprise (Retailer)"], ["NER176683", 0, 0, "S.H Enterprise (Retailer)"], ["NER176818", 0, 0, "JBK Enterprise (Retailer)"], ["NER176874", 0, 0, "Sisi Infosys-Main (Retailer)"], ["NER176978", 0, 0, "LTM Enterprise (Retailer)"], ["NER177716", 0, 0, "Sanju Enterprise(NE) (Retailer)"], ["NER177889", 0, 0, "SR Enterprise-Main (Retailer)"], ["NER178752", 0, 0, "M/S Mobile Centre (NE) (Retailer)"], ["NER178930", 0, 0, "U S Enterprise-Main (Retailer)"], ["NER178966", 0, 0, "RS Enterprise-Main (Retailer)"], ["NER179437", 0, 0, "Jay Electronics (Retailer)"], ["NER00216051", 20, 584000, "Techno Park (Retailer)"], ["NER00299970", 45, 1539000, "Foto Zone (Retailer)"], ["NER00301351", 32, 1026000, "Visionary Mobile (Retailer)"], ["NER176375", 62, 2120400, "King Mobile (Retailer)"], ["NER177696", 50, 1810000, "Smart Phone Hub (Kxj) (Retailer)"], ["NER178676", 22, 684000, "Mobile World (Karimganj) (Retailer)"], ["NER178846", 45, 1539000, "Computer & Mobile Mart (Retailer)"], ["NER179049", 62, 2120400, "Mobile Hub(Karimganj) (Retailer)"], ["NER201808", 30, 1026000, "Star Mobile Centre (Retailer)"], ["NER00268986", 30, 1026000, "S S Mobile Service (Retailer)"], ["NER177604", 62, 2120400, "Moulana Mobile Store (Retailer)"], ["NER178114", 25, 855000, "Pulok Roy (Retailer)"], ["NER178218", 70, 2394000, "Lily Mobile (Retailer)"], ["NER178250", 20, 684000, "RK Mobile(Karimganj) (Retailer)"], ["NER180101", 90, 3078000, "Smart Mobile(Pkt) (Retailer)"], ["NER187391", 70, 2394000, "Mobile Place (Karimganj) (Retailer)"], ["NER00211228", 35, 850000, "Raja Steel Furniture (Retailer)"], ["NER00229048", 30, 950000, "A2 Electronics (Retailer)"], ["NER00245343", 135, 5900000, "Croma(Retailer) - NE"], ["NER00284812", 100, 3000000, "Oye Mobile (Retailer)"], ["NER00320565", 25, 600000, "JD Zone (Retailer)"], ["NER00335876", 0, 0, "Reetesh Digital (Retailer)"], ["NER176485", 35, 1000000, "Akansha Enterprise (Retailer)"], ["NER176894", 440, 14000000, "Connecting People-Main (Retailer)"], ["NER177760", 40, 1100000, "Mobile Junction-Main (Retailer)"], ["NER178410", 30, 800000, "AK Mobile Point-Main (Retailer)"], ["NER178428", 35, 1050000, "R N Enterprises-Main (Retailer)"], ["NER178498", 45, 1100000, "Lucky Mobile Centre-Main (Retailer)"], ["NER179145", 38, 700000, "Cellocity Zone-Main (Retailer)"], ["NER179252", 30, 750000, "Galaxy Hub-Main (Retailer)"], ["NER179292", 48, 1200000, "Taru N Sons-Main (Retailer)"], ["NER185566", 50, 1397000, "MB Zone (Retailer)"], ["NER00213577", 3, 100000, "M/S Sudhir Subba (Retailer)"], ["NER00214005", 0, 0, "Amardeep Gupta (Retailer)"], ["NER00214009", 3, 100000, "Rajani Prasad (Retailer)"], ["NER00215468", 3, 100000, "Pawan Kumar Gupta (Namchi) (Retailer)"], ["NER00289470", 3, 100000, "Man Kumar Pradhan (Retailer)"], ["NER00289474", 3, 100000, "Ram Niwas Thakur (Retailer)"], ["NER00295234", 5, 160000, "Nima Bhutia (Retailer)"], ["NER00295244", 23, 700000, "Karnamaya Limbuni (Retailer)"], ["NER00300914", 5, 160000, "Santosh Kumar Prasad (Retailer)"], ["NER00300936", 5, 150000, "M/S Sara Enterprises (Retailer)"], ["NER00301409", 10, 300000, "Saif Electronics (Retailer)"], ["NER00304486", 3, 100000, "Awadh Kishor Prasad (Retailer)"], ["NER00324216", 7, 200000, "Ashish Mobile Shop(NE) (Retailer)"], ["NER176553", 23, 700000, "Laxmikant (Retailer)"], ["NER177668", 27, 800000, "Tour Care (Retailer)"], ["NER178000", 20, 600000, "Sailesh Lakhotia (Retailer)"], ["NER178357", 30, 900000, "V K Lakhotia (Retailer)"], ["NER178373", 3, 100000, "Motim Electronics (Retailer)"], ["NER178412", 50, 1500000, "Kishore Pradhan-Main (Retailer)"], ["NER178694", 5, 150000, "Abid Electronics (Retailer)"], ["NER178706", 30, 900000, "Jameel Electronic-Main (Retailer)"], ["NER201331", 20, 600000, "Mazhar Hussain Ansari (Retailer)"], ["NER00332605", 15, 150000, "The Galaxy Way (Retailer)"], ["NER176360", 60, 2600000, "Nitu Brothers-Main (Retailer)"], ["NER176574", 75, 2300000, "Maitri Traders-Main (Retailer)"], ["NER176723", 30, 650000, "Brahmaputra Enterprise (Retailer)"], ["NER177087", 120, 3500000, "Alibaba-Main (Retailer)"], ["NER177159", 35, 1100000, "SN Planet (Retailer)"], ["NER177426", 30, 900000, "Surya Communication-Main (Retailer)"], ["NER177686", 50, 1700000, "Great Eastern Trading Co-Main (Retailer)"], ["NER179139", 40, 1050000, "K R Communication-Main (Retailer)"], ["NER176515", 248, 8532752, "Rainbow-Main (Retailer)"], ["NER177680", 58, 1686942, "Cell Care (Aiz) (Retailer)"], ["NER177838", 13, 435985, "Dk Mobile Care (Retailer)"], ["NER178363", 31, 1154969, "Thanchhingi N Sons-Main (Retailer)"], ["NER178530", 15, 435985, "Hnamte Agencies (Retailer)"], ["NER178671", 14, 435985, "Isreal Mobiles (Retailer)"], ["NER00218937", 0, 0, "M/S Sony Mobile Accessories (Retailer)"], ["NER00265606", 0, 0, "M/S U K Jha Enterprise (Retailer)"], ["NER00305659", 0, 0, "Dipti Mobile Point-Main (Retailer)"], ["NER00306319", 0, 0, "Ansh Electronics (Retailer)"], ["NER00307002", 0, 0, "TC Mobile Shop (Retailer)"], ["NER00308518", 0, 0, "Jeewan Electronis (Retailer)"], ["NER00313472", 0, 0, "Dhyinkho Mobile (Retailer)"], ["NER176255", 0, 0, "Jai Ganesh Mobile Point (Retailer)"], ["NER176541", 0, 0, "Superfone Cafe (Retailer)"], ["NER176732", 0, 0, "Star Mobile Centre(AP) (Retailer)"], ["NER176888", 0, 0, "Electrojunction (Retailer)"], ["NER177097", 0, 0, "Classic Collection (Retailer)"], ["NER177618", 0, 0, "TDR Mobile Shop (Retailer)"], ["NER177658", 0, 0, "Shangri La Mobile (Retailer)"], ["NER178147", 0, 0, "Cell Vision (Retailer)"], ["NER178702", 0, 0, "IT Solution (Retailer)"], ["NER178792", 0, 0, "Gungli Traders (Retailer)"], ["NER179027", 0, 0, "Balaji Electronics(West Kameng) (Retailer)"], ["NER179033", 0, 0, "DB Corner (Retailer)"], ["NER179272", 0, 0, "RBT Mobile Centre (Retailer)"], ["NER187805", 0, 0, "Minam Mobile Shop (Retailer)"], ["NER00255782", 23, 700000, "Mobile Universe(NE) (Retailer)"], ["NER00269250", 5, 150000, "Banik Mobile House (Retailer)"], ["NER00270495", 7, 200000, "Tithi Mobile Care (Bishalghar) (Retailer)"], ["NER00271129", 0, 0, "Standard Electronics(NE) (Retailer)"], ["NER00271131", 0, 0, "M/S Saha Gift House (Retailer)"], ["NER00274428", 17, 500000, "Metro Electronics(Belonia) (Retailer)"], ["NER00275024", 8, 225000, "New Mani Electronics (Udaipur) (Retailer)"], ["NER00275067", 0, 0, "AK Mobile India (Udaipur) (Retailer)"], ["NER00277205", 5, 150000, "Sk Mobile (Bankumari) (Retailer)"], ["NER00303419", 50, 1500000, "Computer World (NE)-Main (Retailer)"], ["NER00328720", 17, 500000, "Rainbow E-Corner (Retailer)"], ["NER177006", 27, 800000, "Arjya Mobile-Main (Retailer)"], ["NER177307", 0, 0, "Tripuraswari Mobile Center (Retailer)"], ["NER177865", 17, 500000, "Prabha(Udaipur) (Retailer)"], ["NER178159", 15, 450000, "Sri Krishna Mobile Center (UDP) (Retailer)"], ["NER178190", 0, 0, "Saha Varities(Tripura) (Retailer)"], ["NER178452", 3, 100000, "Mobile City(Udaipur) (Retailer)"], ["NER178746", 30, 900000, "Mobile Centre (Udaipur)-Main (Retailer)"], ["NER178826", 20, 600000, "Omker Electronics(Manubazar) (Retailer)"], ["NER179180", 47, 1400000, "Sahin Electronics -Main (Retailer)"], ["NER179258", 8, 225000, "Trishna Mobile Net (Retailer)"], ["NER179316", 23, 700000, "S R Mobile(NE)-Main (Retailer)"], ["NER179322", 30, 900000, "Mobile World n Repairing (Retailer)"], ["NER00227604", 40, 1200000, "Choudhury Electronics (Retailer)"], ["NER00264759", 67, 2000000, "Moriom Mobile Store (Retailer)"], ["NER00329007", 33, 1000000, "Digital Communication (NE) (Retailer)"], ["NER176880", 293, 8800000, "Afsana Mobile Store (Retailer)"], ["NER177390", 167, 5000000, "Rainbow Infotech-Main (Retailer)"], ["NER177927", 50, 1500000, "Abhins Corner-Main (Retailer)"], ["NER178774", 100, 3000000, "Cell Phone Hub-Main (Retailer)"], ["NER178918", 27, 800000, "Das Communication (Retailer)"], ["NER179409", 27, 800000, "Mobile Plus(NE) (Retailer)"], ["NER200756", 33, 1000000, "Palash Das (Retailer)"], ["NER00272067", 4, 128000, "Dreamline Tour & Travels (Retailer)"], ["NER00276787", 8, 225000, "K Mobile Service (Retailer)"], ["NER00291608", 0, 0, "M/S Joy Guru Beez Bhander (Retailer)"], ["NER00291612", 13, 386000, "Insaf Mobile And Watch (Retailer)"], ["NER00300571", 12, 354000, "Prabhas Internet Banking (Retailer)"], ["NER00300573", 39, 1158000, "Khan Watch & Mobile Shop (Retailer)"], ["NER00322928", 8, 225000, "Ramthakur Stores (Retailer)"], ["NER00328731", 8, 225000, "Paul Brothers (Retailer)"], ["NER00330612", 0, 0, "Next Zone (Retailer)"], ["NER176269", 12, 354000, "Nath Stores (Retailer)"], ["NER176305", 31, 927000, "Rahul Enterprise(NE) (Retailer)"], ["NER176413", 23, 695000, "Om Enterprise (Retailer)"], ["NER176430", 0, 0, "New Prem Video (Retailer)"], ["NER176495", 3, 96000, "Mobiland(NE) (Retailer)"], ["NER176525", 0, 0, "Sneha Enterprise(Dharmanagar) (Retailer)"], ["NER176535", 13, 400000, "Noruttam Enterprise (Retailer)"], ["NER176679", 8, 225000, "Roy Eletronic (Retailer)"], ["NER176695", 38, 1133000, "Maa Kali Store (Retailer)"], ["NER176776", 27, 800000, "Nexus (Retailer)"], ["NER176796", 47, 1400000, "Online Electronic (Retailer)"], ["NER176826", 9, 257000, "Das Mobile Centre(Kumarghat) (Retailer)"], ["NER176852", 0, 0, "Ruma Travels (Retailer)"], ["NER177456", 73, 2200000, "Super Computer (Retailer)"], ["NER177528", 73, 2200000, "New Utsav (Retailer)"], ["NER177790", 21, 643000, "Mobile Store-Dharmanagar (Retailer)"], ["NER178182", 8, 225000, "Uttam Varaitise(Manu) (Retailer)"], ["NER178718", 12, 354000, "Sharma Sons (Retailer)"], ["NER178950", 17, 515000, "Muktishree (Retailer)"], ["NER179190", 24, 708000, "Global Marketing (Retailer)"], ["NER179234", 21, 643000, "Misto Varities (Retailer)"], ["NER196541", 8, 225000, "Sweety Varities (Retailer)"], ["NER202509", 23, 704000, "Akash Enterprise (Retailer)"], ["NER209060", 17, 500000, "Utsav (Retailer)"], ["NER00246255", 48, 1588452, "Enosa Enterprise (Retailer)"], ["NER176295", 119, 3769381, "Lunglei Mobile Repairing Center-Main (Retailer)"], ["NER176890", 33, 1034967, "Universal Cells (Retailer)"], ["NER177584", 81, 2352419, "Lawmi Mobile Shop-Main (Retailer)"], ["NER177970", 52, 1776448, "Angie Mobile House-Main (Retailer)"], ["NER178282", 67, 2840933, "Puii Infotech(Lunglei)-Main (Retailer)"], ["NER00272408", 20, 600000, "Jyoti Optics (Agartala) (Retailer)"], ["NER00299917", 43, 1300000, "Hello Electronics (Melarmath)-Main (Retailer)"], ["NER00318143", 20, 600000, "Mobile Communication (Agartala) (Retailer)"], ["NER176590", 60, 1800000, "This n That-Main (Retailer)"], ["NER177119", 117, 4500000, "Abanrai Electronics-Main (Retailer)"], ["NER178084", 100, 3000000, "Maa Electronics-Main (Retailer)"], ["NER178204", 27, 800000, "Sarala Electronics-Main (Retailer)"], ["NER176697", 60, 2052000, "Basanti Mobile System (Retailer)"], ["NER176734", 62, 2120400, "Mobile India(Hailakandi) (Retailer)"], ["NER176956", 40, 1368000, "Happy Mobile Zone (Retailer)"], ["NER177085", 75, 2565000, "Laskar Mobile Repairing (Retailer)"], ["NER177612", 90, 3078000, "G S Mobile Gallery (Retailer)"], ["NER177988", 70, 2394000, "Esha Mobile House (Retailer)"], ["NER178046", 75, 2565000, "Priya Enterprise(Silchar) (Retailer)"], ["NER178050", 45, 1539000, "Cell Beat(Hailakandi) (Retailer)"], ["NER178122", 62, 2120400, "M/S Reba Electronics (Retailer)"], ["NER178248", 125, 4275000, "Top in Stand (Retailer)"], ["NER178882", 24, 820800, "Bapsab Electronics (Retailer)"], ["NER00229136", 26, 762474, "Bless Mobile Shop (Retailer)"], ["NER177067", 32, 1089958, "RC Mobi World-Main (Retailer)"], ["NER177256", 29, 707972, "Digiport (Retailer)"], ["NER177622", 22, 450000, "Alpha Enterprise(Aizawl)-Main (Retailer)"], ["NER177804", 26, 744478, "Digital House (Retailer)"], ["NER178340", 35, 1021968, "Electronic Centre-Bara Bazar (Retailer)"], ["NER178514", 28, 775206, "Emarald Comms-Main (Retailer)"], ["NER179087", 22, 449982, "Kolasib Mobile House (Retailer)"], ["NER179131", 24, 777218, "Khiangte Mobile House-Main (Retailer)"], ["NER00312078", 3, 100000, "Shani Mobile (Retailer)"], ["NER00331289", 7, 200000, "Cell Central (Retailer)"], ["NER177093", 7, 200000, "Basanti Lal Prasad(ES) (Retailer)"], ["NER177224", 40, 1200000, "Impression (Retailer)"], ["NER177408", 23, 700000, "Sri Ram Cellzone (Retailer)"], ["NER177568", 17, 500000, "Suhana Electronics (Retailer)"], ["NER177830", 7, 200000, "R.K. Electronic (Retailer)"], ["NER177879", 7, 200000, "Pramod Kumar Rathi (Retailer)"], ["NER178762", 7, 200000, "Mobile Planet(Gangtok) (Retailer)"], ["NER178911", 7, 200000, "Rajesh Kumar Prashad (Retailer)"], ["NER179174", 33, 1000000, "Amilal and Co (Retailer)"], ["NER179176", 40, 1200000, "Om Mobile Care (Retailer)"], ["NER179202", 40, 1200000, "Darjeeling Tea House (Retailer)"], ["NER179240", 23, 700000, "Padam Electronics (Singtam Bazar) (Retailer)"], ["NER188089", 23, 700000, "S.S Electronic (Retailer)"], ["NER00223382", 20, 400000, "Digital Arena-Main (Retailer)"], ["NER00284766", 80, 2500000, "Tanveer Mobile City-Main (Retailer)"], ["NER00286263", 30, 800000, "Triansh Electronics (Retailer)"], ["NER00334612", 10, 150000, "Santoshi Maa Mobile Center (Retailer)"], ["NER177392", 60, 1759000, "Sudip Time n Sound Centre-Main (Retailer)"], ["NER178153", 120, 2000000, "Shri Bhawani Enterprise-Main (Retailer)"], ["NER178385", 45, 837000, "Bharali Brothers (Retailer)"], ["NER178472", 38, 850000, "Bela Watch Co-Main (Retailer)"], ["NER178716", 150, 4000000, "New Bela Watch-Main (Retailer)"], ["NER178784", 120, 3500000, "Web Net-Main (Retailer)"], ["NER178844", 250, 7000000, "Music Den-Main (Retailer)"], ["NER179212", 30, 700000, "Friends Communication(Lokrah)-Main (Retailer)"], ["NER00296936", 30, 900000, "Mazo Hub Private Limited (Imphal)-Main (Retailer)"], ["NER00321974", 13, 400000, "A1 Mobile (Retailer)"], ["NER00333508", 7, 200000, "Oasis Mobile World (Retailer)"], ["NER00333511", 27, 800000, "Lamka Mobile (NE) (Retailer)"], ["NER00333518", 27, 800000, "Galaxcity Gadgets (Retailer)"], ["NER00333520", 3, 100000, "Ars Enterprises (NE) (Retailer)"], ["NER00333522", 2, 50000, "Biophones Wangjing (Retailer)"], ["NER00333524", 2, 50000, "Click Mobile (Retailer)"], ["NER00333526", 20, 600000, "DM Mobile (NE)-Main (Retailer)"], ["NER00333528", 9, 280000, "Iqbal Mobile (Retailer)"], ["NER00333537", 2, 50000, "M/S Capital Electronic Store (Retailer)"], ["NER00333539", 2, 50000, "Rk Mobile (NE) (Retailer)"], ["NER00333670", 2, 50000, "Sanathoiba Mobile (Retailer)"], ["NER00333672", 17, 500000, "Ms Computer (Retailer)"], ["NER00333677", 17, 500000, "Eben Emoinu Electronics (Retailer)"], ["NER00333682", 13, 400000, "Mobile Solutions (NE) (Retailer)"], ["NER00333687", 2, 50000, "Wai Electronics (Retailer)"], ["NER00333704", 13, 400000, "Bishnu Enterprises (Retailer)"], ["NER00334606", 2, 50000, "Maibam Store (Retailer)"], ["NER00334608", 2, 50000, "F&C  Mobile Sales & Servicing (Retailer)"], ["NER00334614", 2, 50000, "JB Enterprises (Retailer)"], ["NER00334652", 2, 50000, "M/S Royal Enterprises (Retailer)"], ["NER00334654", 2, 50000, "Lanchenbi Mobile (Retailer)"], ["NER00334659", 2, 50000, "SA Electronics (Retailer)"], ["NER00334661", 17, 500000, "K Electronics (Retailer)"], ["NER00334667", 3, 100000, "Hassan Mobile (NE) (Retailer)"], ["NER00334675", 2, 50000, "Kushi Mobile Shop (Retailer)"], ["NER00335536", 2, 50000, "Ayush Mobile (NE) (Retailer)"], ["NER00335773", 2, 50000, "Leishi Electronics (NE) (Retailer)"], ["NER00335779", 2, 50000, "Juman Mobile (Retailer)"], ["NER176794", 17, 800000, "Achy Cassete Gallery (Retailer)"], ["NER177333", 17, 500000, "SK Mobile Store(NE) (Retailer)"], ["NER178016", 13, 400000, "Star Mobile(Manipur)-Main (Retailer)"], ["NER178128", 30, 900000, "Santosh Electronics(Moreh Bazar) (Retailer)"], ["NER178228", 13, 400000, "Pasa Enterprises-Main (Retailer)"], ["NER178534", 65, 3000000, "Amplified Communications-Main (Retailer)"], ["NER178742", 13, 400000, "Mobile Cafe-Main (Retailer)"], ["NER179047", 27, 800000, "Shipra Mobile(NE) (Retailer)"], ["NER179111", 13, 400000, "Chingtam Mobile (Retailer)"], ["NER179278", 27, 800000, "Ibohal Enterprises-Main (Retailer)"], ["NER179457", 17, 500000, "Deepak Mobile(NE) (Retailer)"], ["NER00263144", 25, 800000, "Emmanuel Electronics (Retailer)"], ["NER176257", 25, 650000, "Ritesh Mobile Shop-Main (Retailer)"], ["NER177420", 140, 6500000, "J M Electronic-Main (Retailer)"], ["NER177736", 15, 450000, "New Digitek India (Retailer)"], ["NER177798", 410, 13000000, "Datamation Service-Main (Retailer)"], ["NER177895", 30, 1093000, "Infinity World-Main (Retailer)"], ["NER178298", 28, 650000, "Anushree-Main (Retailer)"], ["NER178496", 20, 450000, "Sunita Electronics (Retailer)"], ["NER178830", 50, 1250000, "Spectrum Trade Comm Centre-Main (Retailer)"], ["NER00211046", 23, 700000, "Joyram Mobile & Repairing (Retailer)"], ["NER00212725", 20, 600000, "Mobile Parlour(NE) (Retailer)"], ["NER00255789", 17, 500000, "The Mobile World(NE) (Retailer)"], ["NER00290888", 10, 300000, "Manasha Electronic & Mobile (Retailer)"], ["NER176986", 13, 400000, "Susanta Store(Khowai) (Retailer)"], ["NER177335", 33, 1000000, "Maa Manasa (Retailer)"], ["NER177682", 13, 400000, "Shan Computer(Ambassa) (Retailer)"], ["NER178018", 73, 2200000, "Net To Net (Agr)-Main (Retailer)"], ["NER178288", 13, 400000, "Poulami Interiors (Retailer)"], ["NER178510", 33, 1000000, "Maa Electronics Mobile(Khowai) (Retailer)"], ["NER178570", 67, 2000000, "JC Mobile-Main (Retailer)"], ["NER178832", 40, 1200000, "Joyguru Mobile (Retailer)"], ["NER189028", 33, 1000000, "Gupi Deb(NE)-Main (Retailer)"], ["NER176511", 81, 2547419, "JK Business Services-Main (Retailer)"], ["NER176858", 50, 1380950, "Mobile House Miz-Main (Retailer)"], ["NER177748", 39, 1069461, "MRC Champhai (Retailer)"], ["NER177897", 50, 1445950, "Two in One Sales n Services-Main (Retailer)"], ["NER00209560", 5, 100000, "Sky Vision (Ulubari) (Retailer)"], ["NER00209563", 8, 250000, "Brand Rush (Retailer)"], ["NER00210755", 10, 250000, "Areca (Retailer)"], ["NER00212048", 2, 68400, "Bardhan Mobile Store (Retailer)"], ["NER00221700", 3, 63997, "P & H (Retailer)"], ["NER00221702", 1, 49999, "Julia Mobile House (Retailer)"], ["NER00223378", 5, 0, "Mazo Hub Private Limited (Retailer)"], ["NER00227177", 25, 855000, "Shree Ganesh Mobile Accessories (Retailer)"], ["NER00228444", 10, 220000, "Zaman Mobile Hub (Retailer)"], ["NER00228658", 8, 200000, "Electro Hub (Hatigaon) (Retailer)"], ["NER00229752", 3, 100000, "Joyguru Mobile Store(G B Bazar) (Retailer)"], ["NER00238977", 0, 0, "M S Enterprise(NE) (Retailer)"], ["NER00248941", 12, 254988, "K.Lalpara & Sons (Retailer)"], ["NER00253659", 8, 200000, "Techno Solution (Retailer)"], ["NER00261911", 10, 220000, "R Mobile Store(NE) (Retailer)"], ["NER00262051", 13, 400000, "Mobile Zone(Agartala) (Retailer)"], ["NER00263140", 5, 450000, "Prafulla Electronic (Retailer)"], ["NER00263584", 10, 250000, "Beauty Enterprise (Retailer)"], ["NER00264786", 8, 150000, "Mobile World (Goroimari) (Retailer)"], ["NER00264794", 10, 342000, "Popular Traders (Retailer)"], ["NER00265754", 6, 205200, "N J Mobile (Retailer)"], ["NER00266199", 10, 342000, "Allhera Enterprise (Retailer)"], ["NER00266856", 10, 220000, "F B Mobile And Electronic (Retailer)"], ["NER00268991", 40, 1368000, "Choudhury & Sons Electronics (Retailer)"], ["NER00269587", 5, 110000, "Jayanti Communication (Silchar) (Retailer)"], ["NER00272059", 3, 100000, "Saha Communication Centre (GB) (Retailer)"], ["NER00273840", 13, 400000, "Debnath Electronics (Agartala) (Retailer)"], ["NER00275291", 5, 150000, "National Electrical House (Retailer)"], ["NER00277008", 15, 250000, "Rozi Electronics (Retailer)"], ["NER00279320", 10, 342000, "Om Trading(NE) (Retailer)"], ["NER00280094", 8, 150000, "Welcome Mart (Retailer)"], ["NER00286202", 62, 2120400, "The Modern Computer & Travels (Retailer)"], ["NER00286204", 6, 205200, "Mobile India(NE) (Retailer)"], ["NER00289534", 8, 289000, "M/S PS Solution (Retailer)"], ["NER00290890", 13, 400000, "Srimata Mobile Reparing (Retailer)"], ["NER00293866", 0, 0, "JM Mobile (Retailer)"], ["NER00293878", 5, 171000, "Popular Mobile Center (Retailer)"], ["NER00299331", 8, 150000, "Mobile House (Kalapahar) (Retailer)"], ["NER00300626", 10, 220000, "Bharat Mobile Store (Retailer)"], ["NER00301354", 3, 100000, "S R World (NE) (Retailer)"], ["NER00301920", 38, 1299600, "J N Mobile Store (Retailer)"], ["NER00303326", 8, 150000, "M K Cell (Retailer)"], ["NER00304252", 10, 220000, "Deb Electronics (NE) (Retailer)"], ["NER00304476", 2, 50000, "MI Digital World (Retailer)"], ["NER00307557", 0, 0, "RT Mobile (Retailer)"], ["NER00309539", 2, 50000, "PK Enterprises (Retailer)"], ["NER00310699", 10, 220000, "Smart Hub (Barjatrapur) (Retailer)"], ["NER00310907", 13, 400000, "R2 Enterprises (Retailer)"], ["NER00311579", 0, 0, "Chowdhury Mobile Store (Retailer)"], ["NER00312552", 8, 150000, "T K Mobile Store (Retailer)"], ["NER00314787", 0, 0, "Subhra Deep Varieties (Retailer)"], ["NER00314889", 8, 150000, "Tina Mobile Center (Retailer)"], ["NER00316240", 15, 400000, "M/S New Digitech Communication (Retailer)"], ["NER00316242", 8, 225000, "S. M. Electronic (Retailer)"], ["NER00318087", 10, 300000, "M/S Bhowmik Electronics (Retailer)"], ["NER00318140", 0, 0, "Camera Spot (Retailer)"], ["NER00318197", 13, 400000, "Tulshi Agency & Mobile Repairing Center (Retailer)"], ["NER00318982", 5, 110000, "Deb Electronics (Silchar) (Retailer)"], ["NER00319579", 6, 205200, "S K N Mobile (Retailer)"], ["NER00320026", 15, 476485, "Arr Ess Enterprise (Retailer)"], ["NER00321971", 15, 513000, "A R Mobile Stores (Retailer)"], ["NER00322169", 8, 176000, "Surjo Mobile & Electronics Hub (Retailer)"], ["NER00323050", 10, 200000, "Bhai Bhai Enterprise (Kalatoli) (Retailer)"], ["NER00323297", 0, 0, "Touch Me (Retailer)"], ["NER00324305", 2, 50000, "The Device Hub (Retailer)"], ["NER00324317", 10, 200000, "Rahman Store (Retailer)"], ["NER00325571", 0, 150000, "Galaxy (Dharapur) (Retailer)"], ["NER00327622", 25, 855000, "Anjali Electronics (NE) (Retailer)"], ["NER00327863", 2, 50000, "Eimi Enterprises (Retailer)"], ["NER00328426", 7, 224993, "The Electronic Store (Retailer)"], ["NER00329133", 5, 150000, "MS Shaw Electronics (Retailer)"], ["NER00329539", 13, 400000, "R.K Mobile & Service (Retailer)"], ["NER00332501", 10, 220000, "King Mobile (NE) (Retailer)"], ["NER00332506", 0, 0, "SR Mobile Store (Retailer)"], ["NER00335534", 8, 150000, "Umananda Electricals And Digital Systems LLP (Retailer)"], ["NER176263", 3, 100000, "Expression Mobile (Retailer)"], ["NER176318", 2, 50000, "ND Mobile Hubs (Retailer)"], ["NER176330", 8, 150000, "Das Communication(Jorabat) (Retailer)"], ["NER176332", 5, 150000, "The Unique (Retailer)"], ["NER176334", 15, 450000, "Chinaki Store (Retailer)"], ["NER176336", 13, 400000, "Mobile Zone (Yairipok) (Retailer)"], ["NER176350", 12, 350000, "Puja Electronics(Agr) (Retailer)"], ["NER176352", 8, 225000, "Maa Gift House (Retailer)"], ["NER176362", 13, 400000, "Rocky Enterprise (Retailer)"], ["NER176403", 145, 4959000, "N S Mobile & Electronics (Retailer)"], ["NER176405", 8, 200000, "Arup Electrical & elctronics (Retailer)"], ["NER176419", 0, 150000, "S S Mobile Solution(Ghy) (Retailer)"], ["NER176421", 8, 150000, "Digital Foto Studio And Mobil Store (Retailer)"], ["NER176438", 6, 117994, "F n F-Main (Retailer)"], ["NER176479", 2, 50000, "Pakhangba Mobile (Retailer)"], ["NER176543", 5, 150000, "Network Zone(NE) (Retailer)"], ["NER176568", 17, 500000, "Mobile Store Thoubal (Retailer)"], ["NER176632", 0, 0, "Choudhury Trader (Retailer)"], ["NER176638", 15, 496000, "Basistha Electronics (Retailer)"], ["NER176642", 2, 50000, "SS Mobile(Imphal) (Retailer)"], ["NER176721", 15, 321000, "Munu Mobile Store (Retailer)"], ["NER176725", 2, 50000, "Eimi Mobile (Retailer)"], ["NER176752", 23, 819477, "Fone Inn-1 (Retailer)"], ["NER176754", 3, 73997, "L R Store (Retailer)"], ["NER176756", 45, 900000, "Gaurav Electronics -Main (Retailer)"], ["NER176760", 2, 50000, "Glamour World (Retailer)"], ["NER176764", 2, 50000, "Mobile World(Kanglatongbi) (Retailer)"], ["NER176784", 10, 250000, "New Sneha-Main (Retailer)"], ["NER176816", 2, 50000, "Afrina Mobile (Retailer)"], ["NER176822", 13, 400000, "SK Mobile (Retailer)"], ["NER176828", 5, 150000, "Jilmil(Mirza) (Retailer)"], ["NER176836", 2, 50000, "Ektta Planet Mobile (Retailer)"], ["NER176860", 0, 150000, "A to Z Mobile Zone(Ghy)-Main (Retailer)"], ["NER176864", 2, 50000, "Gupta Mobile Manipur (Retailer)"], ["NER176884", 10, 180000, "Apol Digital (Guw) (Retailer)"], ["NER176906", 10, 250000, "Sir Ji (Retailer)"], ["NER176930", 0, 0, "Omega Electronics(Sil)-Main (Retailer)"], ["NER176946", 8, 150000, "Ring One (Retailer)"], ["NER177091", 21, 150000, "GF Radio (Retailer)"], ["NER177137", 4, 150000, "Goon Collection (Retailer)"], ["NER177145", 8, 273600, "A Malik Enterprise (Retailer)"], ["NER177167", 42, 1000000, "Uniflame Equipment (Retailer)"], ["NER177173", 10, 400000, "Universal Suppliers (Retailer)"], ["NER177210", 10, 250000, "S S Enterprise(Ghy)-Main (Retailer)"], ["NER177226", 10, 220000, "Star Mobile Hub-Main (Retailer)"], ["NER177246", 15, 400000, "Classic(NE) (Retailer)"], ["NER177258", 15, 513000, "Geetanjali (Karimganj) (Retailer)"], ["NER177325", 13, 444600, "Star Mobile(Silchar) (Retailer)"], ["NER177353", 8, 150000, "Jyoti Watch (Retailer)"], ["NER177363", 18, 615600, "Kathiababa Mobile House (Retailer)"], ["NER177394", 10, 200000, "New Chaya Watch Co-Main (Retailer)"], ["NER177414", 13, 400000, "Sachindra Varities (Retailer)"], ["NER177418", 10, 250000, "Kaziranga Infotech-Main (Retailer)"], ["NER177436", 8, 150000, "Mirza Electronics(NE) (Retailer)"], ["NER177440", 10, 200000, "Melody Mobile Store(Ghy) (Retailer)"], ["NER177476", 2, 50000, "Sethis Mobile (Retailer)"], ["NER177482", 12, 330988, "Rosangliana Enterprise (Retailer)"], ["NER177496", 2, 50000, "BS Mobile Store (Retailer)"], ["NER177632", 10, 150000, "Shree Shyam Gadgets(NE) (Retailer)"], ["NER177648", 2, 50000, "Network Enterprise(NE) (Retailer)"], ["NER177666", 0, 0, "Refidim Infosys (Retailer)"], ["NER177678", 3, 102600, "Radharaman Mobile Store (Retailer)"], ["NER177786", 8, 250000, "CGM Mobile Centre-Main (Retailer)"], ["NER177796", 2, 50000, "Upto Date Mobile (Retailer)"], ["NER177812", 10, 200000, "Cell Point (Bhangagarh) (Retailer)"], ["NER177836", 8, 150000, "Bhogeswari Traders (Retailer)"], ["NER177853", 2, 50000, "M/S Thambal Enterprises (Retailer)"], ["NER177855", 10, 250000, "Republic Watch-Main (Retailer)"], ["NER177859", 15, 513000, "Galaxy Mobile (ASMG) (Retailer)"], ["NER177891", 8, 200000, "Mobile Ghar (Barbari Chariali) (Retailer)"], ["NER177899", 10, 300000, "Solution X (Retailer)"], ["NER177931", 2, 50000, "Ronny Mobile (Retailer)"], ["NER177953", 6, 205200, "Krishna Telecom(NE) (Retailer)"], ["NER177956", 3, 100000, "SS Enterprise(Agt) (Retailer)"], ["NER177992", 3, 100000, "Victor Mobile Hub (Retailer)"], ["NER178028", 15, 513000, "Priyo Store (Hailakandi) (Retailer)"], ["NER178042", 0, 150000, "Galaxy Electronics (Retailer)"], ["NER178074", 0, 0, "Om Electronics(Ghy) (Retailer)"], ["NER178096", 6, 161994, "J S Music Corner -Main (Retailer)"], ["NER178104", 17, 500000, "AR Mobile Centre (Retailer)"], ["NER178108", 15, 289000, "Bambino (Retailer)"], ["NER178118", 2, 50000, "Ema Mobile(Imphal) (Retailer)"], ["NER178136", 5, 110000, "Mobile House(Jiribam ) (Retailer)"], ["NER178238", 14, 624986, "Fone Inn-Main (Retailer)"], ["NER178262", 10, 220000, "Mobile Fashion 2 (Retailer)"], ["NER178300", 15, 513000, "National Watch Electronics (Retailer)"], ["NER178326", 2, 50000, "Arvind Mobile (Retailer)"], ["NER178344", 8, 200000, "Gauhati Stores (Retailer)"], ["NER178516", 2, 50000, "Amazing Mobile (Retailer)"], ["NER178574", 4, 290496, "S B Mobile (Retailer)"], ["NER178610", 35, 1000000, "Multi Corner-Main (Retailer)"], ["NER178648", 7, 200000, "Tripureswari Mobile House (Retailer)"], ["NER178650", 14, 400000, "Jitu Mobile Store-Main (Retailer)"], ["NER178662", 8, 273600, "M/S Mobile Centre(NE) (Retailer)"], ["NER178714", 15, 496485, "Rem Rem Enterprise (Retailer)"], ["NER178780", 15, 513000, "S R Prime (Retailer)"], ["NER178782", 2, 50000, "AP Enterprises -Main (Retailer)"], ["NER178818", 2, 50000, "J K Enterprises(NE) (Retailer)"], ["NER178860", 3, 102600, "M/S J Enterprise (Retailer)"], ["NER178862", 9, 249991, "Zolentu (Retailer)"], ["NER178872", 10, 354000, "Shree Ganga Store (Retailer)"], ["NER178888", 0, 0, "Rinliana Sailo Mobile House (Retailer)"], ["NER178892", 1, 34999, "Bonanza Communication (Mizoram) (Retailer)"], ["NER178922", 2, 50000, "Santosh Mobile(Kakching) (Retailer)"], ["NER178962", 7, 200000, "Anmol Mobile(NE) (Retailer)"], ["NER178964", 25, 650000, "Cell Point (Retailer)"], ["NER178980", 2, 50000, "Hello Point(NE) (Retailer)"], ["NER178986", 10, 420000, "Electronic Juntion (Retailer)"], ["NER178992", 7, 155993, "Tata Indicom (Retailer)"], ["NER178998", 12, 316488, "B5 Mobile House-Main (Retailer)"], ["NER179059", 0, 0, "New Susma Varities (Retailer)"], ["NER179065", 10, 342000, "Mobile Care(Hailakhandi) (Retailer)"], ["NER179075", 15, 541000, "Mobile Care(Hatigaon) (Retailer)"], ["NER179079", 17, 500000, "A To Z Mobile Bazar (Retailer)"], ["NER179109", 5, 150000, "Jindal electronics-Silpukhuri (Retailer)"], ["NER179141", 2, 50000, "Memories Enterprises (Retailer)"], ["NER179166", 13, 400000, "Tripureswari Enterprise(Agartala) (Retailer)"], ["NER179188", 10, 342000, "New Mobile Zone (Retailer)"], ["NER179196", 10, 246990, "My Hamz (Retailer)"], ["NER179218", 2, 50000, "Gopal Enterprises-Main (Retailer)"], ["NER179248", 0, 0, "Mobile Zone(Club Road) (Retailer)"], ["NER179268", 10, 193000, "Shree Balaji Electricals (Retailer)"], ["NER179288", 25, 450000, "Star PCO-Main (Retailer)"], ["NER179302", 5, 110000, "Anand Computer (Retailer)"], ["NER179427", 2, 50000, "Sagar Enterprises(NE) (Retailer)"], ["NER179448", 2, 50000, "Sandesh Mobile(NE) (Retailer)"], ["NER180636", 20, 684000, "Maa Telecom (Retailer)"], ["NER180638", 2, 50000, "Pukhram Mobile House (Retailer)"], ["NER181555", 5, 171000, "Lokenath Mobile Shoppe (Retailer)"], ["NER185028", 4, 128000, "In Tuch (Retailer)"], ["NER185304", 4, 150000, "Papo Enterprise (Retailer)"], ["NER187388", 10, 400000, "Mobile Hub(Pkd) (Retailer)"], ["NER187397", 20, 684000, "Talukdar Communication (Retailer)"], ["NER187401", 5, 110000, "Akmal Mobile Shop (Retailer)"]]
+[
+ [
+  "NER00209560",
+  5,
+  100000,
+  "Sky Vision (Ulubari) (Retailer)"
+ ],
+ [
+  "NER00209563",
+  8,
+  250000,
+  "Brand Rush (Retailer)"
+ ],
+ [
+  "NER00210755",
+  10,
+  250000,
+  "Areca (Retailer)"
+ ],
+ [
+  "NER00211046",
+  23,
+  700000,
+  "Joyram Mobile & Repairing (Retailer)"
+ ],
+ [
+  "NER00211228",
+  35,
+  850000,
+  "Raja Steel Furniture (Retailer)"
+ ],
+ [
+  "NER00212048",
+  2,
+  68400,
+  "Bardhan Mobile Store (Retailer)"
+ ],
+ [
+  "NER00212314",
+  45,
+  1050000,
+  "Tahmina Electicals & Electronics (Retailer)"
+ ],
+ [
+  "NER00212317",
+  40,
+  1200000,
+  "Maa Electronic & Mobile Point (Retailer)"
+ ],
+ [
+  "NER00212725",
+  20,
+  600000,
+  "Mobile Parlour(NE) (Retailer)"
+ ],
+ [
+  "NER00213573",
+  30,
+  900000,
+  "Pema Mobile Shoppe (Retailer)"
+ ],
+ [
+  "NER00213577",
+  3,
+  100000,
+  "M/S Sudhir Subba (Retailer)"
+ ],
+ [
+  "NER00214005",
+  0,
+  0,
+  "Amardeep Gupta (Retailer)"
+ ],
+ [
+  "NER00214009",
+  3,
+  100000,
+  "Rajani Prasad (Retailer)"
+ ],
+ [
+  "NER00215468",
+  3,
+  100000,
+  "Pawan Kumar Gupta (Namchi) (Retailer)"
+ ],
+ [
+  "NER00216051",
+  20,
+  584000,
+  "Techno Park (Retailer)"
+ ],
+ [
+  "NER00218525",
+  16,
+  400000,
+  "M/S Ardh Sainik Canteen (Retailer)"
+ ],
+ [
+  "NER00218937",
+  16,
+  400000,
+  "M/S Sony Mobile Accessories (Retailer)"
+ ],
+ [
+  "NER00221700",
+  3,
+  63997,
+  "P & H (Retailer)"
+ ],
+ [
+  "NER00221702",
+  1,
+  49999,
+  "Julia Mobile House (Retailer)"
+ ],
+ [
+  "NER00223378",
+  5,
+  0,
+  "Mazo Hub Private Limited (Retailer)"
+ ],
+ [
+  "NER00223382",
+  20,
+  400000,
+  "Digital Arena-Main (Retailer)"
+ ],
+ [
+  "NER00227177",
+  25,
+  855000,
+  "Shree Ganesh Mobile Accessories (Retailer)"
+ ],
+ [
+  "NER00227604",
+  40,
+  1200000,
+  "Choudhury Electronics (Retailer)"
+ ],
+ [
+  "NER00228444",
+  10,
+  220000,
+  "Zaman Mobile Hub (Retailer)"
+ ],
+ [
+  "NER00228658",
+  8,
+  200000,
+  "Electro Hub (Hatigaon) (Retailer)"
+ ],
+ [
+  "NER00229048",
+  30,
+  950000,
+  "A2 Electronics (Retailer)"
+ ],
+ [
+  "NER00229136",
+  26,
+  762474,
+  "Bless Mobile Shop (Retailer)"
+ ],
+ [
+  "NER00229752",
+  3,
+  100000,
+  "Joyguru Mobile Store(G B Bazar) (Retailer)"
+ ],
+ [
+  "NER00238977",
+  0,
+  0,
+  "M S Enterprise(NE) (Retailer)"
+ ],
+ [
+  "NER00243942",
+  63,
+  1900000,
+  "Mobi Flash (Retailer)"
+ ],
+ [
+  "NER00245294",
+  4,
+  120000,
+  "M/S B.B Enterprise (Retailer)"
+ ],
+ [
+  "NER00245343",
+  135,
+  5900000,
+  "Croma(Retailer) - NE"
+ ],
+ [
+  "NER00245678",
+  25,
+  700000,
+  "Tech City (Retailer)"
+ ],
+ [
+  "NER00246255",
+  48,
+  1588452,
+  "Enosa Enterprise (Retailer)"
+ ],
+ [
+  "NER00248941",
+  12,
+  254988,
+  "K.Lalpara & Sons (Retailer)"
+ ],
+ [
+  "NER00251895",
+  42,
+  1165000,
+  "G.D Mobile (Diyun) (Retailer)"
+ ],
+ [
+  "NER00253659",
+  8,
+  200000,
+  "Techno Solution (Retailer)"
+ ],
+ [
+  "NER00255104",
+  15,
+  400000,
+  "M/S Kabak Enterprise (Retailer)"
+ ],
+ [
+  "NER00255782",
+  23,
+  700000,
+  "Mobile Universe(NE) (Retailer)"
+ ],
+ [
+  "NER00255789",
+  17,
+  500000,
+  "The Mobile World(NE) (Retailer)"
+ ],
+ [
+  "NER00261909",
+  10,
+  300000,
+  "Sikkim Mobile Hub (Retailer)"
+ ],
+ [
+  "NER00261911",
+  10,
+  220000,
+  "R Mobile Store(NE) (Retailer)"
+ ],
+ [
+  "NER00262051",
+  13,
+  400000,
+  "Mobile Zone(Agartala) (Retailer)"
+ ],
+ [
+  "NER00263140",
+  5,
+  450000,
+  "Prafulla Electronic (Retailer)"
+ ],
+ [
+  "NER00263144",
+  25,
+  800000,
+  "Emmanuel Electronics (Retailer)"
+ ],
+ [
+  "NER00263147",
+  5,
+  150000,
+  "R B Enterprise (Retailer)"
+ ],
+ [
+  "NER00263584",
+  10,
+  250000,
+  "Beauty Enterprise (Retailer)"
+ ],
+ [
+  "NER00264759",
+  67,
+  2000000,
+  "Moriom Mobile Store (Retailer)"
+ ],
+ [
+  "NER00264786",
+  8,
+  150000,
+  "Mobile World (Goroimari) (Retailer)"
+ ],
+ [
+  "NER00264794",
+  10,
+  342000,
+  "Popular Traders (Retailer)"
+ ],
+ [
+  "NER00264961",
+  24,
+  748000,
+  "Nokia Cell Zone (Retailer)"
+ ],
+ [
+  "NER00265606",
+  4,
+  120000,
+  "M/S U K Jha Enterprise (Retailer)"
+ ],
+ [
+  "NER00265657",
+  12,
+  537000,
+  "M/S Digital World (Retailer)"
+ ],
+ [
+  "NER00265754",
+  6,
+  205200,
+  "N J Mobile (Retailer)"
+ ],
+ [
+  "NER00266199",
+  10,
+  342000,
+  "Allhera Enterprise (Retailer)"
+ ],
+ [
+  "NER00266856",
+  10,
+  220000,
+  "F B Mobile And Electronic (Retailer)"
+ ],
+ [
+  "NER00268986",
+  30,
+  1026000,
+  "S S Mobile Service (Retailer)"
+ ],
+ [
+  "NER00268991",
+  40,
+  1368000,
+  "Choudhury & Sons Electronics (Retailer)"
+ ],
+ [
+  "NER00269250",
+  5,
+  150000,
+  "Banik Mobile House (Retailer)"
+ ],
+ [
+  "NER00269587",
+  5,
+  110000,
+  "Jayanti Communication (Silchar) (Retailer)"
+ ],
+ [
+  "NER00270495",
+  7,
+  200000,
+  "Tithi Mobile Care (Bishalghar) (Retailer)"
+ ],
+ [
+  "NER00271129",
+  0,
+  0,
+  "Standard Electronics(NE) (Retailer)"
+ ],
+ [
+  "NER00271131",
+  0,
+  0,
+  "M/S Saha Gift House (Retailer)"
+ ],
+ [
+  "NER00272059",
+  3,
+  100000,
+  "Saha Communication Centre (GB) (Retailer)"
+ ],
+ [
+  "NER00272067",
+  4,
+  128000,
+  "Dreamline Tour & Travels (Retailer)"
+ ],
+ [
+  "NER00272408",
+  20,
+  600000,
+  "Jyoti Optics (Agartala) (Retailer)"
+ ],
+ [
+  "NER00273840",
+  13,
+  400000,
+  "Debnath Electronics (Agartala) (Retailer)"
+ ],
+ [
+  "NER00274428",
+  17,
+  500000,
+  "Metro Electronics(Belonia) (Retailer)"
+ ],
+ [
+  "NER00275024",
+  8,
+  225000,
+  "New Mani Electronics (Udaipur) (Retailer)"
+ ],
+ [
+  "NER00275067",
+  0,
+  0,
+  "AK Mobile India (Udaipur) (Retailer)"
+ ],
+ [
+  "NER00275291",
+  5,
+  150000,
+  "National Electrical House (Retailer)"
+ ],
+ [
+  "NER00276787",
+  8,
+  225000,
+  "K Mobile Service (Retailer)"
+ ],
+ [
+  "NER00277008",
+  15,
+  250000,
+  "Rozi Electronics (Retailer)"
+ ],
+ [
+  "NER00277205",
+  5,
+  150000,
+  "Sk Mobile (Bankumari) (Retailer)"
+ ],
+ [
+  "NER00279320",
+  10,
+  342000,
+  "Om Trading(NE) (Retailer)"
+ ],
+ [
+  "NER00280094",
+  8,
+  150000,
+  "Welcome Mart (Retailer)"
+ ],
+ [
+  "NER00281905",
+  100,
+  3000000,
+  "Galaxy Mobile (Silchar) (Retailer)"
+ ],
+ [
+  "NER00284766",
+  80,
+  2500000,
+  "Tanveer Mobile City-Main (Retailer)"
+ ],
+ [
+  "NER00284812",
+  100,
+  3000000,
+  "Oye Mobile (Retailer)"
+ ],
+ [
+  "NER00286202",
+  62,
+  2120400,
+  "The Modern Computer & Travels (Retailer)"
+ ],
+ [
+  "NER00286204",
+  6,
+  205200,
+  "Mobile India(NE) (Retailer)"
+ ],
+ [
+  "NER00286263",
+  30,
+  800000,
+  "Triansh Electronics (Retailer)"
+ ],
+ [
+  "NER00289470",
+  3,
+  100000,
+  "Man Kumar Pradhan (Retailer)"
+ ],
+ [
+  "NER00289474",
+  3,
+  100000,
+  "Ram Niwas Thakur (Retailer)"
+ ],
+ [
+  "NER00289534",
+  8,
+  289000,
+  "M/S PS Solution (Retailer)"
+ ],
+ [
+  "NER00290888",
+  10,
+  300000,
+  "Manasha Electronic & Mobile (Retailer)"
+ ],
+ [
+  "NER00290890",
+  13,
+  400000,
+  "Srimata Mobile Reparing (Retailer)"
+ ],
+ [
+  "NER00291208",
+  15,
+  400000,
+  "E K Traders (Retailer)"
+ ],
+ [
+  "NER00291608",
+  0,
+  0,
+  "M/S Joy Guru Beez Bhander (Retailer)"
+ ],
+ [
+  "NER00291612",
+  13,
+  386000,
+  "Insaf Mobile And Watch (Retailer)"
+ ],
+ [
+  "NER00293235",
+  62,
+  1600000,
+  "Salamiya Enterprise (Retailer)"
+ ],
+ [
+  "NER00293866",
+  0,
+  0,
+  "JM Mobile (Retailer)"
+ ],
+ [
+  "NER00293878",
+  5,
+  171000,
+  "Popular Mobile Center (Retailer)"
+ ],
+ [
+  "NER00295234",
+  5,
+  160000,
+  "Nima Bhutia (Retailer)"
+ ],
+ [
+  "NER00295244",
+  23,
+  700000,
+  "Karnamaya Limbuni (Retailer)"
+ ],
+ [
+  "NER00296936",
+  30,
+  900000,
+  "Mazo Hub Private Limited (Imphal)-Main (Retailer)"
+ ],
+ [
+  "NER00299331",
+  8,
+  150000,
+  "Mobile House (Kalapahar) (Retailer)"
+ ],
+ [
+  "NER00299917",
+  43,
+  1300000,
+  "Hello Electronics (Melarmath)-Main (Retailer)"
+ ],
+ [
+  "NER00299970",
+  45,
+  1539000,
+  "Foto Zone (Retailer)"
+ ],
+ [
+  "NER00300571",
+  12,
+  354000,
+  "Prabhas Internet Banking (Retailer)"
+ ],
+ [
+  "NER00300573",
+  39,
+  1158000,
+  "Khan Watch & Mobile Shop (Retailer)"
+ ],
+ [
+  "NER00300626",
+  10,
+  220000,
+  "Bharat Mobile Store (Retailer)"
+ ],
+ [
+  "NER00300914",
+  5,
+  160000,
+  "Santosh Kumar Prasad (Retailer)"
+ ],
+ [
+  "NER00300936",
+  5,
+  150000,
+  "M/S Sara Enterprises (Retailer)"
+ ],
+ [
+  "NER00301351",
+  32,
+  1026000,
+  "Visionary Mobile (Retailer)"
+ ],
+ [
+  "NER00301354",
+  3,
+  100000,
+  "S R World (NE) (Retailer)"
+ ],
+ [
+  "NER00301409",
+  10,
+  300000,
+  "Saif Electronics (Retailer)"
+ ],
+ [
+  "NER00301920",
+  38,
+  1299600,
+  "J N Mobile Store (Retailer)"
+ ],
+ [
+  "NER00302683",
+  15,
+  400000,
+  "C.K Enterprises (Retailer)"
+ ],
+ [
+  "NER00303326",
+  8,
+  150000,
+  "M K Cell (Retailer)"
+ ],
+ [
+  "NER00303419",
+  50,
+  1500000,
+  "Computer World (NE)-Main (Retailer)"
+ ],
+ [
+  "NER00304252",
+  10,
+  220000,
+  "Deb Electronics (NE) (Retailer)"
+ ],
+ [
+  "NER00304476",
+  2,
+  50000,
+  "MI Digital World (Retailer)"
+ ],
+ [
+  "NER00304486",
+  3,
+  100000,
+  "Awadh Kishor Prasad (Retailer)"
+ ],
+ [
+  "NER00305659",
+  49,
+  1812000,
+  "Dipti Mobile Point-Main (Retailer)"
+ ],
+ [
+  "NER00306319",
+  16,
+  538000,
+  "Ansh Electronics (Retailer)"
+ ],
+ [
+  "NER00307002",
+  16,
+  400000,
+  "TC Mobile Shop (Retailer)"
+ ],
+ [
+  "NER00307557",
+  0,
+  0,
+  "RT Mobile (Retailer)"
+ ],
+ [
+  "NER00307770",
+  40,
+  1200000,
+  "Muthasir Electronics (Retailer)"
+ ],
+ [
+  "NER00308518",
+  16,
+  400000,
+  "Jeewan Electronis (Retailer)"
+ ],
+ [
+  "NER00309539",
+  2,
+  50000,
+  "PK Enterprises (Retailer)"
+ ],
+ [
+  "NER00310699",
+  10,
+  220000,
+  "Smart Hub (Barjatrapur) (Retailer)"
+ ],
+ [
+  "NER00310895",
+  65,
+  2500000,
+  "Mobile Ghar (Silchar) (Retailer)"
+ ],
+ [
+  "NER00310907",
+  13,
+  400000,
+  "R2 Enterprises (Retailer)"
+ ],
+ [
+  "NER00311579",
+  0,
+  0,
+  "Chowdhury Mobile Store (Retailer)"
+ ],
+ [
+  "NER00312078",
+  3,
+  100000,
+  "Shani Mobile (Retailer)"
+ ],
+ [
+  "NER00312552",
+  8,
+  150000,
+  "T K Mobile Store (Retailer)"
+ ],
+ [
+  "NER00313472",
+  10,
+  193000,
+  "Dhyinkho Mobile (Retailer)"
+ ],
+ [
+  "NER00314787",
+  0,
+  0,
+  "Subhra Deep Varieties (Retailer)"
+ ],
+ [
+  "NER00314889",
+  8,
+  150000,
+  "Tina Mobile Center (Retailer)"
+ ],
+ [
+  "NER00316240",
+  15,
+  400000,
+  "M/S New Digitech Communication (Retailer)"
+ ],
+ [
+  "NER00316242",
+  8,
+  225000,
+  "S. M. Electronic (Retailer)"
+ ],
+ [
+  "NER00318087",
+  10,
+  300000,
+  "M/S Bhowmik Electronics (Retailer)"
+ ],
+ [
+  "NER00318140",
+  0,
+  0,
+  "Camera Spot (Retailer)"
+ ],
+ [
+  "NER00318143",
+  20,
+  600000,
+  "Mobile Communication (Agartala) (Retailer)"
+ ],
+ [
+  "NER00318197",
+  13,
+  400000,
+  "Tulshi Agency & Mobile Repairing Center (Retailer)"
+ ],
+ [
+  "NER00318982",
+  5,
+  110000,
+  "Deb Electronics (Silchar) (Retailer)"
+ ],
+ [
+  "NER00319579",
+  6,
+  205200,
+  "S K N Mobile (Retailer)"
+ ],
+ [
+  "NER00320026",
+  15,
+  476485,
+  "Arr Ess Enterprise (Retailer)"
+ ],
+ [
+  "NER00320565",
+  25,
+  600000,
+  "JD Zone (Retailer)"
+ ],
+ [
+  "NER00321044",
+  13,
+  400000,
+  "Digital Centre (Namsai) (Retailer)"
+ ],
+ [
+  "NER00321971",
+  15,
+  513000,
+  "A R Mobile Stores (Retailer)"
+ ],
+ [
+  "NER00321974",
+  13,
+  400000,
+  "A1 Mobile (Retailer)"
+ ],
+ [
+  "NER00321977",
+  3,
+  100000,
+  "Mahakal Mobile & Electronics (Retailer)"
+ ],
+ [
+  "NER00322169",
+  8,
+  176000,
+  "Surjo Mobile & Electronics Hub (Retailer)"
+ ],
+ [
+  "NER00322928",
+  8,
+  225000,
+  "Ramthakur Stores (Retailer)"
+ ],
+ [
+  "NER00323050",
+  10,
+  200000,
+  "Bhai Bhai Enterprise (Kalatoli) (Retailer)"
+ ],
+ [
+  "NER00323297",
+  0,
+  0,
+  "Touch Me (Retailer)"
+ ],
+ [
+  "NER00324216",
+  7,
+  200000,
+  "Ashish Mobile Shop(NE) (Retailer)"
+ ],
+ [
+  "NER00324305",
+  2,
+  50000,
+  "The Device Hub (Retailer)"
+ ],
+ [
+  "NER00324317",
+  10,
+  200000,
+  "Rahman Store (Retailer)"
+ ],
+ [
+  "NER00325571",
+  0,
+  150000,
+  "Galaxy (Dharapur) (Retailer)"
+ ],
+ [
+  "NER00327622",
+  25,
+  855000,
+  "Anjali Electronics (NE) (Retailer)"
+ ],
+ [
+  "NER00327863",
+  2,
+  50000,
+  "Eimi Enterprises (Retailer)"
+ ],
+ [
+  "NER00328426",
+  7,
+  224993,
+  "The Electronic Store (Retailer)"
+ ],
+ [
+  "NER00328720",
+  17,
+  500000,
+  "Rainbow E-Corner (Retailer)"
+ ],
+ [
+  "NER00328731",
+  8,
+  225000,
+  "Paul Brothers (Retailer)"
+ ],
+ [
+  "NER00329007",
+  33,
+  1000000,
+  "Digital Communication (NE) (Retailer)"
+ ],
+ [
+  "NER00329133",
+  5,
+  150000,
+  "MS Shaw Electronics (Retailer)"
+ ],
+ [
+  "NER00329539",
+  13,
+  400000,
+  "R.K Mobile & Service (Retailer)"
+ ],
+ [
+  "NER00330612",
+  0,
+  0,
+  "Next Zone (Retailer)"
+ ],
+ [
+  "NER00330626",
+  5,
+  150000,
+  "M/s Hello Mobiles (Retailer)"
+ ],
+ [
+  "NER00331289",
+  7,
+  200000,
+  "Cell Central (Retailer)"
+ ],
+ [
+  "NER00332501",
+  10,
+  220000,
+  "King Mobile (NE) (Retailer)"
+ ],
+ [
+  "NER00332506",
+  0,
+  0,
+  "SR Mobile Store (Retailer)"
+ ],
+ [
+  "NER00332603",
+  10,
+  200000,
+  "Ali Store (Retailer)"
+ ],
+ [
+  "NER00332605",
+  15,
+  150000,
+  "The Galaxy Way (Retailer)"
+ ],
+ [
+  "NER00333508",
+  7,
+  200000,
+  "Oasis Mobile World (Retailer)"
+ ],
+ [
+  "NER00333511",
+  27,
+  800000,
+  "Lamka Mobile (NE) (Retailer)"
+ ],
+ [
+  "NER00333518",
+  27,
+  800000,
+  "Galaxcity Gadgets (Retailer)"
+ ],
+ [
+  "NER00333520",
+  3,
+  100000,
+  "Ars Enterprises (NE) (Retailer)"
+ ],
+ [
+  "NER00333522",
+  2,
+  50000,
+  "Biophones Wangjing (Retailer)"
+ ],
+ [
+  "NER00333524",
+  2,
+  50000,
+  "Click Mobile (Retailer)"
+ ],
+ [
+  "NER00333526",
+  20,
+  600000,
+  "DM Mobile (NE)-Main (Retailer)"
+ ],
+ [
+  "NER00333528",
+  9,
+  280000,
+  "Iqbal Mobile (Retailer)"
+ ],
+ [
+  "NER00333537",
+  2,
+  50000,
+  "M/S Capital Electronic Store (Retailer)"
+ ],
+ [
+  "NER00333539",
+  2,
+  50000,
+  "Rk Mobile (NE) (Retailer)"
+ ],
+ [
+  "NER00333670",
+  2,
+  50000,
+  "Sanathoiba Mobile (Retailer)"
+ ],
+ [
+  "NER00333672",
+  17,
+  500000,
+  "Ms Computer (Retailer)"
+ ],
+ [
+  "NER00333677",
+  17,
+  500000,
+  "Eben Emoinu Electronics (Retailer)"
+ ],
+ [
+  "NER00333682",
+  13,
+  400000,
+  "Mobile Solutions (NE) (Retailer)"
+ ],
+ [
+  "NER00333687",
+  2,
+  50000,
+  "Wai Electronics (Retailer)"
+ ],
+ [
+  "NER00333704",
+  13,
+  400000,
+  "Bishnu Enterprises (Retailer)"
+ ],
+ [
+  "NER00334606",
+  2,
+  50000,
+  "Maibam Store (Retailer)"
+ ],
+ [
+  "NER00334608",
+  2,
+  50000,
+  "F&C Mobile Sales & Servicing (Retailer)"
+ ],
+ [
+  "NER00334612",
+  10,
+  150000,
+  "Santoshi Maa Mobile Center (Retailer)"
+ ],
+ [
+  "NER00334614",
+  2,
+  50000,
+  "JB Enterprises (Retailer)"
+ ],
+ [
+  "NER00334652",
+  2,
+  50000,
+  "M/S Royal Enterprises (Retailer)"
+ ],
+ [
+  "NER00334654",
+  2,
+  50000,
+  "Lanchenbi Mobile (Retailer)"
+ ],
+ [
+  "NER00334659",
+  2,
+  50000,
+  "SA Electronics (Retailer)"
+ ],
+ [
+  "NER00334661",
+  17,
+  500000,
+  "K Electronics (Retailer)"
+ ],
+ [
+  "NER00334667",
+  3,
+  100000,
+  "Hassan Mobile (NE) (Retailer)"
+ ],
+ [
+  "NER00334675",
+  2,
+  50000,
+  "Kushi Mobile Shop (Retailer)"
+ ],
+ [
+  "NER00335534",
+  8,
+  150000,
+  "Umananda Electricals And Digital Systems LLP (Retailer)"
+ ],
+ [
+  "NER00335536",
+  2,
+  50000,
+  "Ayush Mobile (NE) (Retailer)"
+ ],
+ [
+  "NER00335773",
+  2,
+  50000,
+  "Leishi Electronics (NE) (Retailer)"
+ ],
+ [
+  "NER00335779",
+  2,
+  50000,
+  "Juman Mobile (Retailer)"
+ ],
+ [
+  "NER00335876",
+  0,
+  0,
+  "Reetesh Digital (Retailer)"
+ ],
+ [
+  "NER176243",
+  250,
+  8688000,
+  "Moni Mobile Rep Centre-Main (Retailer)"
+ ],
+ [
+  "NER176245",
+  5,
+  150000,
+  "Mobile Zone(Ziro) (Retailer)"
+ ],
+ [
+  "NER176255",
+  16,
+  508000,
+  "Jai Ganesh Mobile Point (Retailer)"
+ ],
+ [
+  "NER176257",
+  25,
+  650000,
+  "Ritesh Mobile Shop-Main (Retailer)"
+ ],
+ [
+  "NER176263",
+  3,
+  100000,
+  "Expression Mobile (Retailer)"
+ ],
+ [
+  "NER176269",
+  12,
+  354000,
+  "Nath Stores (Retailer)"
+ ],
+ [
+  "NER176295",
+  119,
+  3769381,
+  "Lunglei Mobile Repairing Center-Main (Retailer)"
+ ],
+ [
+  "NER176305",
+  31,
+  927000,
+  "Rahul Enterprise(NE) (Retailer)"
+ ],
+ [
+  "NER176318",
+  2,
+  50000,
+  "ND Mobile Hubs (Retailer)"
+ ],
+ [
+  "NER176330",
+  8,
+  150000,
+  "Das Communication(Jorabat) (Retailer)"
+ ],
+ [
+  "NER176332",
+  5,
+  150000,
+  "The Unique (Retailer)"
+ ],
+ [
+  "NER176334",
+  15,
+  450000,
+  "Chinaki Store (Retailer)"
+ ],
+ [
+  "NER176336",
+  13,
+  400000,
+  "Mobile Zone (Yairipok) (Retailer)"
+ ],
+ [
+  "NER176350",
+  12,
+  350000,
+  "Puja Electronics(Agr) (Retailer)"
+ ],
+ [
+  "NER176352",
+  8,
+  225000,
+  "Maa Gift House (Retailer)"
+ ],
+ [
+  "NER176360",
+  60,
+  2600000,
+  "Nitu Brothers-Main (Retailer)"
+ ],
+ [
+  "NER176362",
+  13,
+  400000,
+  "Rocky Enterprise (Retailer)"
+ ],
+ [
+  "NER176373",
+  5,
+  150000,
+  "Bruwu Electronics (Retailer)"
+ ],
+ [
+  "NER176375",
+  62,
+  2120400,
+  "King Mobile (Retailer)"
+ ],
+ [
+  "NER176385",
+  45,
+  1200000,
+  "Connecting World(Sil)-Main (Retailer)"
+ ],
+ [
+  "NER176387",
+  14,
+  354000,
+  "Babu Store (Retailer)"
+ ],
+ [
+  "NER176403",
+  145,
+  4959000,
+  "N S Mobile & Electronics (Retailer)"
+ ],
+ [
+  "NER176405",
+  8,
+  200000,
+  "Arup Electrical & elctronics (Retailer)"
+ ],
+ [
+  "NER176413",
+  23,
+  695000,
+  "Om Enterprise (Retailer)"
+ ],
+ [
+  "NER176419",
+  0,
+  150000,
+  "S S Mobile Solution(Ghy) (Retailer)"
+ ],
+ [
+  "NER176421",
+  8,
+  150000,
+  "Digital Foto Studio And Mobil Store (Retailer)"
+ ],
+ [
+  "NER176430",
+  0,
+  0,
+  "New Prem Video (Retailer)"
+ ],
+ [
+  "NER176434",
+  20,
+  600000,
+  "Ram Niwas Agarwal (Retailer)"
+ ],
+ [
+  "NER176438",
+  6,
+  117994,
+  "F n F-Main (Retailer)"
+ ],
+ [
+  "NER176459",
+  3,
+  100000,
+  "Hayat Enterprise (Retailer)"
+ ],
+ [
+  "NER176479",
+  2,
+  50000,
+  "Pakhangba Mobile (Retailer)"
+ ],
+ [
+  "NER176485",
+  35,
+  1000000,
+  "Akansha Enterprise (Retailer)"
+ ],
+ [
+  "NER176495",
+  3,
+  96000,
+  "Mobiland(NE) (Retailer)"
+ ],
+ [
+  "NER176511",
+  81,
+  2547419,
+  "JK Business Services-Main (Retailer)"
+ ],
+ [
+  "NER176515",
+  248,
+  8532752,
+  "Rainbow-Main (Retailer)"
+ ],
+ [
+  "NER176525",
+  0,
+  0,
+  "Sneha Enterprise(Dharmanagar) (Retailer)"
+ ],
+ [
+  "NER176535",
+  13,
+  400000,
+  "Noruttam Enterprise (Retailer)"
+ ],
+ [
+  "NER176541",
+  7,
+  193000,
+  "Superfone Cafe (Retailer)"
+ ],
+ [
+  "NER176543",
+  5,
+  150000,
+  "Network Zone(NE) (Retailer)"
+ ],
+ [
+  "NER176553",
+  23,
+  700000,
+  "Laxmikant (Retailer)"
+ ],
+ [
+  "NER176568",
+  17,
+  500000,
+  "Mobile Store Thoubal (Retailer)"
+ ],
+ [
+  "NER176574",
+  75,
+  2300000,
+  "Maitri Traders-Main (Retailer)"
+ ],
+ [
+  "NER176576",
+  80,
+  3000000,
+  "MMC-Main (Retailer)"
+ ],
+ [
+  "NER176590",
+  60,
+  1800000,
+  "This n That-Main (Retailer)"
+ ],
+ [
+  "NER176592",
+  3,
+  100000,
+  "Padam Times(Singtam) (Retailer)"
+ ],
+ [
+  "NER176600",
+  7,
+  193000,
+  "Alisha Enterprise (Retailer)"
+ ],
+ [
+  "NER176632",
+  0,
+  0,
+  "Choudhury Trader (Retailer)"
+ ],
+ [
+  "NER176638",
+  15,
+  496000,
+  "Basistha Electronics (Retailer)"
+ ],
+ [
+  "NER176642",
+  2,
+  50000,
+  "SS Mobile(Imphal) (Retailer)"
+ ],
+ [
+  "NER176644",
+  45,
+  1500000,
+  "Western Point (Retailer)"
+ ],
+ [
+  "NER176665",
+  63,
+  2000000,
+  "Smart Mobile-Main (Retailer)"
+ ],
+ [
+  "NER176671",
+  15,
+  400000,
+  "JMD Enterprises(NE) (Retailer)"
+ ],
+ [
+  "NER176679",
+  8,
+  225000,
+  "Roy Eletronic (Retailer)"
+ ],
+ [
+  "NER176683",
+  15,
+  600000,
+  "S.H Enterprise (Retailer)"
+ ],
+ [
+  "NER176691",
+  33,
+  1000000,
+  "Abdul Electronics (Retailer)"
+ ],
+ [
+  "NER176695",
+  38,
+  1133000,
+  "Maa Kali Store (Retailer)"
+ ],
+ [
+  "NER176697",
+  60,
+  2052000,
+  "Basanti Mobile System (Retailer)"
+ ],
+ [
+  "NER176709",
+  70,
+  2119000,
+  "Chaya Mobile (Retailer)"
+ ],
+ [
+  "NER176721",
+  15,
+  321000,
+  "Munu Mobile Store (Retailer)"
+ ],
+ [
+  "NER176723",
+  30,
+  650000,
+  "Brahmaputra Enterprise (Retailer)"
+ ],
+ [
+  "NER176725",
+  2,
+  50000,
+  "Eimi Mobile (Retailer)"
+ ],
+ [
+  "NER176732",
+  5,
+  150000,
+  "Star Mobile Centre(AP) (Retailer)"
+ ],
+ [
+  "NER176734",
+  62,
+  2120400,
+  "Mobile India(Hailakandi) (Retailer)"
+ ],
+ [
+  "NER176752",
+  23,
+  819477,
+  "Fone Inn-1 (Retailer)"
+ ],
+ [
+  "NER176754",
+  3,
+  73997,
+  "L R Store (Retailer)"
+ ],
+ [
+  "NER176756",
+  45,
+  900000,
+  "Gaurav Electronics -Main (Retailer)"
+ ],
+ [
+  "NER176760",
+  2,
+  50000,
+  "Glamour World (Retailer)"
+ ],
+ [
+  "NER176764",
+  2,
+  50000,
+  "Mobile World(Kanglatongbi) (Retailer)"
+ ],
+ [
+  "NER176776",
+  27,
+  800000,
+  "Nexus (Retailer)"
+ ],
+ [
+  "NER176784",
+  10,
+  250000,
+  "New Sneha-Main (Retailer)"
+ ],
+ [
+  "NER176786",
+  10,
+  257000,
+  "Sunita Mobile(Namsai) (Retailer)"
+ ],
+ [
+  "NER176794",
+  17,
+  800000,
+  "Achy Cassete Gallery (Retailer)"
+ ],
+ [
+  "NER176796",
+  47,
+  1400000,
+  "Online Electronic (Retailer)"
+ ],
+ [
+  "NER176806",
+  20,
+  600000,
+  "R K Jain (Retailer)"
+ ],
+ [
+  "NER176808",
+  150,
+  5500000,
+  "Time Sound Center-Main (Retailer)"
+ ],
+ [
+  "NER176816",
+  2,
+  50000,
+  "Afrina Mobile (Retailer)"
+ ],
+ [
+  "NER176818",
+  17,
+  562000,
+  "JBK Enterprise (Retailer)"
+ ],
+ [
+  "NER176822",
+  13,
+  400000,
+  "SK Mobile (Retailer)"
+ ],
+ [
+  "NER176826",
+  9,
+  257000,
+  "Das Mobile Centre(Kumarghat) (Retailer)"
+ ],
+ [
+  "NER176828",
+  5,
+  150000,
+  "Jilmil(Mirza) (Retailer)"
+ ],
+ [
+  "NER176836",
+  2,
+  50000,
+  "Ektta Planet Mobile (Retailer)"
+ ],
+ [
+  "NER176852",
+  0,
+  0,
+  "Ruma Travels (Retailer)"
+ ],
+ [
+  "NER176858",
+  50,
+  1380950,
+  "Mobile House Miz-Main (Retailer)"
+ ],
+ [
+  "NER176860",
+  0,
+  150000,
+  "A to Z Mobile Zone(Ghy)-Main (Retailer)"
+ ],
+ [
+  "NER176864",
+  2,
+  50000,
+  "Gupta Mobile Manipur (Retailer)"
+ ],
+ [
+  "NER176874",
+  57,
+  2318000,
+  "Sisi Infosys-Main (Retailer)"
+ ],
+ [
+  "NER176880",
+  293,
+  8800000,
+  "Afsana Mobile Store (Retailer)"
+ ],
+ [
+  "NER176884",
+  10,
+  180000,
+  "Apol Digital (Guw) (Retailer)"
+ ],
+ [
+  "NER176888",
+  13,
+  400000,
+  "Electrojunction (Retailer)"
+ ],
+ [
+  "NER176890",
+  33,
+  1034967,
+  "Universal Cells (Retailer)"
+ ],
+ [
+  "NER176894",
+  440,
+  14000000,
+  "Connecting People-Main (Retailer)"
+ ],
+ [
+  "NER176906",
+  10,
+  250000,
+  "Sir Ji (Retailer)"
+ ],
+ [
+  "NER176930",
+  0,
+  0,
+  "Omega Electronics(Sil)-Main (Retailer)"
+ ],
+ [
+  "NER176946",
+  8,
+  150000,
+  "Ring One (Retailer)"
+ ],
+ [
+  "NER176956",
+  40,
+  1368000,
+  "Happy Mobile Zone (Retailer)"
+ ],
+ [
+  "NER176966",
+  65,
+  1500000,
+  "J H Electronic And Mobile Point-Main (Retailer)"
+ ],
+ [
+  "NER176978",
+  13,
+  400000,
+  "LTM Enterprise (Retailer)"
+ ],
+ [
+  "NER176986",
+  13,
+  400000,
+  "Susanta Store(Khowai) (Retailer)"
+ ],
+ [
+  "NER176988",
+  5,
+  150000,
+  "M/S M & J Enterprises (Retailer)"
+ ],
+ [
+  "NER177006",
+  27,
+  800000,
+  "Arjya Mobile-Main (Retailer)"
+ ],
+ [
+  "NER177028",
+  70,
+  2000000,
+  "Eastern Electro Vision(Mirza) (Retailer)"
+ ],
+ [
+  "NER177067",
+  32,
+  1089958,
+  "RC Mobi World-Main (Retailer)"
+ ],
+ [
+  "NER177085",
+  75,
+  2565000,
+  "Laskar Mobile Repairing (Retailer)"
+ ],
+ [
+  "NER177087",
+  120,
+  3500000,
+  "Alibaba-Main (Retailer)"
+ ],
+ [
+  "NER177091",
+  21,
+  150000,
+  "GF Radio (Retailer)"
+ ],
+ [
+  "NER177093",
+  7,
+  200000,
+  "Basanti Lal Prasad(ES) (Retailer)"
+ ],
+ [
+  "NER177097",
+  33,
+  961000,
+  "Classic Collection (Retailer)"
+ ],
+ [
+  "NER177119",
+  117,
+  4500000,
+  "Abanrai Electronics-Main (Retailer)"
+ ],
+ [
+  "NER177137",
+  4,
+  150000,
+  "Goon Collection (Retailer)"
+ ],
+ [
+  "NER177145",
+  8,
+  273600,
+  "A Malik Enterprise (Retailer)"
+ ],
+ [
+  "NER177159",
+  35,
+  1100000,
+  "SN Planet (Retailer)"
+ ],
+ [
+  "NER177167",
+  42,
+  1000000,
+  "Uniflame Equipment (Retailer)"
+ ],
+ [
+  "NER177173",
+  10,
+  400000,
+  "Universal Suppliers (Retailer)"
+ ],
+ [
+  "NER177195",
+  100,
+  3000000,
+  "Mamon Mobile And Electronic (Retailer)"
+ ],
+ [
+  "NER177203",
+  20,
+  600000,
+  "Awasna Enterprise (Retailer)"
+ ],
+ [
+  "NER177210",
+  10,
+  250000,
+  "S S Enterprise(Ghy)-Main (Retailer)"
+ ],
+ [
+  "NER177214",
+  0,
+  0,
+  "Shreyas (Retailer)"
+ ],
+ [
+  "NER177224",
+  40,
+  1200000,
+  "Impression (Retailer)"
+ ],
+ [
+  "NER177226",
+  10,
+  220000,
+  "Star Mobile Hub-Main (Retailer)"
+ ],
+ [
+  "NER177234",
+  16,
+  400000,
+  "G R Enterprises (Retailer)"
+ ],
+ [
+  "NER177246",
+  15,
+  400000,
+  "Classic(NE) (Retailer)"
+ ],
+ [
+  "NER177256",
+  29,
+  707972,
+  "Digiport (Retailer)"
+ ],
+ [
+  "NER177258",
+  15,
+  513000,
+  "Geetanjali (Karimganj) (Retailer)"
+ ],
+ [
+  "NER177307",
+  0,
+  0,
+  "Tripuraswari Mobile Center (Retailer)"
+ ],
+ [
+  "NER177325",
+  13,
+  444600,
+  "Star Mobile(Silchar) (Retailer)"
+ ],
+ [
+  "NER177333",
+  17,
+  500000,
+  "SK Mobile Store(NE) (Retailer)"
+ ],
+ [
+  "NER177335",
+  33,
+  1000000,
+  "Maa Manasa (Retailer)"
+ ],
+ [
+  "NER177353",
+  8,
+  150000,
+  "Jyoti Watch (Retailer)"
+ ],
+ [
+  "NER177363",
+  18,
+  615600,
+  "Kathiababa Mobile House (Retailer)"
+ ],
+ [
+  "NER177390",
+  167,
+  5000000,
+  "Rainbow Infotech-Main (Retailer)"
+ ],
+ [
+  "NER177392",
+  60,
+  1759000,
+  "Sudip Time n Sound Centre-Main (Retailer)"
+ ],
+ [
+  "NER177394",
+  10,
+  200000,
+  "New Chaya Watch Co-Main (Retailer)"
+ ],
+ [
+  "NER177408",
+  23,
+  700000,
+  "Sri Ram Cellzone (Retailer)"
+ ],
+ [
+  "NER177414",
+  13,
+  400000,
+  "Sachindra Varities (Retailer)"
+ ],
+ [
+  "NER177418",
+  10,
+  250000,
+  "Kaziranga Infotech-Main (Retailer)"
+ ],
+ [
+  "NER177420",
+  140,
+  6500000,
+  "J M Electronic-Main (Retailer)"
+ ],
+ [
+  "NER177426",
+  30,
+  900000,
+  "Surya Communication-Main (Retailer)"
+ ],
+ [
+  "NER177434",
+  27,
+  800000,
+  "Boyz Mobile-Main (Retailer)"
+ ],
+ [
+  "NER177436",
+  8,
+  150000,
+  "Mirza Electronics(NE) (Retailer)"
+ ],
+ [
+  "NER177440",
+  10,
+  200000,
+  "Melody Mobile Store(Ghy) (Retailer)"
+ ],
+ [
+  "NER177452",
+  62,
+  1600000,
+  "Moon Light-Main (Retailer)"
+ ],
+ [
+  "NER177456",
+  73,
+  2200000,
+  "Super Computer (Retailer)"
+ ],
+ [
+  "NER177476",
+  2,
+  50000,
+  "Sethis Mobile (Retailer)"
+ ],
+ [
+  "NER177478",
+  0,
+  0,
+  "Sai Enterprise (Retailer)"
+ ],
+ [
+  "NER177482",
+  12,
+  330988,
+  "Rosangliana Enterprise (Retailer)"
+ ],
+ [
+  "NER177496",
+  2,
+  50000,
+  "BS Mobile Store (Retailer)"
+ ],
+ [
+  "NER177528",
+  73,
+  2200000,
+  "New Utsav (Retailer)"
+ ],
+ [
+  "NER177549",
+  50,
+  1500000,
+  "R.S Traders-Showroom Gangtok-ES (Retailer)"
+ ],
+ [
+  "NER177566",
+  32,
+  1073000,
+  "Ms Mari Enterprises (Retailer)"
+ ],
+ [
+  "NER177568",
+  17,
+  500000,
+  "Suhana Electronics (Retailer)"
+ ],
+ [
+  "NER177584",
+  81,
+  2352419,
+  "Lawmi Mobile Shop-Main (Retailer)"
+ ],
+ [
+  "NER177602",
+  60,
+  1848000,
+  "M/s K.B Enterprise (Retailer)"
+ ],
+ [
+  "NER177604",
+  62,
+  2120400,
+  "Moulana Mobile Store (Retailer)"
+ ],
+ [
+  "NER177612",
+  90,
+  3078000,
+  "G S Mobile Gallery (Retailer)"
+ ],
+ [
+  "NER177618",
+  4,
+  120000,
+  "TDR Mobile Shop (Retailer)"
+ ],
+ [
+  "NER177622",
+  22,
+  450000,
+  "Alpha Enterprise(Aizawl)-Main (Retailer)"
+ ],
+ [
+  "NER177632",
+  10,
+  150000,
+  "Shree Shyam Gadgets(NE) (Retailer)"
+ ],
+ [
+  "NER177648",
+  2,
+  50000,
+  "Network Enterprise(NE) (Retailer)"
+ ],
+ [
+  "NER177658",
+  13,
+  400000,
+  "Shangri La Mobile (Retailer)"
+ ],
+ [
+  "NER177666",
+  0,
+  0,
+  "Refidim Infosys (Retailer)"
+ ],
+ [
+  "NER177668",
+  27,
+  800000,
+  "Tour Care (Retailer)"
+ ],
+ [
+  "NER177670",
+  45,
+  1400000,
+  "Mobile Wale-Main (Retailer)"
+ ],
+ [
+  "NER177678",
+  3,
+  102600,
+  "Radharaman Mobile Store (Retailer)"
+ ],
+ [
+  "NER177680",
+  58,
+  1686942,
+  "Cell Care (Aiz) (Retailer)"
+ ],
+ [
+  "NER177682",
+  13,
+  400000,
+  "Shan Computer(Ambassa) (Retailer)"
+ ],
+ [
+  "NER177686",
+  50,
+  1700000,
+  "Great Eastern Trading Co-Main (Retailer)"
+ ],
+ [
+  "NER177696",
+  50,
+  1810000,
+  "Smart Phone Hub (Kxj) (Retailer)"
+ ],
+ [
+  "NER177716",
+  4,
+  128000,
+  "Sanju Enterprise(NE) (Retailer)"
+ ],
+ [
+  "NER177720",
+  15,
+  500000,
+  "RTCube (Retailer)"
+ ],
+ [
+  "NER177736",
+  15,
+  450000,
+  "New Digitek India (Retailer)"
+ ],
+ [
+  "NER177748",
+  39,
+  1069461,
+  "MRC Champhai (Retailer)"
+ ],
+ [
+  "NER177756",
+  22,
+  608000,
+  "Yadav Electronics (Retailer)"
+ ],
+ [
+  "NER177760",
+  40,
+  1100000,
+  "Mobile Junction-Main (Retailer)"
+ ],
+ [
+  "NER177786",
+  8,
+  250000,
+  "CGM Mobile Centre-Main (Retailer)"
+ ],
+ [
+  "NER177790",
+  21,
+  643000,
+  "Mobile Store-Dharmanagar (Retailer)"
+ ],
+ [
+  "NER177796",
+  2,
+  50000,
+  "Upto Date Mobile (Retailer)"
+ ],
+ [
+  "NER177798",
+  410,
+  13000000,
+  "Datamation Service-Main (Retailer)"
+ ],
+ [
+  "NER177804",
+  26,
+  744478,
+  "Digital House (Retailer)"
+ ],
+ [
+  "NER177812",
+  10,
+  200000,
+  "Cell Point (Bhangagarh) (Retailer)"
+ ],
+ [
+  "NER177828",
+  439,
+  15340000,
+  "Reliance(Retailer) - NE"
+ ],
+ [
+  "NER177830",
+  7,
+  200000,
+  "R.K. Electronic (Retailer)"
+ ],
+ [
+  "NER177836",
+  8,
+  150000,
+  "Bhogeswari Traders (Retailer)"
+ ],
+ [
+  "NER177838",
+  13,
+  435985,
+  "Dk Mobile Care (Retailer)"
+ ],
+ [
+  "NER177845",
+  40,
+  1100000,
+  "J K S Store (Retailer)"
+ ],
+ [
+  "NER177853",
+  2,
+  50000,
+  "M/S Thambal Enterprises (Retailer)"
+ ],
+ [
+  "NER177855",
+  10,
+  250000,
+  "Republic Watch-Main (Retailer)"
+ ],
+ [
+  "NER177859",
+  15,
+  513000,
+  "Galaxy Mobile (ASMG) (Retailer)"
+ ],
+ [
+  "NER177865",
+  17,
+  500000,
+  "Prabha(Udaipur) (Retailer)"
+ ],
+ [
+  "NER177873",
+  17,
+  400000,
+  "Ms Matbing Enterprises (Retailer)"
+ ],
+ [
+  "NER177879",
+  7,
+  200000,
+  "Pramod Kumar Rathi (Retailer)"
+ ],
+ [
+  "NER177889",
+  63,
+  2424000,
+  "SR Enterprise-Main (Retailer)"
+ ],
+ [
+  "NER177891",
+  8,
+  200000,
+  "Mobile Ghar (Barbari Chariali) (Retailer)"
+ ],
+ [
+  "NER177895",
+  30,
+  1093000,
+  "Infinity World-Main (Retailer)"
+ ],
+ [
+  "NER177897",
+  50,
+  1445950,
+  "Two in One Sales n Services-Main (Retailer)"
+ ],
+ [
+  "NER177899",
+  10,
+  300000,
+  "Solution X (Retailer)"
+ ],
+ [
+  "NER177927",
+  50,
+  1500000,
+  "Abhins Corner-Main (Retailer)"
+ ],
+ [
+  "NER177931",
+  2,
+  50000,
+  "Ronny Mobile (Retailer)"
+ ],
+ [
+  "NER177953",
+  6,
+  205200,
+  "Krishna Telecom(NE) (Retailer)"
+ ],
+ [
+  "NER177956",
+  3,
+  100000,
+  "SS Enterprise(Agt) (Retailer)"
+ ],
+ [
+  "NER177970",
+  52,
+  1776448,
+  "Angie Mobile House-Main (Retailer)"
+ ],
+ [
+  "NER177988",
+  70,
+  2394000,
+  "Esha Mobile House (Retailer)"
+ ],
+ [
+  "NER177990",
+  27,
+  800000,
+  "Shiwang Electronics-Main (Retailer)"
+ ],
+ [
+  "NER177992",
+  3,
+  100000,
+  "Victor Mobile Hub (Retailer)"
+ ],
+ [
+  "NER178000",
+  20,
+  600000,
+  "Sailesh Lakhotia (Retailer)"
+ ],
+ [
+  "NER178010",
+  24,
+  902000,
+  "Baby Electronics (Retailer)"
+ ],
+ [
+  "NER178016",
+  13,
+  400000,
+  "Star Mobile(Manipur)-Main (Retailer)"
+ ],
+ [
+  "NER178018",
+  73,
+  2200000,
+  "Net To Net (Agr)-Main (Retailer)"
+ ],
+ [
+  "NER178022",
+  50,
+  1550000,
+  "Zoom Electronics ( Chaygaon ) (Retailer)"
+ ],
+ [
+  "NER178028",
+  15,
+  513000,
+  "Priyo Store (Hailakandi) (Retailer)"
+ ],
+ [
+  "NER178042",
+  0,
+  150000,
+  "Galaxy Electronics (Retailer)"
+ ],
+ [
+  "NER178046",
+  75,
+  2565000,
+  "Priya Enterprise(Silchar) (Retailer)"
+ ],
+ [
+  "NER178050",
+  45,
+  1539000,
+  "Cell Beat(Hailakandi) (Retailer)"
+ ],
+ [
+  "NER178074",
+  0,
+  0,
+  "Om Electronics(Ghy) (Retailer)"
+ ],
+ [
+  "NER178084",
+  100,
+  3000000,
+  "Maa Electronics-Main (Retailer)"
+ ],
+ [
+  "NER178096",
+  6,
+  161994,
+  "J S Music Corner -Main (Retailer)"
+ ],
+ [
+  "NER178104",
+  17,
+  500000,
+  "AR Mobile Centre (Retailer)"
+ ],
+ [
+  "NER178108",
+  15,
+  289000,
+  "Bambino (Retailer)"
+ ],
+ [
+  "NER178114",
+  25,
+  855000,
+  "Pulok Roy (Retailer)"
+ ],
+ [
+  "NER178116",
+  37,
+  1100000,
+  "NG (Retailer)"
+ ],
+ [
+  "NER178118",
+  2,
+  50000,
+  "Ema Mobile(Imphal) (Retailer)"
+ ],
+ [
+  "NER178122",
+  62,
+  2120400,
+  "M/S Reba Electronics (Retailer)"
+ ],
+ [
+  "NER178128",
+  30,
+  900000,
+  "Santosh Electronics(Moreh Bazar) (Retailer)"
+ ],
+ [
+  "NER178136",
+  5,
+  110000,
+  "Mobile House(Jiribam ) (Retailer)"
+ ],
+ [
+  "NER178147",
+  7,
+  193000,
+  "Cell Vision (Retailer)"
+ ],
+ [
+  "NER178153",
+  120,
+  2000000,
+  "Shri Bhawani Enterprise-Main (Retailer)"
+ ],
+ [
+  "NER178159",
+  15,
+  450000,
+  "Sri Krishna Mobile Center (UDP) (Retailer)"
+ ],
+ [
+  "NER178163",
+  40,
+  1000000,
+  "Jitu Electronics And Mobiles (Retailer)"
+ ],
+ [
+  "NER178182",
+  8,
+  225000,
+  "Uttam Varaitise(Manu) (Retailer)"
+ ],
+ [
+  "NER178190",
+  0,
+  0,
+  "Saha Varities(Tripura) (Retailer)"
+ ],
+ [
+  "NER178204",
+  27,
+  800000,
+  "Sarala Electronics-Main (Retailer)"
+ ],
+ [
+  "NER178212",
+  30,
+  900000,
+  "Rahul Mobile Center (Retailer)"
+ ],
+ [
+  "NER178218",
+  70,
+  2394000,
+  "Lily Mobile (Retailer)"
+ ],
+ [
+  "NER178228",
+  13,
+  400000,
+  "Pasa Enterprises-Main (Retailer)"
+ ],
+ [
+  "NER178238",
+  14,
+  624986,
+  "Fone Inn-Main (Retailer)"
+ ],
+ [
+  "NER178248",
+  125,
+  4275000,
+  "Top in Stand (Retailer)"
+ ],
+ [
+  "NER178250",
+  20,
+  684000,
+  "RK Mobile(Karimganj) (Retailer)"
+ ],
+ [
+  "NER178258",
+  14,
+  452000,
+  "Ms T L Enterprises (Retailer)"
+ ],
+ [
+  "NER178262",
+  10,
+  220000,
+  "Mobile Fashion 2 (Retailer)"
+ ],
+ [
+  "NER178282",
+  67,
+  2840933,
+  "Puii Infotech(Lunglei)-Main (Retailer)"
+ ],
+ [
+  "NER178288",
+  13,
+  400000,
+  "Poulami Interiors (Retailer)"
+ ],
+ [
+  "NER178298",
+  28,
+  650000,
+  "Anushree-Main (Retailer)"
+ ],
+ [
+  "NER178300",
+  15,
+  513000,
+  "National Watch Electronics (Retailer)"
+ ],
+ [
+  "NER178326",
+  2,
+  50000,
+  "Arvind Mobile (Retailer)"
+ ],
+ [
+  "NER178340",
+  35,
+  1021968,
+  "Electronic Centre-Bara Bazar (Retailer)"
+ ],
+ [
+  "NER178344",
+  8,
+  200000,
+  "Gauhati Stores (Retailer)"
+ ],
+ [
+  "NER178346",
+  160,
+  3500000,
+  "J A Electronics(Goroimari) (Retailer)"
+ ],
+ [
+  "NER178357",
+  30,
+  900000,
+  "V K Lakhotia (Retailer)"
+ ],
+ [
+  "NER178363",
+  31,
+  1154969,
+  "Thanchhingi N Sons-Main (Retailer)"
+ ],
+ [
+  "NER178365",
+  30,
+  700000,
+  "Laskar Mobile Point (Retailer)"
+ ],
+ [
+  "NER178373",
+  3,
+  100000,
+  "Motim Electronics (Retailer)"
+ ],
+ [
+  "NER178385",
+  45,
+  837000,
+  "Bharali Brothers (Retailer)"
+ ],
+ [
+  "NER178392",
+  24,
+  772000,
+  "Sah Computer (Retailer)"
+ ],
+ [
+  "NER178402",
+  16,
+  400000,
+  "Ms Electronic Solution (Retailer)"
+ ],
+ [
+  "NER178410",
+  30,
+  800000,
+  "AK Mobile Point-Main (Retailer)"
+ ],
+ [
+  "NER178412",
+  50,
+  1500000,
+  "Kishore Pradhan-Main (Retailer)"
+ ],
+ [
+  "NER178428",
+  35,
+  1050000,
+  "R N Enterprises-Main (Retailer)"
+ ],
+ [
+  "NER178452",
+  3,
+  100000,
+  "Mobile City(Udaipur) (Retailer)"
+ ],
+ [
+  "NER178472",
+  38,
+  850000,
+  "Bela Watch Co-Main (Retailer)"
+ ],
+ [
+  "NER178496",
+  20,
+  450000,
+  "Sunita Electronics (Retailer)"
+ ],
+ [
+  "NER178498",
+  45,
+  1100000,
+  "Lucky Mobile Centre-Main (Retailer)"
+ ],
+ [
+  "NER178510",
+  33,
+  1000000,
+  "Maa Electronics Mobile(Khowai) (Retailer)"
+ ],
+ [
+  "NER178514",
+  28,
+  775206,
+  "Emarald Comms-Main (Retailer)"
+ ],
+ [
+  "NER178516",
+  2,
+  50000,
+  "Amazing Mobile (Retailer)"
+ ],
+ [
+  "NER178530",
+  15,
+  435985,
+  "Hnamte Agencies (Retailer)"
+ ],
+ [
+  "NER178534",
+  65,
+  3000000,
+  "Amplified Communications-Main (Retailer)"
+ ],
+ [
+  "NER178559",
+  62,
+  1400000,
+  "Ijaj Mobile And Electronics (Retailer)"
+ ],
+ [
+  "NER178570",
+  67,
+  2000000,
+  "JC Mobile-Main (Retailer)"
+ ],
+ [
+  "NER178574",
+  4,
+  290496,
+  "S B Mobile (Retailer)"
+ ],
+ [
+  "NER178610",
+  35,
+  1000000,
+  "Multi Corner-Main (Retailer)"
+ ],
+ [
+  "NER178648",
+  7,
+  200000,
+  "Tripureswari Mobile House (Retailer)"
+ ],
+ [
+  "NER178650",
+  14,
+  400000,
+  "Jitu Mobile Store-Main (Retailer)"
+ ],
+ [
+  "NER178658",
+  30,
+  500000,
+  "HiFi Telecom (Retailer)"
+ ],
+ [
+  "NER178662",
+  8,
+  273600,
+  "M/S Mobile Centre(NE) (Retailer)"
+ ],
+ [
+  "NER178664",
+  19,
+  542000,
+  "Ete Hi-Choice (Retailer)"
+ ],
+ [
+  "NER178671",
+  14,
+  435985,
+  "Isreal Mobiles (Retailer)"
+ ],
+ [
+  "NER178676",
+  22,
+  684000,
+  "Mobile World (Karimganj) (Retailer)"
+ ],
+ [
+  "NER178694",
+  5,
+  150000,
+  "Abid Electronics (Retailer)"
+ ],
+ [
+  "NER178702",
+  7,
+  193000,
+  "IT Solution (Retailer)"
+ ],
+ [
+  "NER178706",
+  30,
+  900000,
+  "Jameel Electronic-Main (Retailer)"
+ ],
+ [
+  "NER178714",
+  15,
+  496485,
+  "Rem Rem Enterprise (Retailer)"
+ ],
+ [
+  "NER178716",
+  150,
+  4000000,
+  "New Bela Watch-Main (Retailer)"
+ ],
+ [
+  "NER178718",
+  12,
+  354000,
+  "Sharma Sons (Retailer)"
+ ],
+ [
+  "NER178742",
+  13,
+  400000,
+  "Mobile Cafe-Main (Retailer)"
+ ],
+ [
+  "NER178746",
+  30,
+  900000,
+  "Mobile Centre (Udaipur)-Main (Retailer)"
+ ],
+ [
+  "NER178752",
+  55,
+  1817000,
+  "M/S Mobile Centre (NE) (Retailer)"
+ ],
+ [
+  "NER178762",
+  7,
+  200000,
+  "Mobile Planet(Gangtok) (Retailer)"
+ ],
+ [
+  "NER178774",
+  100,
+  3000000,
+  "Cell Phone Hub-Main (Retailer)"
+ ],
+ [
+  "NER178780",
+  15,
+  513000,
+  "S R Prime (Retailer)"
+ ],
+ [
+  "NER178782",
+  2,
+  50000,
+  "AP Enterprises -Main (Retailer)"
+ ],
+ [
+  "NER178784",
+  120,
+  3500000,
+  "Web Net-Main (Retailer)"
+ ],
+ [
+  "NER178792",
+  30,
+  1291000,
+  "Gungli Traders (Retailer)"
+ ],
+ [
+  "NER178818",
+  2,
+  50000,
+  "J K Enterprises(NE) (Retailer)"
+ ],
+ [
+  "NER178826",
+  20,
+  600000,
+  "Omker Electronics(Manubazar) (Retailer)"
+ ],
+ [
+  "NER178830",
+  50,
+  1250000,
+  "Spectrum Trade Comm Centre-Main (Retailer)"
+ ],
+ [
+  "NER178832",
+  40,
+  1200000,
+  "Joyguru Mobile (Retailer)"
+ ],
+ [
+  "NER178844",
+  250,
+  7000000,
+  "Music Den-Main (Retailer)"
+ ],
+ [
+  "NER178846",
+  45,
+  1539000,
+  "Computer & Mobile Mart (Retailer)"
+ ],
+ [
+  "NER178860",
+  3,
+  102600,
+  "M/S J Enterprise (Retailer)"
+ ],
+ [
+  "NER178862",
+  9,
+  249991,
+  "Zolentu (Retailer)"
+ ],
+ [
+  "NER178872",
+  10,
+  354000,
+  "Shree Ganga Store (Retailer)"
+ ],
+ [
+  "NER178882",
+  24,
+  820800,
+  "Bapsab Electronics (Retailer)"
+ ],
+ [
+  "NER178888",
+  0,
+  0,
+  "Rinliana Sailo Mobile House (Retailer)"
+ ],
+ [
+  "NER178892",
+  1,
+  34999,
+  "Bonanza Communication (Mizoram) (Retailer)"
+ ],
+ [
+  "NER178911",
+  7,
+  200000,
+  "Rajesh Kumar Prashad (Retailer)"
+ ],
+ [
+  "NER178918",
+  27,
+  800000,
+  "Das Communication (Retailer)"
+ ],
+ [
+  "NER178922",
+  2,
+  50000,
+  "Santosh Mobile(Kakching) (Retailer)"
+ ],
+ [
+  "NER178930",
+  36,
+  1457000,
+  "U S Enterprise-Main (Retailer)"
+ ],
+ [
+  "NER178932",
+  7,
+  200000,
+  "Khetaram Murlidhar (Retailer)"
+ ],
+ [
+  "NER178940",
+  5,
+  150000,
+  "Nokia House (Retailer)"
+ ],
+ [
+  "NER178950",
+  17,
+  515000,
+  "Muktishree (Retailer)"
+ ],
+ [
+  "NER178962",
+  7,
+  200000,
+  "Anmol Mobile(NE) (Retailer)"
+ ],
+ [
+  "NER178964",
+  25,
+  650000,
+  "Cell Point (Retailer)"
+ ],
+ [
+  "NER178966",
+  45,
+  1500000,
+  "RS Enterprise-Main (Retailer)"
+ ],
+ [
+  "NER178976",
+  17,
+  400000,
+  "M/s Jini Smart Tech (Retailer)"
+ ],
+ [
+  "NER178980",
+  2,
+  50000,
+  "Hello Point(NE) (Retailer)"
+ ],
+ [
+  "NER178986",
+  10,
+  420000,
+  "Electronic Juntion (Retailer)"
+ ],
+ [
+  "NER178988",
+  32,
+  1021000,
+  "J K Electronic (Retailer)"
+ ],
+ [
+  "NER178992",
+  7,
+  155993,
+  "Tata Indicom (Retailer)"
+ ],
+ [
+  "NER178998",
+  12,
+  316488,
+  "B5 Mobile House-Main (Retailer)"
+ ],
+ [
+  "NER179006",
+  53,
+  1600000,
+  "BK Furniture and Electronics (Retailer)"
+ ],
+ [
+  "NER179012",
+  5,
+  150000,
+  "M/S B.M. Electrical And Electronics (Retailer)"
+ ],
+ [
+  "NER179027",
+  19,
+  632000,
+  "Balaji Electronics(West Kameng) (Retailer)"
+ ],
+ [
+  "NER179033",
+  23,
+  792000,
+  "DB Corner (Retailer)"
+ ],
+ [
+  "NER179047",
+  27,
+  800000,
+  "Shipra Mobile(NE) (Retailer)"
+ ],
+ [
+  "NER179049",
+  62,
+  2120400,
+  "Mobile Hub(Karimganj) (Retailer)"
+ ],
+ [
+  "NER179059",
+  0,
+  0,
+  "New Susma Varities (Retailer)"
+ ],
+ [
+  "NER179065",
+  10,
+  342000,
+  "Mobile Care(Hailakhandi) (Retailer)"
+ ],
+ [
+  "NER179075",
+  15,
+  541000,
+  "Mobile Care(Hatigaon) (Retailer)"
+ ],
+ [
+  "NER179079",
+  17,
+  500000,
+  "A To Z Mobile Bazar (Retailer)"
+ ],
+ [
+  "NER179087",
+  22,
+  449982,
+  "Kolasib Mobile House (Retailer)"
+ ],
+ [
+  "NER179109",
+  5,
+  150000,
+  "Jindal electronics-Silpukhuri (Retailer)"
+ ],
+ [
+  "NER179111",
+  13,
+  400000,
+  "Chingtam Mobile (Retailer)"
+ ],
+ [
+  "NER179131",
+  24,
+  777218,
+  "Khiangte Mobile House-Main (Retailer)"
+ ],
+ [
+  "NER179139",
+  40,
+  1050000,
+  "K R Communication-Main (Retailer)"
+ ],
+ [
+  "NER179141",
+  2,
+  50000,
+  "Memories Enterprises (Retailer)"
+ ],
+ [
+  "NER179145",
+  38,
+  700000,
+  "Cellocity Zone-Main (Retailer)"
+ ],
+ [
+  "NER179166",
+  13,
+  400000,
+  "Tripureswari Enterprise(Agartala) (Retailer)"
+ ],
+ [
+  "NER179174",
+  33,
+  1000000,
+  "Amilal and Co (Retailer)"
+ ],
+ [
+  "NER179176",
+  40,
+  1200000,
+  "Om Mobile Care (Retailer)"
+ ],
+ [
+  "NER179180",
+  47,
+  1400000,
+  "Sahin Electronics -Main (Retailer)"
+ ],
+ [
+  "NER179188",
+  10,
+  342000,
+  "New Mobile Zone (Retailer)"
+ ],
+ [
+  "NER179190",
+  24,
+  708000,
+  "Global Marketing (Retailer)"
+ ],
+ [
+  "NER179196",
+  10,
+  246990,
+  "My Hamz (Retailer)"
+ ],
+ [
+  "NER179202",
+  40,
+  1200000,
+  "Darjeeling Tea House (Retailer)"
+ ],
+ [
+  "NER179212",
+  30,
+  700000,
+  "Friends Communication(Lokrah)-Main (Retailer)"
+ ],
+ [
+  "NER179218",
+  2,
+  50000,
+  "Gopal Enterprises-Main (Retailer)"
+ ],
+ [
+  "NER179234",
+  21,
+  643000,
+  "Misto Varities (Retailer)"
+ ],
+ [
+  "NER179240",
+  23,
+  700000,
+  "Padam Electronics (Singtam Bazar) (Retailer)"
+ ],
+ [
+  "NER179248",
+  0,
+  0,
+  "Mobile Zone(Club Road) (Retailer)"
+ ],
+ [
+  "NER179252",
+  30,
+  750000,
+  "Galaxy Hub-Main (Retailer)"
+ ],
+ [
+  "NER179258",
+  8,
+  225000,
+  "Trishna Mobile Net (Retailer)"
+ ],
+ [
+  "NER179268",
+  10,
+  193000,
+  "Shree Balaji Electricals (Retailer)"
+ ],
+ [
+  "NER179272",
+  13,
+  400000,
+  "RBT Mobile Centre (Retailer)"
+ ],
+ [
+  "NER179278",
+  27,
+  800000,
+  "Ibohal Enterprises-Main (Retailer)"
+ ],
+ [
+  "NER179288",
+  25,
+  450000,
+  "Star PCO-Main (Retailer)"
+ ],
+ [
+  "NER179292",
+  48,
+  1200000,
+  "Taru N Sons-Main (Retailer)"
+ ],
+ [
+  "NER179302",
+  5,
+  110000,
+  "Anand Computer (Retailer)"
+ ],
+ [
+  "NER179316",
+  23,
+  700000,
+  "S R Mobile(NE)-Main (Retailer)"
+ ],
+ [
+  "NER179322",
+  30,
+  900000,
+  "Mobile World n Repairing (Retailer)"
+ ],
+ [
+  "NER179341",
+  12,
+  289000,
+  "Bruwu Watch n Electronics (Retailer)"
+ ],
+ [
+  "NER179409",
+  27,
+  800000,
+  "Mobile Plus(NE) (Retailer)"
+ ],
+ [
+  "NER179427",
+  2,
+  50000,
+  "Sagar Enterprises(NE) (Retailer)"
+ ],
+ [
+  "NER179437",
+  25,
+  800000,
+  "Jay Electronics (Retailer)"
+ ],
+ [
+  "NER179448",
+  2,
+  50000,
+  "Sandesh Mobile(NE) (Retailer)"
+ ],
+ [
+  "NER179453",
+  4,
+  128000,
+  "Jaiswal Electronics(NE) (Retailer)"
+ ],
+ [
+  "NER179457",
+  17,
+  500000,
+  "Deepak Mobile(NE) (Retailer)"
+ ],
+ [
+  "NER180101",
+  90,
+  3078000,
+  "Smart Mobile(Pkt) (Retailer)"
+ ],
+ [
+  "NER180636",
+  20,
+  684000,
+  "Maa Telecom (Retailer)"
+ ],
+ [
+  "NER180638",
+  2,
+  50000,
+  "Pukhram Mobile House (Retailer)"
+ ],
+ [
+  "NER181555",
+  5,
+  171000,
+  "Lokenath Mobile Shoppe (Retailer)"
+ ],
+ [
+  "NER184792",
+  10,
+  257000,
+  "Hoda Electronics (Retailer)"
+ ],
+ [
+  "NER184794",
+  23,
+  761000,
+  "Rajen Watch And Electronics-Main (Retailer)"
+ ],
+ [
+  "NER185028",
+  4,
+  128000,
+  "In Tuch (Retailer)"
+ ],
+ [
+  "NER185304",
+  4,
+  150000,
+  "Papo Enterprise (Retailer)"
+ ],
+ [
+  "NER185566",
+  50,
+  1397000,
+  "MB Zone (Retailer)"
+ ],
+ [
+  "NER187388",
+  10,
+  400000,
+  "Mobile Hub(Pkd) (Retailer)"
+ ],
+ [
+  "NER187391",
+  70,
+  2394000,
+  "Mobile Place (Karimganj) (Retailer)"
+ ],
+ [
+  "NER187397",
+  20,
+  684000,
+  "Talukdar Communication (Retailer)"
+ ],
+ [
+  "NER187401",
+  5,
+  110000,
+  "Akmal Mobile Shop (Retailer)"
+ ],
+ [
+  "NER187405",
+  30,
+  900000,
+  "M/S. Masum Communication (Retailer)"
+ ],
+ [
+  "NER187805",
+  19,
+  746000,
+  "Minam Mobile Shop (Retailer)"
+ ],
+ [
+  "NER188089",
+  23,
+  700000,
+  "S.S Electronic (Retailer)"
+ ],
+ [
+  "NER189028",
+  33,
+  1000000,
+  "Gupi Deb(NE)-Main (Retailer)"
+ ],
+ [
+  "NER196541",
+  8,
+  225000,
+  "Sweety Varities (Retailer)"
+ ],
+ [
+  "NER197525",
+  13,
+  664000,
+  "Khushi Steel (Retailer)"
+ ],
+ [
+  "NER200756",
+  33,
+  1000000,
+  "Palash Das (Retailer)"
+ ],
+ [
+  "NER201331",
+  20,
+  600000,
+  "Mazhar Hussain Ansari (Retailer)"
+ ],
+ [
+  "NER201808",
+  30,
+  1026000,
+  "Star Mobile Centre (Retailer)"
+ ],
+ [
+  "NER202509",
+  23,
+  704000,
+  "Akash Enterprise (Retailer)"
+ ],
+ [
+  "NER207537",
+  40,
+  950000,
+  "JM Mobiles Goroimari (Retailer)"
+ ],
+ [
+  "NER209060",
+  17,
+  500000,
+  "Utsav (Retailer)"
+ ]
+]
