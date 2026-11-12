@@ -1104,7 +1104,7 @@ $('avatarBtn').addEventListener('click', () => openSheet(`
 
 /* ---------------- LOG VISIT ---------------- */
 const CHIPS = ['Stock low', 'Good sale', 'Scheme query', 'Needs demo set', 'Competitor offer', 'Display issue', 'Payment issue'];
-let visitState = { retailer: null, chips: new Set(), photos: [] };
+let visitState = { retailer: null, chips: new Set(), photos: [], saved: null };
 let gps = null;
 let gpsWatch = null;
 
@@ -1131,7 +1131,7 @@ function setGpsText() {
 
 function showVisit(code) {
   visitState.photos.forEach((p) => URL.revokeObjectURL(p.url));
-  visitState = { retailer: null, chips: new Set(), photos: [] };
+  visitState = { retailer: null, chips: new Set(), photos: [], saved: null };
   $('visitNotes').value = ''; $('visitFollow').value = ''; $('visitErr').classList.add('hidden');
   renderChips(); renderPhotos();
   $('retailerQuery').value = '';
@@ -1180,6 +1180,7 @@ function showSearch() {
 
 function pickRetailer(r, dist) {
   visitState.retailer = r;
+  visitState.saved = null;
   $('retailerSearch').classList.add('hidden');
   const perf = (cache.perf || {}).data;
   const row = perf && (perf.retailers || []).find((x) => x.code === r.code);
@@ -1226,9 +1227,15 @@ function renderPhotos() {
   $('photoGrid').innerHTML = ph.map((p, i) => `<div class="photo"><img src="${p.url}" alt="Stock photo ${i + 1}"><button type="button" data-rm="${i}" aria-label="Remove photo ${i + 1}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('') +
     (ph.length < 5 ? `<label class="addPhoto"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Take photo<input type="file" accept="image/*" capture="environment" id="photoInput" aria-label="Take a stock photo"></label>` : '');
   const inp = $('photoInput');
-  if (inp) inp.onchange = () => {
-    [...inp.files].filter((f) => f.type.startsWith('image/')).slice(0, 5 - visitState.photos.length)
-      .forEach((f) => visitState.photos.push({ file: f, url: URL.createObjectURL(f) }));
+  if (inp) inp.onchange = async () => {
+    const picked = [...inp.files].filter((f) => !f.type || f.type.startsWith('image/')).slice(0, 5 - visitState.photos.length);
+    for (const f of picked) {
+      // Copy the camera file into memory now: on some Android phones the original
+      // file can no longer be read a few minutes later, and the upload then fails.
+      let mem = f;
+      try { mem = new File([await f.arrayBuffer()], f.name || 'photo.jpg', { type: f.type || 'image/jpeg' }); } catch {}
+      visitState.photos.push({ file: mem, url: URL.createObjectURL(mem) });
+    }
     renderPhotos();
   };
 }
@@ -1277,21 +1284,45 @@ $('submitVisit').addEventListener('click', async () => {
     if (!gps || Date.now() - gps.at > 120000) await getGPS();
     setGpsText();
     if (!gps) throw new Error('Location is needed to log a visit. Allow location access and try again.');
-    btn.innerHTML = '<span class="spin"></span> Saving visit…';
-    const today = new Date(); const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    const v = await api('/visits', { method: 'POST', json: {
-      retailer: r.name, market: r.town_name || r.district_name || r.zone || 'Market', visit_date: iso,
-      feedback: [chips.length ? chips.join(', ') : '', notes].filter(Boolean).join(' — '),
-      suggestions: $('visitFollow').value.trim(),
-      latitude: gps.latitude, longitude: gps.longitude, gps_accuracy: gps.accuracy
-    } });
-    if (visitState.photos.length) {
-      btn.innerHTML = `<span class="spin"></span> Uploading ${visitState.photos.length} photo${visitState.photos.length > 1 ? 's' : ''}…`;
-      const fd = new FormData();
-      for (const p of visitState.photos) { const f = await stampPhoto(p.file, r.name); fd.append('files', f, f.name); }
-      const res = await fetch(`/visits/${v.id}/photos`, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
-      if (!res.ok) { let d = {}; try { d = await res.json(); } catch {} throw new Error('Visit saved, but photos failed to upload: ' + (d.detail || res.statusText)); }
+    // If the visit was already saved and only the photos failed, don't save it again.
+    let v = visitState.saved && visitState.saved.code === r.code ? visitState.saved.visit : null;
+    if (!v) {
+      btn.innerHTML = '<span class="spin"></span> Saving visit…';
+      const today = new Date(); const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      v = await api('/visits', { method: 'POST', json: {
+        retailer: r.name, market: r.town_name || r.district_name || r.zone || 'Market', visit_date: iso,
+        feedback: [chips.length ? chips.join(', ') : '', notes].filter(Boolean).join(' — '),
+        suggestions: $('visitFollow').value.trim(),
+        latitude: gps.latitude, longitude: gps.longitude, gps_accuracy: gps.accuracy
+      } });
+      visitState.saved = { code: r.code, visit: v };
     }
+    if (visitState.photos.length) {
+      const n = visitState.photos.length;
+      btn.innerHTML = `<span class="spin"></span> Uploading ${n} photo${n > 1 ? 's' : ''}…`;
+      const files = [];
+      for (const p of visitState.photos) files.push(await stampPhoto(p.file, r.name));
+      let lastErr = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const fd = new FormData();
+          files.forEach((f) => fd.append('files', f, f.name || 'photo.jpg'));
+          const res = await fetch(`/visits/${v.id}/photos`, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
+          if (res.ok) { lastErr = null; break; }
+          let d = {}; try { d = await res.json(); } catch {}
+          lastErr = new Error(d.detail || res.statusText);
+          if (res.status < 500) break;              // a real rejection: retrying won't help
+        } catch (e) { lastErr = e; }
+        if (attempt < 3) { btn.innerHTML = `<span class="spin"></span> Retrying photo upload (${attempt + 1} of 3)…`; await new Promise((ok) => setTimeout(ok, 1500 * attempt)); }
+      }
+      if (lastErr) {
+        const net = /fetch|network|load failed/i.test(lastErr.message);
+        throw new Error('Your visit is saved. ' + (net
+          ? 'The photos could not be sent from this phone. Check the internet and tap Send photos, or remove the photos and retake them.'
+          : 'The photos were not accepted: ' + lastErr.message));
+      }
+    }
+    visitState.saved = null;
     visitState.photos.forEach((p) => URL.revokeObjectURL(p.url));
     visitState.photos = [];
     invalidate('priorities', 'health', 'perf');
@@ -1302,7 +1333,7 @@ $('submitVisit').addEventListener('click', async () => {
   } catch (e) {
     fail(e.message);
   } finally {
-    btn.disabled = false; btn.textContent = 'Submit visit';
+    btn.disabled = false; btn.textContent = visitState.saved ? 'Send photos' : 'Submit visit';
   }
 });
 
