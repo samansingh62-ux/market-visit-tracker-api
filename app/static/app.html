@@ -1377,6 +1377,61 @@ function showR360(code) {
   api(`/retailers/${encodeURIComponent(r360Code)}/360`).then((d) => { if (r360Code === String(code).toUpperCase()) { r360Data = d; renderR360(); } })
     .catch((e) => { r360Data = { error: e.message }; renderR360(); });
 }
+/* November 2026 retailer schemes for one counter (provisional, from V-Work uploads). */
+function schemesHtml(row) {
+  const S = row && row.schemes;
+  if (!S) return `<div class="card note">${row ? 'November scheme figures are not available right now. Try again in a few minutes.' : 'Scheme figures appear once live sales load.'}</div>`;
+  const P = S.periods || {};
+  const when = (p, label) => p && p.closed ? `${label} · closed` : p && p.days_left != null ? `${label} · ${p.days_left} day${p.days_left === 1 ? '' : 's'} left` : label;
+  const head = (title, sub, amt) => `<div class="between" style="align-items:baseline;gap:8px"><b style="font-size:15px">${title}</b><b class="num" style="font-size:17px">${amt == null ? '—' : money(amt)}</b></div><span class="note" style="margin-top:-6px">${sub}</span>`;
+  const card = (inner) => `<div class="card" style="display:flex;flex-direction:column;gap:10px">${inner}</div>`;
+  const nextTxt = (n, open) => n && open ? `<span class="note" style="color:var(--brand-ink);font-weight:700">${n.units_more} more → ₹${fmt(n.rate)}/unit (${money(n.payout)})</span>` : '';
+  const modelOpen = P.models && !P.models.closed;
+  const lineRow = (l) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(l.series)}</b><span class="num note">${fmt(l.units)} sold${l.slab ? ' · ' + esc(l.slab) + ' · ₹' + fmt(l.rate) + '/unit' : ' · below first slab'}</span>${nextTxt(l.next, modelOpen)}</div><b class="num">${money(l.payout)}</b></div>`;
+
+  // Booster
+  const b = S.booster || {};
+  const bSub = b.type ? `${b.type === 'PO' ? 'Club / PO' : 'Non-club / NPO'} · 20K+ phones, except T-series · ${when(P.booster, '1–10 Nov')}` : (b.note || 'Club not set');
+  const bBody = b.type ? `<div class="num note">${fmt(b.units)} unit${b.units === 1 ? '' : 's'} at 20K+${b.slab ? ' · slab ' + esc(b.slab) : ` · needed ${fmt(b.min_units)}+ to qualify`}${b.below_20k_units ? ` · ${fmt(b.below_20k_units)} below 20K not counted` : ''}</div>` : '';
+
+  // Model schemes
+  const group = (title, g, period, showUnsold) => {
+    const sold = (g.lines || []).filter((l) => l.units > 0);
+    const unsold = (g.lines || []).filter((l) => !l.units).map((l) => l.series);
+    if (!sold.length && !showUnsold) return '';
+    return card(head(title, when(period, '1–15 Nov'), g.payout) +
+      (sold.length ? `<div>${sold.map(lineRow).join('')}</div>` : '') +
+      (showUnsold && unsold.length ? `<span class="note">Not sold yet: ${unsold.map(esc).join(', ')}</span>` : ''));
+  };
+  const modelsLeft = [S.clearance, S.additional].every((g) => !(g.lines || []).some((l) => l.units > 0));
+
+  // Back support
+  const m = S.back_support || {};
+  const club = m.club_used ? `${esc(m.club_used)}${m.upgraded ? ` <span class="pill" style="background:var(--good-bg);color:var(--good)">up from ${esc(m.club_assigned || 'Non-Club')}</span>` : ''}` : '—';
+  const bsBody = `<div class="grid3" style="gap:8px">
+      <div class="stat"><span>Value</span><b class="num">${money(m.counted_value)}</b></div>
+      <div class="stat"><span>Target</span><b class="num">${m.target_value ? money(m.target_value) : '—'}</b></div>
+      <div class="stat"><span>Achieved</span><b class="num">${m.achievement_pct == null ? '—' : fmt1(m.achievement_pct) + '%'}</b></div></div>
+    <div class="kv"><span>Club rate used</span><b>${club}</b></div>
+    <div class="kv"><span>Margin on 20K+ value</span><b class="num">${money(m.base_margin)}</b></div>
+    <span class="note">${esc(m.rule || '')}${m.value_to_90 ? ` · ${money(m.value_to_90)} more to reach 90%` : m.value_to_100 ? ` · ${money(m.value_to_100)} more for full margin` : ''}</span>`;
+
+  // Shop boy
+  const sb = S.shopboy || {};
+  const sbLine = (label, x) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px"><b>${label}</b>${x.next_from ? `<span class="note">${money(x.value_more)} more → ${money(x.next_amount)}</span>` : '<span class="note">Top slab</span>'}</div><b class="num">${money(x.amount)}</b></div>`;
+
+  return card(`<span class="note" style="font-weight:700">November schemes · provisional</span><b class="num" style="font-size:30px;line-height:1">${money(S.total)}</b>
+      <span class="note">Booster + Focus + Clearance + Additional + Back Support. Paid only with 100% V-Work upload and 90% activation; pre-activation above 5% cuts 20%; MOP breach or infiltration voids it.</span>`) +
+    card(head('Booster', bSub, b.payout) + bBody) +
+    group('Focus Model', S.focus || {}, P.models, true) +
+    group('Clearance Model', S.clearance || {}, P.models, false) +
+    group('Additional Model', S.additional || {}, P.models, false) +
+    (modelsLeft ? `<div class="card note">Clearance (Y51 Pro, V70 FE, X300 Ultra) and Additional (Y05, X300 FE, X Fold6): none sold here yet. ${modelOpen ? 'Pays until 15 Nov.' : ''}</div>` : '') +
+    card(head('Back Support Margin', `${when(P.month, 'November')} · 90% of value target to qualify`, m.payable) + bsBody) +
+    card(`<b style="font-size:15px">Shop boy slab</b><span class="note" style="margin-top:-6px">Only if a shop boy is placed here (not VBA / FVBA). Non-T value ${money(sb.value)}</span>` +
+      (sb.core ? sbLine('Core shop boy', sb.core) + sbLine('Uniform shop boy', sb.uniform) : '')) +
+    '<div class="note" style="padding:0 4px">If this counter signed a Special Commitment, Focus pay-out on the committed models is replaced by the commitment rate.</div>';
+}
 const R360_TABS = ['Sales', 'Stock', 'Schemes', 'Visits', 'Compete'];
 function r360TabsHtml(active) {
   return R360_TABS.map((t) => `<button role="tab" aria-selected="${t === active}" data-t="${t}" style="font-size:13px">${t}</button>`).join('');
@@ -1417,13 +1472,7 @@ function r360Html(r360Tab, d, r360Comp, r360Code, inVisit) {
          return `<div class="kv"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(m.model)}</b><span class="num note">Sold ${fmt(m.sales)} · Stock ${fmt(m.stock)} · ${esc(m.action || '')}</span></div><span class="pill num" style="align-self:center;background:${bad ? 'var(--bad-bg)' : 'var(--good-bg)'};color:${bad ? 'var(--bad)' : 'var(--good)'}">${m.dos == null ? esc(m.status) : fmt1(m.dos) + ' days'}</span></div>`;
        }).join('') || '<div class="kv note">No stock records.</div>'}</div>`) : (errBox || loading);
   } else if (r360Tab === 'Schemes') {
-    if (!row) html = '<div class="card note">Scheme figures appear once live sales load.</div>';
-    else {
-      const items = [['Festive Booster', row.scheme_payout], ['Focus Model', row.focus_scheme_payout], ['V80 NPL', row.v80_normal_sales_payout], ['Back Support Margin', row.back_support_payable]];
-      const total = items.reduce((a, [, v]) => a + Number(v || 0), 0);
-      html = `<div class="card stat" style="gap:4px"><span style="font-size:13px">October schemes · provisional</span><b class="num" style="font-size:30px">${money(total)}</b><span class="note">Final payout depends on activation, MOP and other scheme conditions.</span></div>
-        <div class="card" style="padding:6px 16px">${items.map(([k, v]) => `<div class="kv"><span>${k}</span><b class="num">${v == null ? '—' : money(v)}</b></div>`).join('')}</div>`;
-    }
+    html = schemesHtml(row);
   } else if (r360Tab === 'Compete') {
     const c = r360Comp;
     if (!c) html = '<div class="skeleton" style="height:180px"></div>';

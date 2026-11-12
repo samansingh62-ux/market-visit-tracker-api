@@ -523,17 +523,17 @@ button{min-height:44px}
 
   <div id="perfRetailerView" class="perfView hidden perfPanel">
     <h3>Retailer wise performance</h3>
-    <div class="perfSub">Live sales, target achievement, stock cover, visit status and provisional festive scheme payout for your assigned hierarchy.</div>
+    <div class="perfSub">Live sales, target achievement, stock cover, visit status and provisional November scheme payout for your assigned hierarchy.</div>
     <div class="schemeBanner">
       <div>
-        <div class="schemeBannerTitle">October 2026 Retailer Schemes</div>
-        <div class="schemeBannerMeta">Festive Booster · Focus Model · V80 NPL · Back Support Margin. Figures are provisional where final eligibility conditions cannot yet be verified.</div>
+        <div class="schemeBannerTitle">November 2026 Retailer Schemes</div>
+        <div class="schemeBannerMeta">Booster (1–10 Nov) · Focus, Clearance &amp; Additional Model (1–15 Nov) · Back Support Margin. Provisional: upload, activation and MOP conditions are not checked here.</div>
       </div>
       <div class="schemeBannerValue"><b id="perfAllSchemePayout">₹0</b><span>known/provisional payout in current view</span></div>
     </div>
     <div class="wrap"><table class="perfTable"><thead><tr>
-      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>MTD Vol</th><th>MTD Value</th><th>MTD ASP</th><th>FTD Vol</th><th>FTD Value</th><th>FTD ASP</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Festive</th><th>Focus Model</th><th>V80 Normal</th><th>V80 Max*</th><th>Back Support</th><th>Total Known</th><th>Last Visit</th><th>Status</th>
-    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="24">Loading…</td></tr></tbody></table></div>
+      <th>Retailer</th><th>TL</th><th>SS</th><th>RDS</th><th>Target</th><th>MTD Vol</th><th>MTD Value</th><th>MTD ASP</th><th>FTD Vol</th><th>FTD Value</th><th>FTD ASP</th><th>Achievement</th><th>Gap</th><th>Req/Day</th><th>Stock</th><th>DOS</th><th>Booster</th><th>Focus Model</th><th>Clearance + Additional</th><th>Back Support</th><th>Total Known</th><th>Last Visit</th><th>Status</th>
+    </tr></thead><tbody id="perfRetailerRows"><tr><td colspan="23">Loading…</td></tr></tbody></table></div>
   </div>
 
   <div id="perfDayView" class="perfView hidden">
@@ -879,7 +879,7 @@ function renderPerfTables(){
   $('perfRetailers').textContent=rows.length;
   let schemePayout=rows.reduce((a,r)=>a+Number(r.scheme_payout||0),0);
   let focusPayout=rows.reduce((a,r)=>a+Number(r.focus_scheme_payout||0),0);
-  let v80Normal=rows.reduce((a,r)=>a+Number(r.v80_normal_sales_payout||0),0);
+  let v80Normal=rows.reduce((a,r)=>a+Number(r.clearance_scheme_payout||0)+Number(r.additional_scheme_payout||0),0);
   let backKnown=rows.reduce((a,r)=>a+(r.back_support_payable==null?0:Number(r.back_support_payable||0)),0);
   let totalKnown=schemePayout+focusPayout+v80Normal+backKnown;
   if($('perfAllSchemePayout'))$('perfAllSchemePayout').textContent=inr(totalKnown);
@@ -897,14 +897,13 @@ function renderPerfTables(){
       <td>${r.stock_matched===false?'—':Math.round(Number(r.stock||0))}</td><td>${r.dos==null?'—':Math.round(Number(r.dos))}</td>
       <td><b>${inr(r.scheme_payout||0)}</b><div class="priorityReason">${esc(r.scheme_slab||'Not qualified')}</div></td>
       <td><b>${inr(r.focus_scheme_payout||0)}</b><div class="priorityReason">${Math.round(Number(r.focus_scheme_units||0))} units</div></td>
-      <td><b>${inr(r.v80_normal_sales_payout||0)}</b><div class="priorityReason">${esc(r.v80_slab||'Not active/qualified')}</div></td>
-      <td><b>${inr(r.v80_max_total_payout||0)}</b><div class="priorityReason">subject to conversion/Buds conditions</div></td>
+      <td><b>${inr(Number(r.clearance_scheme_payout||0)+Number(r.additional_scheme_payout||0))}</b><div class="priorityReason">Clearance ${inr(r.clearance_scheme_payout||0)} · Additional ${inr(r.additional_scheme_payout||0)}</div></td>
       <td><b>${r.back_support_payable==null?'Pending':inr(r.back_support_payable)}</b><div class="priorityReason">${esc(r.back_support_eligibility||'')}</div></td>
-      <td><b>${inr(Number(r.scheme_payout||0)+Number(r.focus_scheme_payout||0)+Number(r.v80_normal_sales_payout||0)+(r.back_support_payable==null?0:Number(r.back_support_payable||0)))}</b></td>
+      <td><b>${inr(Number(r.scheme_payout||0)+Number(r.focus_scheme_payout||0)+Number(r.clearance_scheme_payout||0)+Number(r.additional_scheme_payout||0)+(r.back_support_payable==null?0:Number(r.back_support_payable||0)))}</b></td>
       <td>${esc(r.last_visit||'Never')}</td>
       <td><span class="perfStatus ${perfStatusClass(r.status)}">${esc(r.status)}</span></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="24">No retailers match the selected filters.</td></tr>';
+  }).join(''):'<tr><td colspan="23">No retailers match the selected filters.</td></tr>';
 
   $('perfRetailerRows').querySelectorAll('tr[data-code]').forEach(tr=>tr.onclick=()=>{
     let r=master.find(x=>String(x.code||'').toUpperCase()===String(tr.dataset.code||'').toUpperCase());
@@ -1093,7 +1092,7 @@ async function performanceDashboard(){
     $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
     renderPerfTables();
   }catch(e){
-    $('perfRetailerRows').innerHTML='<tr><td colspan="24">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
+    $('perfRetailerRows').innerHTML='<tr><td colspan="23">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
   }
 }
 

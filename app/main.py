@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database
+from . import crud, database, schemes_nov
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -1015,11 +1015,11 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
         ("Productive Retailers", summary.get("productive_retailers", 0)),
         ("Zero Sales Retailers", summary.get("zero_sales_retailers", 0)),
         ("Visits", len(visits)),
-        ("Festive Scheme Eligible Units", summary.get("scheme_eligible_units", 0)),
-        ("Festive Scheme Provisional Payout", summary.get("scheme_payout", 0)),
-        ("Focus Model Provisional Payout", summary.get("focus_scheme_payout", 0)),
-        ("V80 Normal Sales Provisional Payout", summary.get("v80_normal_sales_payout", 0)),
-        ("V80 Maximum Conditional Payout", summary.get("v80_max_total_payout", 0)),
+        ("Booster (1-10 Nov) Eligible Units", summary.get("scheme_eligible_units", 0)),
+        ("Booster (1-10 Nov) Provisional Payout", summary.get("scheme_payout", 0)),
+        ("Focus Model (1-15 Nov) Provisional Payout", summary.get("focus_scheme_payout", 0)),
+        ("Clearance Model (1-15 Nov) Provisional Payout", summary.get("clearance_scheme_payout", 0)),
+        ("Additional Model (1-15 Nov) Provisional Payout", summary.get("additional_scheme_payout", 0)),
         ("Back Support Base Margin", summary.get("back_support_base_margin", 0)),
         ("Back Support Known Payable", summary.get("back_support_payable_known", 0)),
         ("Scope", "Full Zone A" if user.get("role") in ("MANAGER", "CEO", "ADMIN", "VIEWER") else f"{user.get('role')} hierarchy only"),
@@ -1029,9 +1029,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
     finish(ws)
 
     ws = wb.create_sheet("Retailer Performance")
-    ws.append(["Retailer Code","Retailer","Town","District","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Festive Type","Festive Slab","Festive Eligible Units","Festive Payout","Focus Eligible Units","Focus Payout","V80 Units","V80 Slab","V80 Normal Payout","V80 Max Conditional Payout","Back Support Base Margin","Back Support Payable","Back Support Achievement %","Back Support Eligibility","Last Visit","Days Since Visit","Visit Count","Status"])
+    ws.append(["Retailer Code","Retailer","Town","District","TL","SS","RDS","Zone","Club","Target","MTD Sales","Achievement %","Gap","Required / Day","Stock","Avg / Day","DOS","Booster Type","Booster Slab","Booster Eligible Units","Booster Payout","Focus Units","Focus Payout","Clearance Payout","Additional Model Payout","Back Support Base Margin","Back Support Payable","Back Support Achievement %","Back Support Eligibility","Last Visit","Days Since Visit","Visit Count","Status"])
     for x in perf.get("retailers", []):
-        ws.append([x.get("code"),x.get("name"),x.get("town_name"),x.get("district_name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("focus_scheme_units"),x.get("focus_scheme_payout"),x.get("v80_units"),x.get("v80_slab"),x.get("v80_normal_sales_payout"),x.get("v80_max_total_payout"),x.get("back_support_base_margin"),x.get("back_support_payable"),x.get("back_support_achievement_pct"),x.get("back_support_eligibility"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
+        ws.append([x.get("code"),x.get("name"),x.get("town_name"),x.get("district_name"),x.get("tl"),x.get("ss"),x.get("rds"),x.get("zone"),x.get("club"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("required_per_day"),x.get("stock"),x.get("avg_daily_sales"),x.get("dos"),x.get("scheme_type"),x.get("scheme_slab"),x.get("scheme_eligible_units"),x.get("scheme_payout"),x.get("focus_scheme_units"),x.get("focus_scheme_payout"),x.get("clearance_scheme_payout"),x.get("additional_scheme_payout"),x.get("back_support_base_margin"),x.get("back_support_payable"),x.get("back_support_achievement_pct"),x.get("back_support_eligibility"),x.get("last_visit"),x.get("days_since_visit"),x.get("visit_count"),x.get("status")])
     finish(ws)
 
     ws = wb.create_sheet("Visit History")
@@ -1042,9 +1042,9 @@ def export_all_data_xlsx(user: dict = Depends(get_dashboard_user)):
 
     for key, title in (("tl","TL Summary"),("ss","SS Summary"),("rds","RDS Summary")):
         ws = wb.create_sheet(title)
-        ws.append(["Name","Retailers","Target","MTD Sales","Achievement %","Gap","Stock","Festive Payout","Focus Payout","V80 Normal Payout","Back Support Known","Total Known Payout"])
+        ws.append(["Name","Retailers","Target","MTD Sales","Achievement %","Gap","Stock","Booster Payout","Focus Payout","Clearance + Additional Payout","Back Support Known","Total Known Payout"])
         for x in perf.get("hierarchy", {}).get(key, []):
-            ws.append([x.get("name"),x.get("retailers"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("stock"),x.get("festive_payout"),x.get("focus_payout"),x.get("v80_normal_payout"),x.get("back_support_known"),x.get("total_known_payout")])
+            ws.append([x.get("name"),x.get("retailers"),x.get("target"),x.get("sales"),x.get("achievement_pct"),x.get("gap"),x.get("stock"),x.get("festive_payout"),x.get("focus_payout"),x.get("model_payout"),x.get("back_support_known"),x.get("total_known_payout")])
         finish(ws)
 
     out = io.BytesIO()
@@ -1205,8 +1205,9 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
     festive = int(summary.get("scheme_payout") or 0)
     focus = int(summary.get("focus_scheme_payout") or 0)
     v80 = int(summary.get("v80_normal_sales_payout") or 0)
+    models = int(summary.get("clearance_scheme_payout") or 0) + int(summary.get("additional_scheme_payout") or 0)
     back = int(summary.get("back_support_payable_known") or 0)
-    total_known = festive + focus + v80 + back
+    total_known = festive + focus + v80 + models + back
 
     zero_sales_rows = [
         row for row in (perf.get("retailers") or [])
@@ -1222,7 +1223,7 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         zero_sales_detail = ""
 
     lines = [
-        "vivo NESA Zone A - October 2026 Update",
+        f"vivo NESA Zone A - {date.today().strftime('%B %Y')} Update",
         f"{target_user.get('role')}: {target_user.get('name')}",
         "",
         f"Target: {target:,} units",
@@ -1233,9 +1234,9 @@ def admin_whatsapp_preview(user_id: int = Query(..., ge=1)):
         *([f"Zero Sales Retailer List: {zero_sales_detail}"] if zero_sales_detail else []),
         "",
         "Provisional Incentive Summary",
-        f"Festive Booster: {_format_inr(festive)}",
+        f"Booster (1-10 Nov): {_format_inr(festive)}",
         f"Focus Model: {_format_inr(focus)}",
-        f"V80 Normal: {_format_inr(v80)}",
+        f"Clearance + Additional Model: {_format_inr(models)}",
         f"Back Support (known): {_format_inr(back)}",
         f"Total Known / Provisional: {_format_inr(total_known)}",
         "",
@@ -2287,31 +2288,32 @@ def _build_performance_dashboard(user: dict):
                 params=params,
                 headers=headers,
             )
-            scheme_response = _vwork_request(
-                client,
-                "GET",
-                f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-festive-sales",
-                params=scope,
-                headers=headers,
-            )
-            additional_response = _vwork_request(
-                client,
-                "GET",
-                f"{VWORK_LIVE_API_URL}/api/v1/schemes/october-additional-sales",
-                params=scope,
-                headers=headers,
-            )
+            try:
+                scheme_response = _vwork_request(
+                    client,
+                    "GET",
+                    f"{VWORK_LIVE_API_URL}/api/v1/schemes/november-sales",
+                    params=scope,
+                    headers=headers,
+                )
+            except Exception as exc:
+                scheme_response = exc
         response.raise_for_status()
-        scheme_response.raise_for_status()
-        additional_response.raise_for_status()
         live_payload = response.json() or {}
         live_rows = live_payload.get("retailers") or []
         store_sales = live_payload.get("store_sales") or []
-        scheme_payload = scheme_response.json() or {}
-        scheme_rows = scheme_payload.get("retailers") or []
-        additional_payload = additional_response.json() or {}
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Live performance data unavailable: {exc}") from exc
+    # Schemes are a convenience: if their sales can't be fetched the dashboard still loads.
+    try:
+        if isinstance(scheme_response, Exception):
+            raise scheme_response
+        scheme_response.raise_for_status()
+        scheme_rows = (scheme_response.json() or {}).get("retailers") or []
+        schemes_ok = True
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning("November scheme sales unavailable: %s", exc)
+        scheme_rows, schemes_ok = [], False
 
     live_by_code = {
         str(x.get("retailer_code") or "").strip().upper(): x
@@ -2350,22 +2352,6 @@ def _build_performance_dashboard(user: dict):
         for x in scheme_rows if x.get("retailer_code")
     }
 
-    focus_by_code = {
-        str(x.get("retailer_code") or "").strip().upper(): x
-        for x in ((additional_payload.get("focus_model") or {}).get("retailers") or [])
-        if x.get("retailer_code")
-    }
-    v80_by_code = {
-        str(x.get("retailer_code") or "").strip().upper(): x
-        for x in ((additional_payload.get("v80_npl") or {}).get("retailers") or [])
-        if x.get("retailer_code")
-    }
-    back_by_code = {
-        str(x.get("retailer_code") or "").strip().upper(): x
-        for x in ((additional_payload.get("back_support") or {}).get("retailers") or [])
-        if x.get("retailer_code")
-    }
-
     month_days = calendar.monthrange(today.year, today.month)[1]
     days_remaining = max(month_days - today.day + 1, 1)
     retailer_rows = []
@@ -2383,10 +2369,8 @@ def _build_performance_dashboard(user: dict):
         avg_daily = float((live or {}).get("avg_daily_sales") or 0)
         dos = live.get("dos") if stock_matched else None
         target = int(row.get("target_volume") or 0)
-        scheme = _festive_scheme_payout(row.get("club"), scheme_by_code.get(code, {}))
-        focus_scheme = _focus_model_payout(focus_by_code.get(code, {}))
-        v80_scheme = _v80_npl_payout(v80_by_code.get(code, {}))
-        back_support = _back_support_estimate(row.get("club"), row.get("target_value"), back_by_code.get(code, {}))
+        nov = schemes_nov.for_retailer(row.get("club"), row.get("target_value"), scheme_by_code.get(code, {}), today) if schemes_ok else None
+        nb, nf, nbs = (nov or {}).get("booster") or {}, (nov or {}).get("focus") or {}, (nov or {}).get("back_support") or {}
         gap = max(target - sales, 0)
         ach = round((sales / target) * 100, 1) if target > 0 else 0
         req = round(gap / days_remaining, 1) if target > 0 else 0
@@ -2442,24 +2426,28 @@ def _build_performance_dashboard(user: dict):
             "days_since_visit": days_since,
             "visit_count": int(row.get("visit_count") or 0),
             "status": status,
-            "scheme_type": scheme.get("scheme_type"),
-            "scheme_slab": scheme.get("slab"),
-            "scheme_eligible_units": scheme.get("eligible_units"),
-            "scheme_payout": scheme.get("payout"),
-            "scheme_unknown_price_units": scheme.get("unknown_price_units"),
-            "scheme_segments": scheme.get("segments"),
-            "focus_scheme_units": focus_scheme.get("eligible_units"),
-            "focus_scheme_payout": focus_scheme.get("payout"),
-            "focus_scheme_detail": focus_scheme.get("detail"),
-            "v80_units": v80_scheme.get("units"),
-            "v80_slab": v80_scheme.get("slab"),
-            "v80_normal_sales_payout": v80_scheme.get("normal_sales_payout"),
-            "v80_max_total_payout": v80_scheme.get("max_total_payout"),
-            "back_support_base_margin": back_support.get("base_margin"),
-            "back_support_payable": back_support.get("provisional_payable"),
-            "back_support_achievement_pct": back_support.get("achievement_pct_value"),
-            "back_support_eligibility": back_support.get("eligibility"),
-            "back_support_unknown_value_units": back_support.get("unknown_value_units"),
+            # November 2026: "scheme_*" is the Booster (PO / NPO) scheme.
+            "scheme_type": {"PO": "Club / PO", "NPO": "NPO / Non-Club"}.get(nb.get("type"), "Unclassified"),
+            "scheme_slab": nb.get("slab"),
+            "scheme_eligible_units": nb.get("units"),
+            "scheme_payout": nb.get("payout"),
+            "scheme_unknown_price_units": nb.get("unknown_price_units"),
+            "scheme_segments": nb.get("segments"),
+            "focus_scheme_units": nf.get("units"),
+            "focus_scheme_payout": nf.get("payout"),
+            "focus_scheme_detail": nf.get("lines"),
+            "clearance_scheme_payout": ((nov or {}).get("clearance") or {}).get("payout"),
+            "additional_scheme_payout": ((nov or {}).get("additional") or {}).get("payout"),
+            "v80_units": None,
+            "v80_slab": None,
+            "v80_normal_sales_payout": 0,
+            "v80_max_total_payout": 0,
+            "back_support_base_margin": nbs.get("base_margin"),
+            "back_support_payable": nbs.get("payable"),
+            "back_support_achievement_pct": nbs.get("achievement_pct"),
+            "back_support_eligibility": nbs.get("rule"),
+            "back_support_unknown_value_units": nbs.get("unknown_value_units"),
+            "schemes": nov,
         })
 
     total_target = sum(x["target"] for x in retailer_rows)
@@ -2487,6 +2475,8 @@ def _build_performance_dashboard(user: dict):
     total_scheme_payout = sum(int(x.get("scheme_payout") or 0) for x in retailer_rows)
     total_scheme_units = sum(int(x.get("scheme_eligible_units") or 0) for x in retailer_rows)
     total_focus_payout = sum(int(x.get("focus_scheme_payout") or 0) for x in retailer_rows)
+    total_clearance = sum(int(x.get("clearance_scheme_payout") or 0) for x in retailer_rows)
+    total_additional = sum(int(x.get("additional_scheme_payout") or 0) for x in retailer_rows)
     total_v80_normal = sum(int(x.get("v80_normal_sales_payout") or 0) for x in retailer_rows)
     total_v80_max = sum(int(x.get("v80_max_total_payout") or 0) for x in retailer_rows)
     total_back_base = sum(int(x.get("back_support_base_margin") or 0) for x in retailer_rows)
@@ -2501,7 +2491,7 @@ def _build_performance_dashboard(user: dict):
             g = groups.setdefault(name, {
                 "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
                 "ftd_sales": 0, "ftd_sales_value": 0.0, "stock": 0,
-                "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
+                "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0, "model_payout": 0,
                 "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
             })
             g["sales"] += int(store.get("sales") or 0)
@@ -2517,7 +2507,7 @@ def _build_performance_dashboard(user: dict):
                 g = groups.setdefault(name, {
                     "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
                 "ftd_sales": 0, "ftd_sales_value": 0.0, "stock": 0,
-                    "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0,
+                    "festive_payout": 0, "focus_payout": 0, "v80_normal_payout": 0, "model_payout": 0,
                     "back_support_known": 0, "_codes": set(), "shared_payout_pending": False,
                 })
                 g["_codes"].add(item["code"])
@@ -2528,6 +2518,7 @@ def _build_performance_dashboard(user: dict):
                     g["festive_payout"] += int(item.get("scheme_payout") or 0)
                     g["focus_payout"] += int(item.get("focus_scheme_payout") or 0)
                     g["v80_normal_payout"] += int(item.get("v80_normal_sales_payout") or 0)
+                    g["model_payout"] += int(item.get("clearance_scheme_payout") or 0) + int(item.get("additional_scheme_payout") or 0)
                     g["back_support_known"] += int(item.get("back_support_payable") or 0)
         out = []
         for g in groups.values():
@@ -2540,7 +2531,7 @@ def _build_performance_dashboard(user: dict):
             g["asp"] = round(g["sales_value"] / g["sales"], 2) if g["sales"] > 0 else 0
             g["ftd_asp"] = round(g["ftd_sales_value"] / g["ftd_sales"], 2) if g["ftd_sales"] > 0 else 0
             g["gap"] = max(g["target"] - g["sales"], 0)
-            g["total_known_payout"] = None if g["shared_payout_pending"] else g["festive_payout"] + g["focus_payout"] + g["v80_normal_payout"] + g["back_support_known"]
+            g["total_known_payout"] = None if g["shared_payout_pending"] else g["festive_payout"] + g["focus_payout"] + g["model_payout"] + g["back_support_known"]
             out.append(g)
         hierarchy[field] = sorted(out, key=lambda x: x["sales"], reverse=True)
 
@@ -2579,14 +2570,18 @@ def _build_performance_dashboard(user: dict):
             "scheme_eligible_units": total_scheme_units,
             "focus_scheme_payout": total_focus_payout,
             "v80_normal_sales_payout": total_v80_normal,
+            "clearance_scheme_payout": total_clearance,
+            "additional_scheme_payout": total_additional,
             "v80_max_total_payout": total_v80_max,
             "back_support_base_margin": total_back_base,
             "back_support_payable_known": total_back_payable,
         },
         "scheme": {
-            "name": "Festive Booster Scheme - October 2026",
-            "start": FESTIVE_SCHEME_START.isoformat(),
-            "end": FESTIVE_SCHEME_END.isoformat(),
+            "name": "Retailer schemes - November 2026",
+            "start": schemes_nov.MONTH_START.isoformat(),
+            "end": schemes_nov.MONTH_END.isoformat(),
+            "periods": schemes_nov.periods(today),
+            "available": schemes_ok,
             "provisional": True,
             "eligibility_note": "Provisional sales-based payout. Final payout remains subject to upload, activation, pre-activation, MOP and infiltration conditions.",
         },
