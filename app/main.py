@@ -2110,6 +2110,51 @@ def sales_by_date(
     return result
 
 
+# ---- Stock finder: non-moving stock in the user's territory, for sale-return calls ----
+FINDER_ROLES = {"TL", "SS", "KAM", "CEO", "ADMIN", "VIEWER", "MANAGER"}
+_finder_cache: dict = {}
+_finder_lock = __import__("threading").Lock()
+
+
+@app.get("/stock/finder")
+def stock_finder(
+    model: Optional[str] = Query(default=None),
+    days: int = Query(default=30),
+    user: dict = Depends(get_dashboard_user),
+):
+    """Stock at each counter in the user's area against its recent sales of the same variant."""
+    if str(user.get("role") or "").upper() not in FINDER_ROLES:
+        raise HTTPException(status_code=403, detail="The stock finder is for TL, SS, KAM and zone roles.")
+    scope = _scope(user)
+    key = (tuple(sorted(scope.items())), (model or "").strip().lower(), days)
+    now = time.monotonic()
+    with _finder_lock:
+        hit = _finder_cache.get(key)
+        if hit and now - hit[0] < 300:
+            return hit[1]
+        for k in [k for k, v in _finder_cache.items() if now - v[0] >= 300]:
+            _finder_cache.pop(k, None)
+    params = {**scope, "days": days}
+    if model:
+        params["model"] = model.strip()
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+            response = _vwork_request(client, "GET", f"{VWORK_LIVE_API_URL}/api/v1/stock/finder", params=params, headers=headers)
+        if response.status_code == 400:
+            raise HTTPException(status_code=400, detail=(response.json() or {}).get("detail") or "Invalid request.")
+        response.raise_for_status()
+        data = response.json()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Stock is unavailable right now: {exc}") from exc
+    result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}}
+    with _finder_lock:
+        _finder_cache[key] = (time.monotonic(), result)
+    return result
+
+
 _PERF_CACHE_TTL_SECONDS = int(os.getenv("PERF_CACHE_TTL_SECONDS", "120"))
 _perf_cache: dict = {}
 _perf_cache_lock = __import__("threading").Lock()

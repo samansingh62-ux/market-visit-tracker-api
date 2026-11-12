@@ -273,6 +273,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <div class="rank" style="background:var(--brand-soft);color:var(--brand)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Sales by date</b><span class="note">Pick any past dates: day by day, models, counters</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
 
+    <a class="listCard hidden" href="#/stock" id="stockFinderLink">
+      <div class="rank" style="background:var(--warn-bg);color:var(--warn)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Stock finder</b><span class="note">Non-moving stock in your area, for sale returns</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+
     <div id="eodAlert"></div>
     <div id="homeHighlights"></div>
 
@@ -307,6 +311,31 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <span class="note" id="salesScope"></span>
     </div>
     <div id="salesResult" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</section>
+
+<!-- ============ STOCK FINDER ============ -->
+<section id="s-stock" class="screen hidden" aria-label="Stock finder">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Stock finder</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <form id="sfForm" class="card" style="display:flex;flex-direction:column;gap:12px" autocomplete="off">
+      <label class="field">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="sfQuery" list="sfModels" placeholder="Search a model, e.g. Y31t" aria-label="Search a model">
+        <datalist id="sfModels"></datalist>
+      </label>
+      <div class="chipScroll" id="sfDays" role="group" aria-label="No sale in the last">
+        <button type="button" class="chip dark" data-d="15">15 days</button>
+        <button type="button" class="chip dark" data-d="30">30 days</button>
+        <button type="button" class="chip dark" data-d="45">45 days</button>
+        <button type="button" class="chip dark" data-d="60">60 days</button>
+      </div>
+      <span class="note" id="sfScope"></span>
+    </form>
+    <div id="sfResult" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 </section>
 
@@ -622,7 +651,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'sales', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
+const SCREENS = ['login', 'home', 'sales', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
@@ -645,7 +674,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, sales: showSales, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
+  ({ login: showLogin, home: showHome, sales: showSales, stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -774,6 +803,7 @@ function showHome() {
   $('homeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + viewLabel();
   renderViewSwitch();
   $('homeHello').textContent = 'Hi, ' + firstName(user.name);
+  $('stockFinderLink').classList.toggle('hidden', !canFindStock());
   $('avatarBtn').textContent = initials(user.name);
   refreshCounts();
 
@@ -913,6 +943,118 @@ function renderSales(d) {
     ${team && team.rows.length ? `<div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">${team.title}</div>${team.rows.map((r) => `<div class="kv"><span>${esc(r.name)}</span><b class="num">${fmt(r.units)}</b></div>`).join('')}</div>` : ''}
     ${counters.length ? `<div class="sectionHead"><h2>Top counters</h2><span class="note">${fmt(t.counters_selling)} sold</span></div>
     <div style="display:flex;flex-direction:column;gap:8px">${counters.map((c, i) => `<a class="listCard" href="#/r/${encodeURIComponent(c.code)}"><div class="rank num">${i + 1}</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(c.name)}</b><span class="note ellipsis">${esc([c.tl, c.ss].filter(Boolean).join(' · '))}</span></div><b class="num" style="font-size:17px">${fmt(c.units)}</b></a>`).join('')}</div>` : ''}`;
+}
+
+/* ---------------- STOCK FINDER ---------------- */
+const FINDER_ROLES = ['TL', 'SS', 'KAM', 'CEO', 'ADMIN', 'VIEWER', 'MANAGER'];
+function canFindStock() { return view === 'zone' || FINDER_ROLES.includes(String(user.role || '').toUpperCase()); }
+let sfModel = '', sfSeq = 0, sfFilter = 'returns', sfLast = null;
+function sfDays() { const d = Number(store.get('mvt_sf_days')); return [15, 30, 45, 60].includes(d) ? d : 30; }
+function showStock(model) {
+  if (!canFindStock()) { $('sfResult').innerHTML = '<div class="err">The stock finder is for TL, SS, KAM and zone roles.</div>'; return; }
+  sfModel = model || '';
+  $('sfQuery').value = sfModel;
+  document.querySelectorAll('#sfDays [data-d]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.d) === sfDays())));
+  const area = view === 'zone' || ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) ? 'all of Zone A' : 'your area';
+  $('sfScope').textContent = `Counters in ${area} holding stock with no sale of that variant in the last ${sfDays()} days are flagged as return candidates.`;
+  runStock();
+}
+$('sfForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const q = $('sfQuery').value.trim();
+  location.hash = q ? '#/stock/' + encodeURIComponent(q) : '#/stock';
+  if ((q || '') === sfModel) runStock();
+});
+$('sfQuery').addEventListener('change', () => { const q = $('sfQuery').value.trim(); if (q && q !== sfModel) location.hash = '#/stock/' + encodeURIComponent(q); });
+$('sfDays').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  store.set('mvt_sf_days', Number(b.dataset.d));
+  showStock(sfModel);
+});
+async function runStock() {
+  const seq = ++sfSeq, box = $('sfResult'), days = sfDays();
+  box.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>${sfModel ? 'Finding ' + esc(sfModel) + '…' : 'Checking stock in your area…'}</b><span class="note">Reads today’s stock and the last ${days} days of sales from V-Work. The first look can take up to a minute.</span><div class="skeleton" style="height:120px"></div></div>`;
+  try {
+    const q = `/stock/finder?days=${days}` + (sfModel ? '&model=' + encodeURIComponent(sfModel) : '');
+    const d = await api(q);
+    if (seq !== sfSeq) return;
+    sfLast = d;
+    $('sfModels').innerHTML = (d.models || []).map((m) => `<option value="${esc(m.model)}">`).join('');
+    if (sfModel) renderStockModel(d); else renderStockSummary(d);
+  } catch (e) {
+    if (seq === sfSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="runStock()">Try again</button>`;
+  }
+}
+function sfPill(status) {
+  const c = status === 'Not moving' ? ['var(--bad-bg)', 'var(--bad)'] : status === 'Slow' ? ['var(--warn-bg)', 'var(--warn)'] : ['var(--good-bg)', 'var(--good)'];
+  return `<span class="pill" style="background:${c[0]};color:${c[1]}">${esc(status)}</span>`;
+}
+function renderStockSummary(d) {
+  const s = d.summary || {}, models = d.models || [];
+  const moving = models.filter((m) => m.not_moving_units || m.slow_units);
+  $('sfResult').innerHTML = `
+    <div class="hero" style="gap:12px">
+      <div class="lite" style="font-size:14px;font-weight:600">No sale in the last ${d.days} days</div>
+      <div style="display:flex;align-items:baseline;gap:8px"><div class="num" style="font-size:40px;font-weight:800;line-height:1">${fmt(s.not_moving_units)}</div><div class="lite" style="font-size:15px;font-weight:600">units not moving</div></div>
+      <div class="grid3" style="gap:8px">
+        <div class="heroTile"><span>Counters</span><b class="num">${fmt(s.not_moving_counters)}</b></div>
+        <div class="heroTile"><span>Slow</span><b class="num" style="color:#FFC46B">${fmt(s.slow_units)}</b></div>
+        <div class="heroTile"><span>All stock</span><b class="num">${fmt(s.stock)}</b></div>
+      </div>
+      <div class="lite" style="font-size:13px">Slow means selling, but holding more than ${d.slow_days} days of stock. Stock as of today.</div>
+    </div>
+    <div class="sectionHead"><h2>Models to look at</h2><span class="note">Tap one for the counters</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">${moving.length ? moving.map((m) => `
+      <a class="listCard" href="#/stock/${encodeURIComponent(m.model)}">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(m.model)}</b>
+        <span class="note num">${m.not_moving_units ? `<b style="color:var(--bad)">${fmt(m.not_moving_units)} not moving</b> at ${fmt(m.not_moving_counters)} counter${m.not_moving_counters === 1 ? '' : 's'}` : 'All selling'}${m.slow_units ? ` · ${fmt(m.slow_units)} slow` : ''} · ${fmt(m.stock)} in stock</span></div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>`).join('') : '<div class="card note">Everything in stock in your area has sold in the last ' + d.days + ' days.</div>'}</div>`;
+}
+function renderStockModel(d) {
+  const vs = d.variants || [];
+  if (!vs.length) {
+    $('sfResult').innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:6px"><b>No stock or sales of “${esc(d.query)}” in your area.</b><span class="note">Check the spelling, or pick a model from the list.</span></div><a class="btn soft" style="height:44px" href="#/stock">See all models</a>`;
+    return;
+  }
+  const filt = (h) => sfFilter === 'all' || h.status === 'Not moving' || h.status === 'Slow';
+  const last = (h) => h.last_sold ? 'last sold ' + shortDay(h.last_sold) : 'no sale in ' + d.days + ' days';
+  $('sfResult').innerHTML = `
+    <div class="between"><a href="#/stock" class="note" style="font-weight:700">← All models</a>
+      <div class="chipScroll" style="margin:0;padding:0" role="group" aria-label="Show">
+        <button class="chip" data-f="returns" aria-pressed="${sfFilter === 'returns'}">Return candidates</button>
+        <button class="chip" data-f="all" aria-pressed="${sfFilter === 'all'}">All holders</button>
+      </div></div>
+    ${vs.map((v, vi) => {
+      const rows = v.holders.filter(filt);
+      return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div class="between" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${esc(v.variant)}</b>
+          <span class="note num">${fmt(v.stock)} in stock · ${fmt(v.sold)} sold in ${d.days} days</span></div>
+          ${v.not_moving_units ? `<span class="pill num" style="background:var(--bad-bg);color:var(--bad)">${fmt(v.not_moving_units)} not moving</span>` : ''}</div>
+        ${rows.length ? rows.map((h) => `
+          <div style="display:flex;flex-direction:column;gap:4px;padding-top:10px;border-top:1px solid #EEF1F6">
+            <div class="between" style="gap:8px"><a href="#/r/${encodeURIComponent(h.code)}" class="ellipsis" style="font-weight:700;font-size:15px;color:var(--ink)">${esc(h.name)}</a>${sfPill(h.status)}</div>
+            <span class="note num">Stock <b>${fmt(h.stock)}</b> · Sold ${fmt(h.sold)} · ${esc(last(h))}${h.cover_days != null ? ' · ' + fmt(h.cover_days) + ' days cover' : ''}</span>
+            <span class="note">${esc((h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', '))}${h.tl ? ' · TL ' + esc(h.tl) : ''}</span>
+          </div>`).join('') : `<span class="note">No return candidates for this variant — every counter holding it has sold it in the last ${d.days} days.</span>`}
+        ${v.short.length ? `<details ${v.not_moving_units ? 'open' : ''}><summary style="cursor:pointer;font-weight:700;font-size:14px;padding-top:6px">Selling here, short of stock (${v.short.length})</summary>
+          ${v.short.map((x) => `<div class="kv" style="gap:10px"><a href="#/r/${encodeURIComponent(x.code)}" class="ellipsis" style="color:var(--ink);min-width:0">${esc(x.name)}</a><b class="num" style="white-space:nowrap;flex-shrink:0;font-size:13px">Sold ${fmt(x.sold)} · Stock ${fmt(x.stock)}</b></div>`).join('')}
+          <span class="note">Counters that sold this variant in the last ${d.days} days with no stock or under a week left. Returned stock can go here.</span></details>` : ''}
+        ${v.not_moving_units ? `<button class="btn soft" style="height:44px" data-share="${vi}">Share return list</button>` : ''}
+      </div>`;
+    }).join('')}`;
+  $('sfResult').querySelectorAll('[data-f]').forEach((b) => b.onclick = () => { sfFilter = b.dataset.f; renderStockModel(d); });
+  $('sfResult').querySelectorAll('[data-share]').forEach((b) => b.onclick = () => shareReturnList(d, vs[Number(b.dataset.share)]));
+}
+async function shareReturnList(d, v) {
+  const nm = v.holders.filter((h) => h.status === 'Not moving');
+  const lines = [`${v.variant}: no sale in the last ${d.days} days (stock as of ${shortDay(d.as_of)})`, '',
+    ...nm.map((h) => `• ${h.name} — ${h.stock} pcs (${(h.colours || []).map((c) => c.colour + ' ' + c.qty).join(', ')})${h.tl ? ' · TL ' + h.tl : ''}`)];
+  if (v.short.length) lines.push('', 'Selling, short of stock:', ...v.short.slice(0, 6).map((x) => `• ${x.name} — sold ${x.sold}, stock ${x.stock}`));
+  const text = lines.join('\n');
+  try {
+    if (navigator.share) { await navigator.share({ title: v.variant + ' return list', text }); return; }
+    await navigator.clipboard.writeText(text); toast('Return list copied');
+  } catch (e) { if (e && e.name !== 'AbortError') toast('Couldn’t share the list', true); }
 }
 
 function renderHero(perf, at) {
