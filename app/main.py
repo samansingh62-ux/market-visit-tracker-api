@@ -3146,20 +3146,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: chain parents on live data (read-only) ----
-def _cpchk():
-    time.sleep(40)
-    log = logging.getLogger("uvicorn.error")
-    for u in ({"name": "Bappan Das", "role": "TL"}, {"name": "check", "role": "MANAGER"}):
-        try:
-            d = _build_performance_dashboard(u)
-            cp = d.get("chain_parents") or []
-            ml = [(p["code"], p["name"], p["store_codes"], p["sales"], p["target"], p["stock"], (p.get("schemes") or {}).get("total")) for p in cp if "Moon" in p["name"]]
-            log.warning("CPCHK %s parents=%s moon=%s total_sales=%s", u["role"], len(cp), ml, (d.get("summary") or {}).get("total_sales"))
-        except Exception as exc:
-            log.warning("CPCHK failed %r", exc)
-
-
-import threading as _threading_cp
-_threading_cp.Thread(target=_cpchk, daemon=True).start()
