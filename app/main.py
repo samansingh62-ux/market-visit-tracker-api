@@ -3110,28 +3110,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: November schemes for chain stores (read-only) ----
-def _schk2():
-    time.sleep(40)
-    log = logging.getLogger("uvicorn.error")
-    try:
-        d = _build_performance_dashboard({"name": "check", "role": "MANAGER"})
-        rows = d.get("retailers") or []
-        zero = [r for r in rows if r.get("schemes") and not r["schemes"]["total"]]
-        shared = [r for r in rows if (r.get("schemes") or {}).get("shared")]
-        s = d.get("summary") or {}
-        log.warning("SCHK2 rows=%s zero_total=%s shared=%s zero_with_10plus=%s totals=%s", len(rows), len(zero), len(shared),
-                    [(r["code"], r["name"], r.get("sales")) for r in zero if (r.get("sales") or 0) >= 10][:6],
-                    {k: s.get(k) for k in ("scheme_payout", "focus_scheme_payout", "clearance_scheme_payout", "additional_scheme_payout", "back_support_payable_known")})
-        for r in rows:
-            if r["name"].startswith(("Moon Light", "Rainbow")):
-                sc = r["schemes"]
-                log.warning("SCHK2 %s %s total=%s counted=%s booster=%s focus=%s payout_field=%s", r["code"], r["name"], sc["total"],
-                            sc["shared"]["counted_here"], sc["booster"].get("payout"), sc["focus"]["payout"], r.get("scheme_payout"))
-    except Exception as exc:
-        log.warning("SCHK2 failed %r", exc)
-
-
-import threading as _threading_sk2
-_threading_sk2.Thread(target=_schk2, daemon=True).start()
