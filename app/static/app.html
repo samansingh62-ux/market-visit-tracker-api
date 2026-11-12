@@ -279,6 +279,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 
     <div id="eodAlert"></div>
     <div id="homeHighlights"></div>
+    <div id="homeFocus"></div>
 
     <div class="sectionHead"><h2>Visit today</h2><a href="#/retailers">See all</a></div>
     <div id="todayList" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -311,6 +312,18 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <span class="note" id="salesScope"></span>
     </div>
     <div id="salesResult" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</section>
+
+<!-- ============ FOCUS MODELS ============ -->
+<section id="s-focus" class="screen hidden" aria-label="Focus models">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Focus models</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="chipScroll" id="fmChips" role="group" aria-label="Choose a focus model"></div>
+    <div id="fmResult" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 </section>
 
@@ -662,7 +675,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'sales', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
+const SCREENS = ['login', 'home', 'sales', 'focus', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
@@ -685,7 +698,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, sales: showSales, stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
+  ({ login: showLogin, home: showHome, sales: showSales, focus: () => showFocus(arg), stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -825,6 +838,9 @@ function showHome() {
   const ins = insightsLoad();
   if (!ins.saved) $('homeHighlights').innerHTML = '<div class="skeleton" style="height:170px"></div>';
   whenLoaded(ins, renderHomeInsights, () => { $('homeHighlights').innerHTML = ''; });
+  const fm = load('focus', '/focus-models', 5 * 60e3);
+  if (!fm.saved) $('homeFocus').innerHTML = '<div class="skeleton" style="height:220px;margin-top:16px"></div>';
+  whenLoaded(fm, renderHomeFocus, () => { $('homeFocus').innerHTML = ''; });
   const cmp = load('compete', '/competition/summary', 2 * 60e3);
   if (cmp.pending) cmp.pending.then(() => cache.insights && renderHomeInsights(cache.insights.data)).catch(() => {});
 
@@ -954,6 +970,82 @@ function renderSales(d) {
     ${team && team.rows.length ? `<div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">${team.title}</div>${team.rows.map((r) => `<div class="kv"><span>${esc(r.name)}</span><b class="num">${fmt(r.units)}</b></div>`).join('')}</div>` : ''}
     ${counters.length ? `<div class="sectionHead"><h2>Top counters</h2><span class="note">${fmt(t.counters_selling)} sold</span></div>
     <div style="display:flex;flex-direction:column;gap:8px">${counters.map((c, i) => `<a class="listCard" href="#/r/${encodeURIComponent(c.code)}"><div class="rank num">${i + 1}</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(c.name)}</b><span class="note ellipsis">${esc([c.tl, c.ss].filter(Boolean).join(' · '))}</span></div><b class="num" style="font-size:17px">${fmt(c.units)}</b></a>`).join('')}</div>` : ''}`;
+}
+
+/* ---------------- FOCUS MODELS ---------------- */
+const fmTone = (pct, exp) => pct == null ? 'var(--muted)' : pct >= exp ? 'var(--good)' : pct >= exp * 0.7 ? 'var(--warn)' : 'var(--bad)';
+function fmBar(r, exp) {
+  const w = r.pct == null ? 0 : Math.min(100, r.pct);
+  return `<div style="position:relative;height:8px;border-radius:4px;background:#E9EEF6;overflow:hidden">
+    <i style="position:absolute;inset:0 auto 0 0;width:${w}%;background:${fmTone(r.pct, exp)};border-radius:4px"></i>
+    <i style="position:absolute;top:-2px;bottom:-2px;left:${Math.min(100, exp)}%;width:2px;background:var(--ink);opacity:.35"></i></div>`;
+}
+function renderHomeFocus(d) {
+  const box = $('homeFocus'); if (!box) return;
+  if (!d || !d.available) { box.innerHTML = ''; return; }
+  const t = d.total || {};
+  box.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+    <a href="#/focus" class="between" style="color:var(--ink)"><b style="font-size:16px">Focus models</b><span style="font-size:13px;font-weight:700;color:var(--brand)">${t.pct == null ? '' : fmt1(t.pct) + '% · '}Details ›</span></a>
+    <span class="note" style="margin-top:-6px">Target vs MTD · ${fmt(t.mtd)} of ${fmt(t.target)} · line shows where you should be today (${fmt1(d.expected_pct)}%)</span>
+    ${(d.models || []).map((r) => `<a href="#/focus/${encodeURIComponent(r.variant)}" style="display:flex;flex-direction:column;gap:5px;color:var(--ink)">
+      <div class="between" style="gap:8px"><span style="font-size:14px;font-weight:700">${esc(r.variant)}</span><span class="num" style="font-size:13px"><b>${fmt(r.mtd)}</b><span class="note"> / ${fmt(r.target)}</span> <b style="color:${fmTone(r.pct, d.expected_pct)}">${r.pct == null ? '—' : Math.round(r.pct) + '%'}</b></span></div>
+      ${fmBar(r, d.expected_pct)}</a>`).join('')}
+  </div>`;
+}
+let fmSeq = 0;
+function showFocus(variant) {
+  const box = $('fmResult');
+  const seq = ++fmSeq;
+  const sum = (cache.focus || {}).data;
+  const models = (sum && sum.models) || [];
+  const pick = variant || (models[0] && models[0].variant) || '';
+  $('fmChips').innerHTML = models.map((r) => `<a class="chip dark" aria-pressed="${r.variant === pick}" href="#/focus/${encodeURIComponent(r.variant)}">${esc(r.variant)}</a>`).join('');
+  box.innerHTML = '<div class="skeleton" style="height:150px"></div><div class="skeleton" style="height:260px"></div>';
+  if (!pick) {   // opened without a model: take the first one once the summary is in
+    whenLoaded(load('focus', '/focus-models', 5 * 60e3), (s) => {
+      if (seq !== fmSeq) return;
+      const first = s && s.models && s.models[0];
+      if (first) location.replace('#/focus/' + encodeURIComponent(first.variant));
+      else box.innerHTML = `<div class="card note">${esc((s && s.message) || 'Focus models are not set for this month.')}</div>`;
+    }, (e) => { box.innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+    return;
+  }
+  api('/focus-models?variant=' + encodeURIComponent(pick)).then((d) => {
+    if (seq !== fmSeq) return;
+    if (!d.available) { box.innerHTML = `<div class="card note">${esc(d.message || 'Focus models are not set for this month.')}</div>`; return; }
+    if (!models.length) {
+      $('fmChips').innerHTML = d.models.map((r) => `<a class="chip dark" aria-pressed="${r.variant === pick}" href="#/focus/${encodeURIComponent(r.variant)}">${esc(r.variant)}</a>`).join('');
+    }
+    const ch = $('fmChips').querySelector('[aria-pressed="true"]'); if (ch) ch.scrollIntoView({ block: 'nearest', inline: 'center' });
+    renderFocus(d, pick);
+  }).catch((e) => { if (seq === fmSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="showFocus(${JSON.stringify(pick).replace(/"/g, '&quot;')})">Try again</button>`; });
+}
+function renderFocus(d, v) {
+  const r = (d.models || []).find((x) => x.variant === v) || {};
+  const x = d.detail || {};
+  const nm = x.not_moving || [], ns = x.no_stock_with_target || [], vz = x.vbas_zero || [];
+  const counterRow = (c) => `<a class="listCard" href="#/r/${encodeURIComponent(c.code)}"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(c.name)}</b><span class="note ellipsis">${esc([c.tl && tlLabel(c.tl), c.ss && 'SS ' + c.ss].filter(Boolean).join(' · '))}</span></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><b class="num" style="font-size:16px">${fmt(c.stock)} pcs</b><span class="note num">target ${fmt(c.target)}</span></div></a>`;
+  $('fmResult').innerHTML = `
+    <div class="hero" style="gap:12px">
+      <div class="between"><div class="lite" style="font-size:15px;font-weight:700">${esc(v)}</div><div class="lite" style="font-size:13px;font-weight:600">${d.days_left} days left</div></div>
+      <div style="display:flex;align-items:baseline;gap:8px"><div class="num" style="font-size:40px;font-weight:800;line-height:1">${fmt(r.mtd)}</div><div class="lite" style="font-size:15px;font-weight:600">of ${fmt(r.target)} · ${r.pct == null ? '—' : Math.round(r.pct) + '%'}</div></div>
+      <div class="grid3" style="gap:8px">
+        <div class="heroTile"><span>Today</span><b class="num">${fmt(r.ftd)}</b></div>
+        <div class="heroTile"><span>In stock</span><b class="num">${fmt(r.stock)}</b></div>
+        <div class="heroTile"><span>Needed / day</span><b class="num">${r.per_day_needed == null ? '—' : fmt1(r.per_day_needed)}</b></div>
+      </div>
+    </div>
+    <div class="sectionHead"><h2>Counters not moving it</h2><span class="note">${fmt(nm.length)}</span></div>
+    <span class="note" style="margin-top:-6px">Holding ${esc(v)} with no sale this month. Most stock first.</span>
+    <div style="display:flex;flex-direction:column;gap:8px">${nm.slice(0, 40).map(counterRow).join('') || '<div class="card note">Every counter holding it has sold it this month.</div>'}</div>
+    ${nm.length > 40 ? `<span class="note">+${nm.length - 40} more counters</span>` : ''}
+    ${ns.length ? `<details class="card"><summary style="cursor:pointer;font-weight:700">Target but no stock and no sale · ${fmt(ns.length)}</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">${ns.slice(0, 60).map(counterRow).join('')}</div></details>` : ''}
+    <div class="sectionHead"><h2>VBAs at zero</h2><span class="note">${fmt(vz.length)} of ${fmt(x.vbas_in_area)}</span></div>
+    <span class="note" style="margin-top:-6px">No ${esc(v)} sold this month and none today at the store they work in.</span>
+    <div class="card" style="padding:4px 16px">${vz.slice(0, 80).map((b) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(b.name)} <span class="tag" style="background:var(--brand-soft);color:var(--brand-ink)">${esc(b.type === 'FVBA' ? 'FVBA' : 'VBA')}</span></b><span class="note ellipsis">${esc(b.store)}${b.tl ? ' · ' + esc(tlLabel(b.tl)) : ''}</span></div><span class="num note" style="white-space:nowrap">target ${fmt(b.target)}</span></div>`).join('') || '<div class="kv note">Every VBA in your area has sold it this month or today.</div>'}</div>
+    ${vz.length > 80 ? `<span class="note">+${vz.length - 80} more VBAs</span>` : ''}
+    <span class="note">Targets from ${esc(d.source || 'the month’s dashboard')}. V-Work does not say which VBA made a sale, so a VBA’s sales are their store’s sales.</span>`;
 }
 
 /* ---------------- STOCK FINDER ---------------- */

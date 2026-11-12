@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database, schemes_nov
+from . import crud, database, schemes_nov, focus_models
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -2154,6 +2154,52 @@ def stock_finder(
     with _finder_lock:
         _finder_cache[key] = (time.monotonic(), result)
     return result
+
+
+_focus_cache: dict = {}
+_focus_lock = __import__("threading").Lock()
+
+
+def _focus_live(scope: dict, variants: list) -> dict:
+    key = (tuple(sorted(scope.items())), tuple(variants))
+    now = time.monotonic()
+    with _focus_lock:
+        hit = _focus_cache.get(key)
+        if hit and now - hit[0] < 300:
+            return hit[1]
+        for k in [k for k, v in _focus_cache.items() if now - v[0] >= 300]:
+            _focus_cache.pop(k, None)
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+            response = _vwork_request(client, "GET", f"{VWORK_LIVE_API_URL}/api/v1/focus-variants",
+                                      params={**scope, "variants": ",".join(variants)}, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Focus model sales are unavailable right now: {exc}") from exc
+    with _focus_lock:
+        _focus_cache[key] = (time.monotonic(), data)
+    return data
+
+
+@app.get("/focus-models")
+def focus_models_view(variant: Optional[str] = Query(default=None), user: dict = Depends(get_dashboard_user)):
+    """Focus-model target vs achievement for the user's area; with `variant`, the counters not
+    moving it and the VBAs with nothing sold this month or today."""
+    today = (datetime.utcnow() + timedelta(hours=5, minutes=30)).date()   # India time
+    targets = focus_models.load_targets(today.strftime("%Y-%m"))
+    if not targets:
+        return {"available": False, "message": "Focus model targets for this month are not loaded yet."}
+    scope = _scope(user)
+    live = _focus_live(scope, targets["models"])
+    out = {"available": True, "source": targets.get("source"),
+           **focus_models.summary(targets, live, user.get("role"), user.get("name"), scope, today)}
+    if variant:
+        if variant not in targets["models"]:
+            raise HTTPException(status_code=404, detail="Not a focus model this month.")
+        out["detail"] = focus_models.detail(targets, live, variant, scope)
+    return out
 
 
 _PERF_CACHE_TTL_SECONDS = int(os.getenv("PERF_CACHE_TTL_SECONDS", "120"))
