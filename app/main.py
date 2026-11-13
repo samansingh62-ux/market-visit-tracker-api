@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database, schemes_nov, focus_models, visit_report
+from . import crud, database, schemes_nov, focus_models, visit_report, punched
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -935,6 +935,60 @@ def visit_report_view(date_from: Optional[str] = Query(default=None), date_to: O
         raise HTTPException(status_code=400, detail="Pick a range of up to two months.")
     visits, users = crud.visit_report_rows(d_from.isoformat(), d_to.isoformat())
     return visit_report.build(visits, users, d_from, d_to, kam_scope)
+
+
+_punched_cache = {}
+
+
+def _punched_data(month: str):
+    hit = _punched_cache.get(month)
+    if hit and time.time() - hit[0] < 120:
+        return hit[1]
+    data = punched.load(month)
+    _punched_cache[month] = (time.time(), data)
+    return data
+
+
+@app.get("/punched-sales")
+def punched_sales(month: Optional[str] = Query(default=None, pattern=r"^\d{4}-\d{2}$"),
+                  user: dict = Depends(get_dashboard_user)):
+    """Sales punched by each VBA / RVBA / FVBA against target, and sales TLs and SSs punched themselves.
+    From the tertiary dashboard's IMEI sheet (V-Work's live feed does not say who punched a sale)."""
+    role = str(user.get("role") or "").upper()
+    if role not in ("CEO", "ADMIN", "MANAGER", "VIEWER", "KAM", "SS", "TL"):
+        raise HTTPException(status_code=403, detail="Not available for this login.")
+    if not month:
+        month = (datetime.utcnow() + timedelta(hours=5, minutes=30)).strftime("%Y-%m")
+    data = _punched_data(month)
+    if not data:
+        return {"month": month, "as_of": None, "totals": [], "total_units": 0, "vbas": [], "own": [],
+                "can_upload": role in ("CEO", "ADMIN", "MANAGER")}
+    out = punched.view(data, _scope(user))
+    out["can_upload"] = role in ("CEO", "ADMIN", "MANAGER")
+    return out
+
+
+@app.post("/admin/tertiary-dashboard")
+async def upload_tertiary_dashboard(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Refresh punched sales from the latest Tertiary Sales Dashboard (.xlsx with the Raw, VBA and FVBA sheets)."""
+    if str(user.get("role") or "").upper() not in ("CEO", "ADMIN", "MANAGER"):
+        raise HTTPException(status_code=403, detail="Only Admin can upload the dashboard.")
+    if not (file.filename or "").lower().endswith((".xlsx", ".xlsm")):
+        raise HTTPException(status_code=400, detail="Upload the dashboard .xlsx file.")
+    import tempfile
+    raw = await file.read()
+    with tempfile.NamedTemporaryFile(suffix=".xlsx") as tmp:
+        tmp.write(raw); tmp.flush()
+        try:
+            data = await asyncio.to_thread(punched.parse_workbook, tmp.name)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Could not read the dashboard: {exc}") from exc
+    if not data.get("sales"):
+        raise HTTPException(status_code=400, detail="No sales rows found in the Raw sheet.")
+    punched.save(data, str(user.get("name") or ""))
+    _punched_cache.pop(data["month"], None)
+    return {"month": data["month"], "as_of": data["as_of"], "rows": len(data["sales"]),
+            "units": sum(r[5] for r in data["sales"]), "vbas": len(data["vbas"])}
 
 
 @app.get("/my-visits/vwork-pending")
