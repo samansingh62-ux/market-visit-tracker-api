@@ -3290,3 +3290,18 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: review check ----
+def _tmp_rv():
+    time.sleep(45)
+    log = logging.getLogger("uvicorn.error")
+    for role, name in (("TL", "Monojit Rudra Paul"), ("SS", "Avisek Das"), ("KAM", "Sailen Das"), ("KAM", "Ireshwad Mehdi")):
+        try:
+            r = person_review(role=role, name=name, user={"name": "Manager", "role": "MANAGER"})
+            log.warning("RVCHK %s %s ok counters=%s team=%s actions=%s flags=%s", role, name, len(r["counters"]), len(r["team"]),
+                        [a["title"][:60] for a in r["actions"]], [f["text"][:80] for f in r["flags"]])
+        except Exception as exc:
+            log.warning("RVCHK %s %s ERR %r", role, name, exc)
+import threading as _thr_tmp
+_thr_tmp.Thread(target=_tmp_rv, daemon=True).start()
