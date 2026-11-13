@@ -371,7 +371,11 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
     <h1 style="flex:1">Review</h1>
     <button class="iconBtn" id="rvShare" aria-label="Share as image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg></button>
   </div>
-  <div class="scroll" style="padding-top:4px"><div id="rvCard"></div></div>
+  <div class="scroll" style="padding-top:4px"><div id="rvCard"></div>
+    <div id="rvBtns" class="hidden" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn soft" id="rvImg" style="height:48px">Share image</button>
+      <button class="btn" id="rvPpt" style="height:48px">Download PPT</button>
+    </div></div>
 </section>
 
 <!-- ============ TL FTD ============ -->
@@ -1186,10 +1190,10 @@ let rvSeq = 0, rvData = null;
 function showReview(arg) {
   const [role, ...rest] = String(arg || '').split('/');
   const name = rest.join('/');
-  const box = $('rvCard'); const seq = ++rvSeq; rvData = null;
+  const box = $('rvCard'); const seq = ++rvSeq; rvData = null; $('rvBtns').classList.add('hidden');
   if (!RV_ROLES.includes(role) || !name) { box.innerHTML = '<div class="err">Pick a TL, SS or KAM to review.</div>'; return; }
   box.innerHTML = '<div class="skeleton" style="height:220px"></div><div class="skeleton" style="height:360px;margin-top:12px"></div>';
-  api(`/review?role=${role}&name=${encodeURIComponent(name)}`).then((d) => { if (seq === rvSeq) { rvData = d; renderReview(d); } })
+  api(`/review?role=${role}&name=${encodeURIComponent(name)}`).then((d) => { if (seq === rvSeq) { rvData = d; renderReview(d); $('rvBtns').classList.remove('hidden'); } })
     .catch((e) => { if (seq === rvSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px;margin-top:10px" onclick="showReview('${role}/${esc(name)}')">Try again</button>`; });
 }
 function renderReview(d) {
@@ -1245,6 +1249,122 @@ async function shareReview() {
   b.disabled = false;
 }
 $('rvShare').addEventListener('click', shareReview);
+function loadScript(src) {
+  return new Promise((ok, bad) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = () => bad(new Error('Could not load. Check your connection.')); document.head.appendChild(sc); });
+}
+async function shareOrSave(blob, fname, mime) {
+  const file = new File([blob], fname, { type: mime });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: fname }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Saved to your downloads.');
+}
+async function downloadReviewPpt() {
+  if (!rvData) return;
+  const b = $('rvPpt'); b.disabled = true; const label = b.textContent; b.innerHTML = '<span class="spin"></span>';
+  try {
+    if (!window.PptxGenJS) await loadScript('/app/pptxgen.js');
+    const blob = await buildReviewPpt(rvData);
+    await shareOrSave(blob, `${rvData.name} - ${rvData.role} review ${rvData.period.end}.pptx`, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+  } catch (e) { toast(e.message || 'Could not make the PPT.', true); }
+  b.disabled = false; b.textContent = label;
+}
+async function buildReviewPpt(d) {
+  const S = d.summary, P = d.period, par = d.parents || {};
+  const NAVY = '0B1B3F', NAVY2 = '14295A', BLUE = '2F6BFF', SKY = '7FA6FF', MUTED = '64748B', LINE = 'E2E8F0', GREEN = '16A34A', AMBER = 'F59E0B', RED = 'E11D48';
+  const col = (p) => p == null ? '94A3B8' : p >= 100 ? GREEN : p >= 50 ? AMBER : RED;
+  const visit = (n) => n == null ? 'Never' : n === 0 ? 'Today' : n === 1 ? 'Yesterday' : n + 'd ago';
+  const n0 = (v) => Number(v || 0).toLocaleString('en-IN');
+  const now = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(11, 16);
+  const day = new Date(P.end + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const pres = new PptxGenJS(); pres.layout = 'LAYOUT_16x9'; pres.title = `${d.name} ${d.role} review`; pres.author = 'Zone A';
+  const F = 'Calibri';
+  pres.defineSlideMaster({ title: 'BODY', background: { color: 'FFFFFF' }, objects: [
+    { rect: { x: 0, y: 0, w: 10, h: 0.08, fill: { color: BLUE } } },
+    { text: { text: `Zone A · ${d.role} review · ${d.name}`, options: { x: 0.4, y: 5.25, w: 6, h: 0.3, fontFace: F, fontSize: 9, color: MUTED } } },
+  ], slideNumber: { x: 9.2, y: 5.25, w: 0.4, h: 0.3, fontFace: F, fontSize: 9, color: MUTED } });
+  const head = (sl, title, sub) => {
+    sl.addText(title, { x: 0.4, y: 0.25, w: 9.2, h: 0.5, fontFace: F, fontSize: 24, bold: true, color: NAVY, margin: 0 });
+    if (sub) sl.addText(sub, { x: 0.4, y: 0.72, w: 9.2, h: 0.3, fontFace: F, fontSize: 12, color: MUTED, margin: 0 });
+  };
+  const hdr = (cells) => cells.map((t, i) => ({ text: t, options: { bold: true, color: 'FFFFFF', fill: { color: NAVY }, align: i ? 'right' : 'left', fontSize: 10 } }));
+  // 1. title
+  let sl = pres.addSlide(); sl.background = { color: NAVY };
+  sl.addText(`ZONE A · ${d.role} REVIEW`, { x: 0.6, y: 1.3, w: 8.8, h: 0.4, fontFace: F, fontSize: 14, bold: true, color: SKY, charSpacing: 4, margin: 0 });
+  sl.addText(d.name, { x: 0.6, y: 1.75, w: 8.8, h: 0.9, fontFace: F, fontSize: 44, bold: true, color: 'FFFFFF', margin: 0 });
+  sl.addText([par.towns && par.towns.join(', '), par.ss && 'SS ' + par.ss, par.kam && 'KAM ' + par.kam, `${S.counters} counters`].filter(Boolean).join('  ·  '), { x: 0.6, y: 2.7, w: 8.8, h: 0.4, fontFace: F, fontSize: 16, color: 'B9C7E8', margin: 0 });
+  sl.addText(`${day} · V-Work live data till ${now}`, { x: 0.6, y: 4.6, w: 8.8, h: 0.35, fontFace: F, fontSize: 12, color: '9FB3DD', margin: 0 });
+  // 2. scorecard
+  sl = pres.addSlide({ masterName: 'BODY' }); head(sl, 'Month so far', `${P.days_remaining} days left including today`);
+  const tiles = [['MTD sale', n0(S.sales), `of ${n0(S.target)} target`, NAVY], ['Achieved', Math.round(S.pct || 0) + '%', `Gap ${n0(S.gap)} units`, col(S.pct)], ['Need per day', n0(S.need), 'units to close the target', NAVY], ['Today (FTD)', n0(S.ftd), `${S.ftd_counters} of ${S.counters} counters sold`, NAVY]];
+  tiles.forEach(([a, v, c, cl], i) => {
+    const x = 0.4 + i * 2.33;
+    sl.addShape(pres.ShapeType.roundRect, { x, y: 1.2, w: 2.15, h: 1.55, fill: { color: 'F1F5FB' }, line: { color: 'F1F5FB' }, rectRadius: 0.1 });
+    sl.addText(a, { x: x + 0.15, y: 1.3, w: 1.9, h: 0.3, fontFace: F, fontSize: 12, color: MUTED, margin: 0 });
+    sl.addText(v, { x: x + 0.15, y: 1.6, w: 1.9, h: 0.65, fontFace: F, fontSize: 34, bold: true, color: cl, margin: 0 });
+    sl.addText(c, { x: x + 0.15, y: 2.3, w: 1.95, h: 0.35, fontFace: F, fontSize: 10.5, color: MUTED, margin: 0 });
+  });
+  let y = 3.05;
+  (d.flags || []).slice(0, 3).forEach((f) => {
+    sl.addShape(pres.ShapeType.roundRect, { x: 0.4, y, w: 9.2, h: 0.55, fill: { color: f.kind === 'warn' ? 'FEF3E2' : 'FDECEA' }, line: { color: f.kind === 'warn' ? AMBER : RED, width: 1 }, rectRadius: 0.08 });
+    sl.addText(f.text, { x: 0.55, y, w: 8.95, h: 0.55, fontFace: F, fontSize: 12.5, bold: true, color: NAVY, valign: 'middle', margin: 0 });
+    y += 0.68;
+  });
+  // 3. TL table + chart (SS / KAM)
+  if (d.team && d.team.length) {
+    for (let i = 0; i < d.team.length; i += 12) {
+      const part = d.team.slice(i, i + 12);
+      sl = pres.addSlide({ masterName: 'BODY' }); head(sl, 'TL performance' + (i ? ' (cont.)' : ''), 'Lowest achievement first');
+      const rows = [hdr(['TL', 'MTD', 'Target', 'Ach', 'FTD', 'Need/day'])].concat(part.map((t) => [
+        { text: t.name, options: { bold: true, align: 'left' } }, n0(t.sales), n0(t.target),
+        { text: Math.round(t.pct || 0) + '%', options: { bold: true, color: col(t.pct) } }, n0(t.ftd), n0(t.need)]));
+      sl.addTable(rows, { x: 0.4, y: 1.15, w: 5.4, colW: [2.1, 0.65, 0.7, 0.6, 0.55, 0.8], fontFace: F, fontSize: 10, color: NAVY, border: { type: 'solid', pt: 0.5, color: LINE }, rowH: 0.28, align: 'right' });
+      sl.addChart(pres.ChartType.bar, [{ name: 'Achievement %', labels: part.map((t) => t.name.split(' ')[0]), values: part.map((t) => Math.round(t.pct || 0)) }], {
+        x: 6.0, y: 1.1, w: 3.6, h: 3.9, barDir: 'bar', chartColors: [BLUE], showValue: true, dataLabelFontSize: 9, dataLabelColor: NAVY, catAxisLabelFontSize: 9, valAxisHidden: true,
+        valGridLine: { style: 'none' }, catAxisLabelColor: MUTED, showLegend: false, showTitle: true, title: 'Achievement %', titleFontSize: 11, titleColor: NAVY, catAxisOrientation: 'maxMin' });
+    }
+  }
+  // 4. counters
+  const cs = d.role === 'TL' ? d.counters : d.counters.filter((c) => c.gap > 0).sort((a, b) => b.gap - a.gap).slice(0, 24);
+  for (let i = 0; i < cs.length; i += 12) {
+    const part = cs.slice(i, i + 12);
+    sl = pres.addSlide({ masterName: 'BODY' });
+    head(sl, (d.role === 'TL' ? 'Counters' : 'Counters furthest behind') + (i ? ' (cont.)' : ''), d.role === 'TL' ? 'Biggest sellers first · stock "main" = chain counter, stock held at the main retailer' : 'Largest unit gap first');
+    const rows = [hdr([d.role === 'TL' ? 'Counter' : 'Counter · TL', 'MTD', 'Target', 'Ach', 'Gap', 'Need/day', 'FTD', 'Stock', 'Days stock', 'Last visit'])].concat(part.map((c) => [
+      { text: c.name + (d.role !== 'TL' && c.tl ? `  (${c.tl})` : ''), options: { bold: true, align: 'left' } }, n0(c.sales), n0(c.target),
+      { text: c.pct == null ? '—' : Math.round(c.pct) + '%', options: { bold: true, color: col(c.pct) } }, n0(c.gap), n0(c.need), n0(c.ftd_sales), n0(c.stock),
+      { text: c.chain ? 'main' : c.dos == null ? '—' : String(Math.round(c.dos)), options: { color: (c.dos || 0) >= 45 ? RED : NAVY, bold: (c.dos || 0) >= 45 } },
+      { text: visit(c.days_since_visit), options: { color: c.days_since_visit == null || c.days_since_visit >= 20 ? RED : NAVY } }]));
+    sl.addTable(rows, { x: 0.4, y: 1.15, w: 9.2, colW: [2.9, 0.6, 0.65, 0.6, 0.6, 0.75, 0.5, 0.6, 0.8, 1.2], fontFace: F, fontSize: 9.5, color: NAVY, border: { type: 'solid', pt: 0.5, color: LINE }, rowH: 0.29, align: 'right' });
+  }
+  // 5. stock & visits
+  const heavy = d.counters.filter((c) => (c.dos || 0) >= 45 && (c.stock || 0) >= 10).sort((a, b) => b.dos - a.dos).slice(0, 10);
+  const stale = d.counters.filter((c) => c.days_since_visit == null || c.days_since_visit >= 20).sort((a, b) => (b.target || 0) - (a.target || 0)).slice(0, 10);
+  if (heavy.length || stale.length) {
+    sl = pres.addSlide({ masterName: 'BODY' }); head(sl, 'Stock and visits', 'Stock not moving (45+ days) and counters not visited in 20+ days, as logged in the app');
+    if (heavy.length) sl.addTable([hdr(['Stock not moving', 'Stock', 'Days'])].concat(heavy.map((c) => [{ text: c.name, options: { bold: true, align: 'left' } }, n0(c.stock), { text: String(Math.round(c.dos)), options: { color: RED, bold: true } }])),
+      { x: 0.4, y: 1.15, w: 4.4, colW: [2.9, 0.75, 0.75], fontFace: F, fontSize: 10, color: NAVY, border: { type: 'solid', pt: 0.5, color: LINE }, rowH: 0.28, align: 'right' });
+    if (stale.length) sl.addTable([hdr(['Not visited', 'Target', 'Last visit'])].concat(stale.map((c) => [{ text: c.name, options: { bold: true, align: 'left' } }, n0(c.target), { text: visit(c.days_since_visit), options: { color: RED } }])),
+      { x: 5.2, y: 1.15, w: 4.4, colW: [2.7, 0.75, 0.95], fontFace: F, fontSize: 10, color: NAVY, border: { type: 'solid', pt: 0.5, color: LINE }, rowH: 0.28, align: 'right' });
+  }
+  // 6. action plan
+  if (d.actions && d.actions.length) {
+    sl = pres.addSlide(); sl.background = { color: NAVY };
+    sl.addText('Action plan', { x: 0.4, y: 0.3, w: 9.2, h: 0.55, fontFace: F, fontSize: 26, bold: true, color: 'FFFFFF', margin: 0 });
+    const h = Math.min(0.82, 4.3 / d.actions.length);
+    d.actions.forEach((a, i) => {
+      const yy = 1.0 + i * (h + 0.06);
+      sl.addShape(pres.ShapeType.roundRect, { x: 0.4, y: yy, w: 9.2, h, fill: { color: NAVY2 }, line: { color: NAVY2 }, rectRadius: 0.08 });
+      sl.addShape(pres.ShapeType.ellipse, { x: 0.55, y: yy + (h - 0.42) / 2, w: 0.42, h: 0.42, fill: { color: BLUE }, line: { color: BLUE } });
+      sl.addText(String(i + 1), { x: 0.55, y: yy + (h - 0.42) / 2, w: 0.42, h: 0.42, fontFace: F, fontSize: 14, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', margin: 0 });
+      sl.addText([{ text: a.title, options: { bold: true, fontSize: 13.5, color: 'FFFFFF', breakLine: true } }, { text: a.text, options: { fontSize: 11, color: 'B9C7E8' } }],
+        { x: 1.15, y: yy, w: 8.3, h, fontFace: F, valign: 'middle', margin: 0 });
+    });
+  }
+  return pres.write({ outputType: 'blob' });
+}
+$('rvPpt').addEventListener('click', downloadReviewPpt);
+$('rvImg').addEventListener('click', shareReview);
+
 
 /* ---------------- TL-WISE FTD ---------------- */
 const FTD_SORTS = { sold: 'Most sold today', behind: 'Furthest behind', zero: 'No sale today' };

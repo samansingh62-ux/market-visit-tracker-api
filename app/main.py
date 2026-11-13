@@ -368,6 +368,11 @@ def mobile_icon():
     return FileResponse(STATIC_DIR / "icon.svg", media_type="image/svg+xml")
 
 
+@app.get("/app/pptxgen.js", include_in_schema=False)
+def mobile_pptxgen():
+    return FileResponse(STATIC_DIR / "pptxgen.js", media_type="application/javascript")
+
+
 @app.get("/app/html-to-image.js", include_in_schema=False)
 def mobile_html_to_image():
     return FileResponse(STATIC_DIR / "html-to-image.js", media_type="application/javascript")
