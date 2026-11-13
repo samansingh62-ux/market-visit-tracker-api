@@ -3254,3 +3254,20 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: TL FTD snapshot ----
+def _tmp_tlftd():
+    import json as _j, threading as _t
+    time.sleep(40)
+    try:
+        d = _build_performance_dashboard({"name": "Manager", "role": "MANAGER"})
+        log = logging.getLogger("uvicorn.error")
+        rows = [{k: t.get(k) for k in ("name", "kam", "ss", "target", "sales", "ftd_sales", "ftd_sales_value", "ftd_counters", "retailers")} for t in d["hierarchy"]["tl"]]
+        log.warning("TLFTDX P %s", _j.dumps({"period": d["period"], "fetched": datetime.utcnow().isoformat(), "n": len(rows)}))
+        for i in range(0, len(rows), 8):
+            log.warning("TLFTDX R%02d %s", i // 8, _j.dumps(rows[i:i + 8], ensure_ascii=False))
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning("TLFTDX ERR %s", exc)
+import threading as _thr_tmp
+_thr_tmp.Thread(target=_tmp_tlftd, daemon=True).start()
