@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database, schemes_nov, focus_models, visit_report, punched
+from . import crud, database, schemes_nov, focus_models, visit_report, punched, review
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -366,6 +366,11 @@ def mobile_manifest():
 @app.get("/app/icon.svg", include_in_schema=False)
 def mobile_icon():
     return FileResponse(STATIC_DIR / "icon.svg", media_type="image/svg+xml")
+
+
+@app.get("/app/html-to-image.js", include_in_schema=False)
+def mobile_html_to_image():
+    return FileResponse(STATIC_DIR / "html-to-image.js", media_type="application/javascript")
 
 
 @app.get("/app/sw.js", include_in_schema=False)
@@ -935,6 +940,35 @@ def visit_report_view(date_from: Optional[str] = Query(default=None), date_to: O
         raise HTTPException(status_code=400, detail="Pick a range of up to two months.")
     visits, users = crud.visit_report_rows(d_from.isoformat(), d_to.isoformat())
     return visit_report.build(visits, users, d_from, d_to, kam_scope)
+
+
+@app.get("/review")
+def person_review(role: str = Query(..., pattern="^(TL|SS|KAM)$"), name: str = Query(..., min_length=2, max_length=80),
+                  user: dict = Depends(get_dashboard_user)):
+    """One-page review of a TL, SS or KAM: KPIs, each counter, flags and an action plan."""
+    name = canonical_name(name)
+    if name in review.PLACEHOLDERS:
+        raise HTTPException(status_code=400, detail="No review for a vacant position.")
+    key = role.lower()
+    rows = [r for r in alignment.rows if canonical_name(r.get(key)) == name]
+    if not rows:
+        raise HTTPException(status_code=404, detail=f"{name} is not a {role} in the current mapping.")
+    viewer = _scope(user)
+    if viewer and not any(alignment.matches(r, viewer) for r in rows):
+        raise HTTPException(status_code=403, detail="This person is outside your area.")
+    if str(user.get("role") or "").upper() == "TL" and not (role == "TL" and name == canonical_name(user.get("name"))):
+        raise HTTPException(status_code=403, detail="TLs can see their own review only.")
+    perf = performance_dashboard({"name": name, "role": role})
+    team = []
+    if role in ("SS", "KAM"):
+        left = max(int(perf["period"].get("days_remaining") or 1), 1)
+        for g in (perf.get("hierarchy") or {}).get("tl") or []:
+            if g["name"] in review.PLACEHOLDERS or not g.get("target") and not g.get("sales"):
+                continue
+            team.append({"name": g["name"], "sales": g["sales"], "target": g["target"], "pct": g.get("achievement_pct"),
+                         "ftd": g.get("ftd_sales"), "need": -(-max(g["target"] - g["sales"], 0) // left) if g["target"] else 0})
+        team.sort(key=lambda x: (x["pct"] or 0))
+    return review.build(perf, role, name, team)
 
 
 _punched_cache = {}
