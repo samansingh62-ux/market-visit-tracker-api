@@ -3148,17 +3148,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: drop the team work-plan scratch table ----
-def _dropsnap():
-    time.sleep(20)
-    try:
-        with database.get_conn() as conn:
-            conn.execute("DROP TABLE IF EXISTS ops_snapshot")
-        logging.getLogger("uvicorn.error").warning("TEAMSNAP table dropped")
-    except Exception as exc:
-        logging.getLogger("uvicorn.error").warning("TEAMSNAP drop failed %r", exc)
-
-
-import threading as _threading_ds
-_threading_ds.Thread(target=_dropsnap, daemon=True).start()
