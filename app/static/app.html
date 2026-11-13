@@ -281,6 +281,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <div class="rank" style="background:var(--brand-soft);color:var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></div>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Visit report</b><span class="note">Outlets visited and remarks by TL, SS and KAM</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
 
+    <a class="listCard hidden" href="#/ftd" id="ftdLink">
+      <div class="rank" style="background:var(--brand-soft);color:var(--brand)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">TL-wise FTD</b><span class="note">Today’s sale by TL against what they need per day</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+
     <a class="listCard hidden" href="#/punched" id="punchedLink">
       <div class="rank" style="background:var(--good-bg,#E7F6EE);color:var(--good)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11l2 2 4-4"/></svg></div>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Punched sales</b><span class="note">VBA / FVBA sales vs target, and TL &amp; SS own punching</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
@@ -332,6 +336,24 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   </div>
   <div class="scroll" style="padding-top:4px" id="vwCopy"></div>
   <div class="bottomBar"><div><button class="btn" id="vwDone">I’ve entered it in V-Work</button></div></div>
+</section>
+
+<!-- ============ TL FTD ============ -->
+<section id="s-ftd" class="screen hidden" aria-label="TL-wise FTD">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">TL-wise FTD</h1>
+    <button class="iconBtn" id="ftdRefresh" aria-label="Refresh"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div id="ftdHead"></div>
+    <div class="chipScroll" id="ftdSort" role="group" aria-label="Sort"></div>
+    <div style="display:flex;gap:8px">
+      <select id="ftdKam" aria-label="KAM area" style="flex:1;min-width:0;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:0 12px;font:inherit;font-weight:600"></select>
+      <input id="ftdSearch" placeholder="Search TL" aria-label="Search TL" autocomplete="off" style="flex:1;min-width:0;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:0 12px;font:inherit">
+    </div>
+    <div id="ftdResult" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
 </section>
 
 <!-- ============ PUNCHED SALES ============ -->
@@ -742,7 +764,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'sales', 'vreport', 'punched', 'vwork', 'focus', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
+const SCREENS = ['login', 'home', 'sales', 'vreport', 'punched', 'ftd', 'vwork', 'focus', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
@@ -765,7 +787,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, sales: showSales, vreport: showVisitReport, punched: showPunched, vwork: () => showVwork(arg), focus: () => showFocus(arg), stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
+  ({ login: showLogin, home: showHome, sales: showSales, vreport: showVisitReport, punched: showPunched, ftd: showFtd, vwork: () => showVwork(arg), focus: () => showFocus(arg), stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -897,6 +919,7 @@ function showHome() {
   $('stockFinderLink').classList.toggle('hidden', !canFindStock());
   $('visitReportLink').classList.toggle('hidden', !canSeeVisitReport());
   $('punchedLink').classList.toggle('hidden', !canSeePunched());
+  $('ftdLink').classList.toggle('hidden', String(user.role || '').toUpperCase() === 'RDS' && view !== 'zone');
   loadVworkPending();
   $('avatarBtn').textContent = initials(user.name);
   refreshCounts();
@@ -1118,6 +1141,72 @@ $('vrRoles').addEventListener('click', (e) => { const b = e.target.closest('[dat
 $('vrTabs').addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (b) { vr.tab = b.dataset.v; [...$('vrTabs').children].forEach((x) => x.setAttribute('aria-selected', String(x === b))); renderVisitReport(); } });
 $('vrKam').addEventListener('change', () => { vr.kam = $('vrKam').value; renderVisitReport(); });
 $('vrSearch').addEventListener('input', () => { vr.q = $('vrSearch').value; renderVisitReport(); });
+
+/* ---------------- TL-WISE FTD ---------------- */
+const FTD_SORTS = { sold: 'Most sold today', behind: 'Furthest behind', zero: 'No sale today' };
+let ftd = { sort: 'sold', kam: '', q: '', seq: 0 };
+function showFtd(force) {
+  const seq = ++ftd.seq;
+  $('ftdSort').innerHTML = Object.entries(FTD_SORTS).map(([k, v]) => `<button class="chip" data-s="${k}" aria-pressed="${k === ftd.sort}">${v}</button>`).join('');
+  if (force) invalidate('perf');
+  $('ftdResult').innerHTML = '<div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:80px"></div>';
+  whenLoaded(load('perf', '/performance-dashboard', 2 * 60e3), (d, at) => { if (seq === ftd.seq) renderFtd(d, at); },
+    (e) => { if (seq === ftd.seq) $('ftdResult').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="showFtd(true)">Try again</button>`; });
+}
+function ftdRows(d) {
+  const left = Math.max((d.period && d.period.days_remaining) || 1, 1);
+  return ((d.hierarchy && d.hierarchy.tl) || []).filter((t) => t.name && t.name !== 'Unassigned').map((t) => {
+    const before = (t.sales || 0) - (t.ftd_sales || 0);   // sold before today
+    const need = t.target ? Math.ceil(Math.max(t.target - before, 0) / left) : null;
+    return { ...t, need, pct: need ? t.ftd_sales * 100 / need : null };
+  });
+}
+function renderFtd(d, at) {
+  const all = ftdRows(d);
+  const kams = [...new Set(all.map((t) => t.kam).filter(Boolean))].sort();
+  const sel = $('ftdKam'); sel.classList.toggle('hidden', kams.length < 2);
+  if (!kams.includes(ftd.kam)) ftd.kam = '';
+  sel.innerHTML = '<option value="">All KAM areas</option>' + kams.map((k) => `<option value="${esc(k)}" ${k === ftd.kam ? 'selected' : ''}>KAM ${esc(k)}</option>`).join('');
+  const q = ftd.q.trim().toLowerCase();
+  let rows = all.filter((t) => (!ftd.kam || t.kam === ftd.kam) && (!q || t.name.toLowerCase().includes(q)));
+  if (ftd.sort === 'zero') rows = rows.filter((t) => !t.ftd_sales);
+  rows.sort(ftd.sort === 'behind' ? (a, b) => (a.pct ?? 999) - (b.pct ?? 999) || (b.need || 0) - (a.need || 0) : (a, b) => b.ftd_sales - a.ftd_sales || a.name.localeCompare(b.name));
+  const base = all.filter((t) => !ftd.kam || t.kam === ftd.kam);
+  const tot = base.reduce((a, t) => (a.u += t.ftd_sales || 0, a.v += t.ftd_sales_value || 0, a.n += t.need || 0, a.z += t.ftd_sales ? 0 : 1, a), { u: 0, v: 0, n: 0, z: 0 });
+  const tone = (p) => p == null ? 'var(--muted)' : p >= 100 ? 'var(--good)' : p >= 60 ? 'var(--warn)' : 'var(--bad)';
+  const time = new Date((at || Date.now()) + 5.5 * 3600e3).toISOString().slice(11, 16);
+  $('ftdHead').innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:10px;padding:14px">
+    <div class="between"><b style="font-size:15px">Today so far</b><span class="note">${esc(vrDay(d.period.end))} · as of ${time}</span></div>
+    <div class="grid3" style="gap:8px">
+      <div class="stat"><span>Sold today</span><b class="num">${fmt(tot.u)}</b><span class="note" style="font-size:11px">${money(tot.v)}</span></div>
+      <div class="stat"><span>Need today</span><b class="num">${fmt(tot.n)}</b><span class="note" style="font-size:11px">${tot.n ? fmt1(tot.u * 100 / tot.n) + '% done' : ''}</span></div>
+      <div class="stat"><span>TLs at zero</span><b class="num" style="color:${tot.z ? 'var(--bad)' : 'inherit'}">${fmt(tot.z)}</b><span class="note" style="font-size:11px">of ${base.length}</span></div></div></div>`;
+  const ret = d.retailers || [];
+  const counters = (name) => ret.filter((r) => (r.assignments || []).some((a) => a.tl === name) || r.tl === name);
+  $('ftdResult').innerHTML = `<span class="note">Need = units per day to reach the month target from where the TL started today · ${d.period.days_remaining} day${d.period.days_remaining > 1 ? 's' : ''} left incl. today</span>
+    ${rows.map((t) => `<details class="card" style="padding:12px 14px" data-tl="${esc(t.name)}">
+      <summary style="cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:6px">
+        <div class="between" style="gap:10px;align-items:flex-start">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(t.name)}</b>
+            <span class="note ellipsis" style="font-size:12px">${t.kam ? 'KAM ' + esc(t.kam) : ''}${t.ss ? ' · SS ' + esc(t.ss) : ''}</span>
+            <span class="note" style="font-size:12px">${t.ftd_counters || 0} of ${t.retailers} counters sold today · MTD ${fmt(t.sales)}${t.target ? ' / ' + fmt(t.target) : ''}</span></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;white-space:nowrap"><b class="num" style="font-size:20px;color:${t.ftd_sales ? 'var(--ink)' : 'var(--bad)'}">${fmt(t.ftd_sales)}<span class="note" style="font-size:13px"> / ${t.need == null ? '—' : fmt(t.need)}</span></b>
+            <span class="note" style="font-size:11px">${t.pct == null ? 'no target' : `<b style="color:${tone(t.pct)}">${Math.round(t.pct)}%</b> of need`} · ${money(t.ftd_sales_value)}</span></div></div>
+        ${t.need ? `<div style="height:6px;border-radius:3px;background:#E9EEF6;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, t.pct || 0)}%;background:${tone(t.pct)}"></i></div>` : ''}
+      </summary><div class="ftdCounters" style="margin-top:8px;border-top:1px solid var(--line)"></div></details>`).join('') || '<div class="card note">No TL matches.</div>'}`;
+  $('ftdResult').querySelectorAll('details').forEach((el) => el.addEventListener('toggle', () => {
+    if (!el.open) return;
+    const list = counters(el.dataset.tl);
+    const sold = list.filter((r) => r.ftd_sales > 0).sort((a, b) => b.ftd_sales - a.ftd_sales);
+    const zero = list.length - sold.length;
+    el.querySelector('.ftdCounters').innerHTML = (sold.length ? sold.map((r) => `<a href="#/r/${encodeURIComponent(r.code)}" class="between" style="gap:8px;padding:9px 0;border-bottom:1px solid var(--line);color:var(--ink)"><span class="ellipsis" style="font-size:14px;min-width:0">${esc(r.name)}</span><b class="num" style="white-space:nowrap">${fmt(r.ftd_sales)}</b></a>`).join('') : '<div class="note" style="padding:9px 0">No counter has sold today yet.</div>')
+      + (zero ? `<div class="note" style="padding:9px 0">${zero} counter${zero > 1 ? 's' : ''} with no sale today</div>` : '');
+  }));
+}
+$('ftdSort').addEventListener('click', (e) => { const b = e.target.closest('[data-s]'); if (b) { ftd.sort = b.dataset.s; [...$('ftdSort').children].forEach((x) => x.setAttribute('aria-pressed', String(x === b))); if (cache.perf) renderFtd(cache.perf.data, cache.perf.at); } });
+$('ftdKam').addEventListener('change', () => { ftd.kam = $('ftdKam').value; if (cache.perf) renderFtd(cache.perf.data, cache.perf.at); });
+$('ftdSearch').addEventListener('input', () => { ftd.q = $('ftdSearch').value; if (cache.perf) renderFtd(cache.perf.data, cache.perf.at); });
+$('ftdRefresh').addEventListener('click', () => showFtd(true));
 
 /* ---------------- PUNCHED SALES ---------------- */
 function canSeePunched() { return view === 'zone' || ['ADMIN', 'CEO', 'MANAGER', 'VIEWER', 'KAM', 'SS', 'TL'].includes(String(user.role || '').toUpperCase()); }

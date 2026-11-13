@@ -2679,6 +2679,10 @@ def _build_performance_dashboard(user: dict):
     total_back_base = sum(int(x.get("back_support_base_margin") or 0) for x in retailer_rows)
     total_back_payable = sum(int(x.get("back_support_payable") or 0) for x in retailer_rows if x.get("back_support_payable") is not None)
 
+    tl_parents = {}
+    for r in alignment.rows:
+        if r.get("tl"):
+            tl_parents.setdefault(canonical_name(r["tl"]), (r.get("kam") or "", r.get("ss") or ""))
     hierarchy = {}
     for field in ("tl", "ss", "rds"):
         explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper())
@@ -2697,6 +2701,8 @@ def _build_performance_dashboard(user: dict):
             g["ftd_sales_value"] += float(store.get("ftd_sales_value") or 0)
             g["stock"] += int(store.get("stock") or 0)
             g["_codes"].add(store["retailer_code"])
+            if int(store.get("ftd_sales") or 0) > 0:
+                g.setdefault("_ftd_codes", set()).add(store["retailer_code"])
         # Include assigned retailers even where there are no current sales.
         for item in retailer_rows:
             names = {canonical_name(a.get(field)) for a in item.get("assignments", [])}
@@ -2720,6 +2726,9 @@ def _build_performance_dashboard(user: dict):
         out = []
         for g in groups.values():
             g["retailers"] = len(g.pop("_codes"))
+            g["ftd_counters"] = len(g.pop("_ftd_codes", ()))
+            if field == "tl":
+                g["kam"], g["ss"] = tl_parents.get(g["name"], ("", ""))
             explicit = explicit_targets.get(g["name"])
             if explicit:
                 g["target"] = int(explicit.get("target_volume") or 0)
