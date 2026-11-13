@@ -3173,22 +3173,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: visit report on live data (read-only) ----
-def _vrchk():
-    time.sleep(40)
-    log = logging.getLogger("uvicorn.error")
-    for u in ({"name": "check", "role": "ADMIN"}, {"name": "Sailen Das", "role": "KAM"}, {"name": "Bappan Das", "role": "TL"}):
-        try:
-            r = visit_report_view(date_from=None, date_to=None, user=u)
-            top = [(p["name"], p["role"], p["kam"], p["outlets"], p["visit_count"]) for p in r["people"][:6]]
-            log.warning("VRCHK %s people=%s none=%s tls=%s day_totals=%s top=%s", u["role"], len(r["people"]),
-                        sum(1 for p in r["people"] if not p["visit_count"]), len(r["tl_daily"]), r["tl_daily_totals"], top)
-        except HTTPException as exc:
-            log.warning("VRCHK %s refused %s", u["role"], exc.detail)
-        except Exception as exc:
-            log.warning("VRCHK %s failed %r", u["role"], exc)
-
-
-import threading as _threading_vr
-_threading_vr.Thread(target=_vrchk, daemon=True).start()
