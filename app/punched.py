@@ -13,6 +13,12 @@ from .alignment import alignment, canonical_name
 _n = lambda s: re.sub(r"\s+", " ", str(s or "").strip())
 
 
+def _key(v) -> str:
+    """Employee codes are kept only as a short hash: enough to match a VBA's sales to their target row."""
+    import hashlib
+    return hashlib.sha1(str(v).encode()).hexdigest()[:10]
+
+
 def _kind(post: str, emp_type: str) -> str:
     p, t = post.upper(), emp_type.upper()
     if p.startswith("FVBA") or t.replace(" ", "") == "FVBA":
@@ -59,7 +65,7 @@ def parse_workbook(path) -> dict:
         if d is None:
             continue
         last = max(last or d, d)
-        uid = _n(r[ix["uid"]]).upper() or _n(r[ix["uploader"]])
+        uid = _key(_n(r[ix["uid"]]).upper() or _n(r[ix["uploader"]]))
         kind = _kind(_n(r[ix["post"]]), _n(r[ix["etype"]]))
         people.setdefault(uid, {"name": canonical_name(_n(r[ix["uploader"]])), "kind": kind})
         qty = int(r[ix["qty"]] or 0)
@@ -80,7 +86,7 @@ def parse_workbook(path) -> dict:
             if len(r) <= c["val"] or not _n(r[c["name"]]) or _n(r[c["status"]]) != "Active":
                 continue
             vtype = "FVBA" if sheet == "FVBA" else ("RVBA" if "RVBA" in _n(r[c["vtype"]]).upper() else "VBA")
-            vbas.append({"uid": _n(r[c["uid"]]).upper(), "vwork_code": _n(r[c["vw"]]), "name": canonical_name(_n(r[c["name"]])),
+            vbas.append({"uid": _key(_n(r[c["uid"]]).upper()), "name": canonical_name(_n(r[c["name"]])),
                          "type": vtype, "store_code": _n(r[c["store"]]).upper(), "store_name": _n(r[c["sname"]]).replace(" (Store)", ""),
                          "retailer_code": _n(r[c["ret"]]).upper(), "tl": _n(r[c["tl"]]), "ss": _n(r[c["ss"]]),
                          "vol_target": int(r[c["vol"]] or 0), "val_target": int(r[c["val"]] or 0)})
