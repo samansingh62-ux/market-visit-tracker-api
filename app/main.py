@@ -3146,3 +3146,52 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: team work-plan snapshot (read-only on business data; writes one scratch table) ----
+def _teamsnap():
+    import json as _j
+    time.sleep(45)
+    log = logging.getLogger("uvicorn.error")
+    try:
+        mgr = {"name": "snapshot", "role": "MANAGER"}
+        perf = _build_performance_dashboard(mgr)
+        rows = perf.get("retailers") or []
+        keep = ("code", "name", "tl", "ss", "kam", "rds", "town_name", "target", "sales", "ftd_sales", "stock", "dos",
+                "days_since_visit", "required_per_day", "achievement_pct", "status", "chain_parent")
+        slim = []
+        for r in rows:
+            x = {k: r.get(k) for k in keep}
+            sc = r.get("schemes") or {}
+            nexts = []
+            for grp in ("focus", "clearance", "additional"):
+                for l in (sc.get(grp) or {}).get("lines") or []:
+                    n = l.get("next")
+                    if n and n.get("units_more", 99) <= 2 and (l.get("units") or 0) > 0:
+                        nexts.append([grp, l["series"], l["units"], l["rate"], n["units_more"], n["rate"], n["payout"] - l["payout"]])
+            x["scheme_total"] = sc.get("total")
+            x["near_slab"] = nexts
+            bs = sc.get("back_support") or {}
+            x["bs"] = [bs.get("achievement_pct"), bs.get("value_to_90"), bs.get("value_to_100"), bs.get("base_margin"), bs.get("payable")]
+            slim.append(x)
+        hier = perf.get("hierarchy") or {}
+        tg = focus_models.load_targets("2026-11")
+        live = _focus_live({}, tg["models"])
+        details = {v: focus_models.detail(tg, live, v, {}) for v in tg["models"]}
+        fsum = focus_models.summary(tg, live, "MANAGER", "snapshot", {}, (datetime.utcnow() + timedelta(hours=5, minutes=30)).date())
+        data = {"rows": slim, "hier": hier, "summary": perf.get("summary"), "focus_summary": fsum,
+                "focus_counters": live.get("counters"), "focus_stores": live.get("stores"),
+                "focus_detail": {v: {"not_moving": d["not_moving"], "vbas_zero": d["vbas_zero"], "vbas_in_area": d["vbas_in_area"]} for v, d in details.items()},
+                "vbas": tg["vbas"]}
+        payload = _j.dumps(data, default=str)
+        with database.get_conn() as conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS ops_snapshot (id SERIAL PRIMARY KEY, name TEXT, data TEXT, created_at TIMESTAMPTZ DEFAULT now())")
+            conn.execute("DELETE FROM ops_snapshot WHERE name = 'teamplan'")
+            conn.execute("INSERT INTO ops_snapshot (name, data) VALUES ('teamplan', %s)", (payload,))
+        log.warning("TEAMSNAP saved %s bytes, rows=%s", len(payload), len(slim))
+    except Exception as exc:
+        log.warning("TEAMSNAP failed %r", exc)
+
+
+import threading as _threading_ts
+_threading_ts.Thread(target=_teamsnap, daemon=True).start()
