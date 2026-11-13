@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -225,8 +226,8 @@ def create_visit(payload) -> dict:
         cur = conn.execute("""
             INSERT INTO visits
                 (retailer, market, visit_date, feedback, suggestions,
-                 submitted_by, submitted_role, tl, ss, rds, created_at, latitude, longitude, gps_accuracy)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 submitted_by, submitted_role, tl, ss, rds, created_at, latitude, longitude, gps_accuracy, vwork_details)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             payload.retailer, payload.market, payload.visit_date.isoformat(),
@@ -235,6 +236,7 @@ def create_visit(payload) -> dict:
             info.get("tl", ""), info.get("ss", ""), info.get("rds", ""),
             datetime.now(timezone.utc).isoformat(),
             payload.latitude, payload.longitude, payload.gps_accuracy,
+            json.dumps(payload.vwork_details, ensure_ascii=False) if getattr(payload, "vwork_details", None) else None,
         ))
         visit_id = cur.fetchone()["id"]
         row = conn.execute("SELECT * FROM visits WHERE id = %s", (visit_id,)).fetchone()
@@ -283,6 +285,21 @@ def list_visits(retailer: Optional[str] = None, tl: Optional[str] = None,
 def get_visit(visit_id: int) -> Optional[dict]:
     with database.get_conn() as conn:
         row = conn.execute("SELECT * FROM visits WHERE id = %s", (visit_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def vwork_pending(name: str, since: str) -> list:
+    with database.get_conn() as conn:
+        return [dict(r) for r in conn.execute("""
+            SELECT id, retailer, visit_date FROM visits
+             WHERE submitted_by = %s AND visit_date >= %s AND vwork_logged_at IS NULL AND vwork_details IS NOT NULL
+             ORDER BY visit_date DESC, id DESC""", (name, since)).fetchall()]
+
+
+def set_vwork_logged(visit_id: int, logged: bool) -> Optional[dict]:
+    with database.get_conn() as conn:
+        row = conn.execute("UPDATE visits SET vwork_logged_at = %s WHERE id = %s RETURNING *",
+                           (datetime.now(timezone.utc).isoformat() if logged else None, visit_id)).fetchone()
         return dict(row) if row else None
 
 
@@ -1172,7 +1189,7 @@ def visit_report_rows(date_from: str, date_to: str) -> tuple:
     with database.get_conn() as conn:
         visits = [dict(r) for r in conn.execute("""
             SELECT v.id, v.retailer, v.visit_date, v.feedback, v.suggestions, v.submitted_by, v.submitted_role,
-                   v.created_at::text AS created_at, r.code AS retailer_code, r.town_name,
+                   v.created_at::text AS created_at, r.code AS retailer_code, r.town_name, v.vwork_logged_at,
                    (SELECT COUNT(*) FROM visit_photos p WHERE p.visit_id = v.id) AS photo_count
               FROM visits v LEFT JOIN retailers r ON r.name = v.retailer
              WHERE v.visit_date >= %s AND v.visit_date <= %s

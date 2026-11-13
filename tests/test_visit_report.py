@@ -34,3 +34,10 @@ def test_kam_sees_only_their_area():
     r = visit_report.build(VISITS, USERS, date(2026, 11, 12), date(2026, 11, 13), kam_scope="Sailen Das")
     names = {x["name"] for x in r["people"]}
     assert {"Bappan Das", "Avisek Das", "Sailen Das"} <= names and "Polash Roy" not in names
+
+
+def test_vwork_ticks_counted():
+    visits = [dict(VISITS[0], vwork_logged_at="2026-11-12T10:00:00Z"), VISITS[2]]
+    r = visit_report.build(visits, USERS, date(2026, 11, 12), date(2026, 11, 13))
+    p = {x["name"]: x for x in r["people"]}
+    assert p["Bappan Das"]["in_vwork"] == 1 and p["Bappan Das"]["visits"][-1]["vwork"] is True or p["Bappan Das"]["in_vwork"] == 1

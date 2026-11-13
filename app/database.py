@@ -74,6 +74,8 @@ def init_db():
         conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION")
         conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION")
         conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS gps_accuracy DOUBLE PRECISION")
+        conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS vwork_details TEXT")
+        conn.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS vwork_logged_at TEXT")
         conn.execute("UPDATE visits SET submitted_role = 'Field' WHERE submitted_role IS NULL")
 
         conn.execute("""

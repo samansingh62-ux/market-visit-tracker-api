@@ -48,7 +48,8 @@ def build(visits: list, users: list, date_from: date, date_to: date, kam_scope: 
             p = people[who] = {"name": who, "role": role, "kam": canonical_name(_area_kam(who, role)), **_team_of(who, role), "visits": []}
         p["visits"].append({"retailer": v["retailer"], "code": v.get("retailer_code"), "town": v.get("town_name"),
                             "date": str(v["visit_date"])[:10], "feedback": v.get("feedback") or "",
-                            "follow_up": v.get("suggestions") or "", "photos": int(v.get("photo_count") or 0)})
+                            "follow_up": v.get("suggestions") or "", "photos": int(v.get("photo_count") or 0),
+                            "vwork": bool(v.get("vwork_logged_at"))})
     out = []
     for p in people.values():
         if kam_scope and p["kam"] != kam_scope and p["name"] != kam_scope:
@@ -62,6 +63,7 @@ def build(visits: list, users: list, date_from: date, date_to: date, kam_scope: 
         p["days_active"] = len({v["date"] for v in vs})
         p["last_visit"] = max((v["date"] for v in vs), default=None)
         p["with_remarks"] = sum(1 for v in vs if v["feedback"].strip() or v["follow_up"].strip())
+        p["in_vwork"] = sum(1 for v in vs if v.get("vwork"))
         out.append(p)
     out.sort(key=lambda p: (-p["outlets"], p["name"]))
 

@@ -1,7 +1,8 @@
+import json
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class VisitCreate(BaseModel):
@@ -15,6 +16,8 @@ class VisitCreate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     gps_accuracy: Optional[float] = None
+    # The fields of V-Work's own visit form, for the person to copy into V-Work.
+    vwork_details: Optional[dict[str, Any]] = None
 
 
 class VisitOut(BaseModel):
@@ -34,6 +37,18 @@ class VisitOut(BaseModel):
     longitude: Optional[float] = None
     gps_accuracy: Optional[float] = None
     photo_count: int = 0
+    vwork_details: Optional[dict[str, Any]] = None
+    vwork_logged_at: Optional[str] = None
+
+    @field_validator("vwork_details", mode="before")
+    @classmethod
+    def _parse_vwork(cls, v):
+        if isinstance(v, str):
+            try:
+                v = json.loads(v) if v else None
+            except ValueError:
+                return None
+        return v if isinstance(v, dict) else None
 
 
 class RetailerOut(BaseModel):

@@ -937,6 +937,24 @@ def visit_report_view(date_from: Optional[str] = Query(default=None), date_to: O
     return visit_report.build(visits, users, d_from, d_to, kam_scope)
 
 
+@app.get("/my-visits/vwork-pending")
+def my_vwork_pending(user: dict = Depends(get_current_user)):
+    """The user's own visits of the last 7 days not yet ticked as entered in V-Work."""
+    since = ((datetime.utcnow() + timedelta(hours=5, minutes=30)).date() - timedelta(days=6)).isoformat()
+    return [{**r, "visit_date": str(r["visit_date"])[:10]} for r in crud.vwork_pending(user.get("name") or "", since)]
+
+
+@app.post("/visits/{visit_id}/vwork-logged", response_model=VisitOut)
+def mark_vwork_logged(visit_id: int, logged: bool = Query(default=True), user: dict = Depends(get_current_user)):
+    """The person who logged the visit ticks it once they have entered it in V-Work too."""
+    visit = crud.get_visit(visit_id)
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found.")
+    if visit.get("submitted_by") != user.get("name"):
+        raise HTTPException(status_code=403, detail="Only the person who logged this visit can tick it.")
+    return crud.set_vwork_logged(visit_id, logged)
+
+
 @app.get("/visits/{visit_id}", response_model=VisitOut)
 def get_visit(visit_id: int, user: dict = Depends(get_dashboard_user)):
     visit = crud.get_visit(visit_id)
