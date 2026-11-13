@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database, schemes_nov, focus_models
+from . import crud, database, schemes_nov, focus_models, visit_report
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -911,6 +911,30 @@ def retailer_360(
             "what_to_discuss": actions[:5],
         },
     }
+
+
+@app.get("/visit-report")
+def visit_report_view(date_from: Optional[str] = Query(default=None), date_to: Optional[str] = Query(default=None),
+                      user: dict = Depends(get_dashboard_user)):
+    """Outlets each TL / SS / KAM visited, with their remarks, and TL-wise outlets per day.
+    Admin and full Zone A users see the zone; a KAM sees their own area."""
+    role = str(user.get("role") or "").upper()
+    if role in ("CEO", "ADMIN", "MANAGER", "VIEWER"):
+        kam_scope = ""
+    elif role == "KAM":
+        kam_scope = canonical_name(user.get("name"))
+    else:
+        raise HTTPException(status_code=403, detail="The visit report is for Admin, Zone A heads and KAMs.")
+    today = (datetime.utcnow() + timedelta(hours=5, minutes=30)).date()
+    try:
+        d_to = date.fromisoformat(date_to) if date_to else today
+        d_from = date.fromisoformat(date_from) if date_from else d_to.replace(day=1)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Dates must be YYYY-MM-DD.")
+    if d_from > d_to or (d_to - d_from).days > 62:
+        raise HTTPException(status_code=400, detail="Pick a range of up to two months.")
+    visits, users = crud.visit_report_rows(d_from.isoformat(), d_to.isoformat())
+    return visit_report.build(visits, users, d_from, d_to, kam_scope)
 
 
 @app.get("/visits/{visit_id}", response_model=VisitOut)
@@ -3148,3 +3172,23 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: visit report on live data (read-only) ----
+def _vrchk():
+    time.sleep(40)
+    log = logging.getLogger("uvicorn.error")
+    for u in ({"name": "check", "role": "ADMIN"}, {"name": "Sailen Das", "role": "KAM"}, {"name": "Bappan Das", "role": "TL"}):
+        try:
+            r = visit_report_view(date_from=None, date_to=None, user=u)
+            top = [(p["name"], p["role"], p["kam"], p["outlets"], p["visit_count"]) for p in r["people"][:6]]
+            log.warning("VRCHK %s people=%s none=%s tls=%s day_totals=%s top=%s", u["role"], len(r["people"]),
+                        sum(1 for p in r["people"] if not p["visit_count"]), len(r["tl_daily"]), r["tl_daily_totals"], top)
+        except HTTPException as exc:
+            log.warning("VRCHK %s refused %s", u["role"], exc.detail)
+        except Exception as exc:
+            log.warning("VRCHK %s failed %r", u["role"], exc)
+
+
+import threading as _threading_vr
+_threading_vr.Thread(target=_vrchk, daemon=True).start()

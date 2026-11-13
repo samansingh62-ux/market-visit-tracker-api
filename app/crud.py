@@ -1165,3 +1165,20 @@ def competition_history(retailer_codes: Optional[list] = None, limit: int = 50) 
             params,
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+def visit_report_rows(date_from: str, date_to: str) -> tuple:
+    """Visits in a date range with the visited counter's code, and the active TL/SS/KAM users."""
+    with database.get_conn() as conn:
+        visits = [dict(r) for r in conn.execute("""
+            SELECT v.id, v.retailer, v.visit_date, v.feedback, v.suggestions, v.submitted_by, v.submitted_role,
+                   v.created_at::text AS created_at, r.code AS retailer_code, r.town_name,
+                   (SELECT COUNT(*) FROM visit_photos p WHERE p.visit_id = v.id) AS photo_count
+              FROM visits v LEFT JOIN retailers r ON r.name = v.retailer
+             WHERE v.visit_date >= %s AND v.visit_date <= %s
+             ORDER BY v.visit_date DESC, v.created_at DESC""", (date_from, date_to)).fetchall()]
+        users = [dict(r) for r in conn.execute("""
+            SELECT name, role FROM users
+             WHERE active AND role IN ('TL', 'SS', 'KAM')
+               AND name NOT IN ('VBM-Vacant', 'Vacant-Zone A', 'SS Direct (NPO)')""").fetchall()]
+    return visits, users
