@@ -402,7 +402,7 @@ def init_db():
         # User identity/hierarchy master. Credentials are only populated by admin provisioning.
         rows = conn.execute("""
             SELECT DISTINCT tl AS name, 'TL' AS role, tl, NULL AS ss, NULL AS rds
-            FROM store_alignment WHERE tl IS NOT NULL AND tl != ''
+            FROM store_alignment WHERE tl IS NOT NULL AND tl != '' AND tl != 'SS Direct (NPO)'
             UNION
             SELECT DISTINCT ss AS name, 'SS' AS role, NULL AS tl, ss, NULL AS rds
             FROM store_alignment WHERE ss IS NOT NULL AND ss != ''
@@ -484,7 +484,6 @@ def init_db():
     "Gobindo Mandal":["TL","bOrLBp-OSSztdT1s2Pka2w==$9Ng9UI5VHTI0Fdju-TSBvQagv1Hj5d1zWa2-gGRrbUU="],
     "Bishnu Suklabaidya":["TL","GAON5Z9w2bBp-AqbQgqW6A==$XkB2TuyXmy4xBVzuNlGl0BBx1Nij2U_ZnWyH-9z48t4="],
     "Saurav Dey":["TL","McOlJAsswXEpYBwhRIq1GA==$ekkHe02cDM93lwF1-FF6HW6XJeeQ3QPN2VKAKVc5qgw="],
-    "Rahul Sharma":["TL","pEJeirf8eHoudqQzLJrbmw==$6fX-5XRcL1k065nAyA1HAg7GdM6SoXWE3A5_4dwL8Pk="],
     "Pappu Kumar":["SS","Nhh8DP47r1a0KCumRwj0Hw==$Lsx6aEoot4E2Il4Oe4tSjlqfDml_kkdRAyEfJTWOZ1o="],
     "Prasenjit Deb":["SS","Q3pMJ83rzMFauffjcZOfBA==$pjDlBctHzCgKnN3lZ3yN1gwp0ariurK7x6tAqoS1M80="],
     "Sujit Sinha":["SS","JURxLIVUYoadE8r2w-MujQ==$9nTtfGf2t-8pTZnca4T3ryhBW8YS0geX7i7K8JEUpjk="],
@@ -563,6 +562,18 @@ def init_db():
             UPDATE users SET active = FALSE
             WHERE name = 'Abhishek Pradhan' AND role = 'SS'
         """)
+
+        # People removed from the system: login off, PIN cleared, history kept.
+        for name, role in REMOVED_USERS:
+            conn.execute("UPDATE users SET active = FALSE, pin_hash = NULL WHERE name = %s AND role = %s", (name, role))
+
+
+# Removed from Zone A (name, role). "SS Direct (NPO)" is the alignment's label for NPO outlets with no
+# TL, not a person.
+REMOVED_USERS = [
+    ("Rahul Sharma", "TL"),       # removed 13 Nov 2026 (Saman)
+    ("SS Direct (NPO)", "TL"),
+]
 
 
 # Target files re-issued after the month was seeded: month -> stamp of the corrected file.
