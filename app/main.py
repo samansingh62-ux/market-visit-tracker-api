@@ -3256,28 +3256,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: TL retailer snapshot ----
-def _tmp_tlret():
-    import json as _j
-    time.sleep(40)
-    log = logging.getLogger("uvicorn.error")
-    try:
-        d = _build_performance_dashboard({"name": "Monojit Rudra Paul", "role": "TL"})
-        keys = ("code", "name", "club", "town_name", "ss", "target", "sales", "sales_value", "asp", "ftd_sales", "achievement_pct",
-                "gap", "required_per_day", "stock", "dos", "avg_daily_sales", "days_since_visit", "visit_count", "status", "chain_parent",
-                "scheme_slab", "scheme_eligible_units", "scheme_payout", "back_support_payable", "back_support_achievement_pct")
-        rows = []
-        for r in d["retailers"]:
-            x = {k: r.get(k) for k in keys}
-            sc = r.get("schemes") or {}
-            x["scheme_total"] = sc.get("total")
-            x["models"] = {l["series"]: l["units"] for part in ("focus", "clearance", "additional") for l in ((sc.get(part) or {}).get("lines") or []) if l.get("units")}
-            rows.append(x)
-        log.warning("TLRETX P %s", _j.dumps({"period": d["period"], "summary": d["summary"], "n": len(rows), "parents": [{k: p.get(k) for k in ("code", "name", "target", "sales", "ftd_sales", "stock", "store_codes")} for p in d.get("chain_parents") or []]}, ensure_ascii=False, default=str))
-        for i, x in enumerate(rows):
-            log.warning("TLRETX R%02d %s", i, _j.dumps(x, ensure_ascii=False, default=str))
-    except Exception as exc:
-        log.warning("TLRETX ERR %r", exc)
-import threading as _thr_tmp
-_thr_tmp.Thread(target=_tmp_tlret, daemon=True).start()
