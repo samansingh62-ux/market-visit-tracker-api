@@ -3307,16 +3307,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: RDS review check ----
-def _tmp_rdsrv():
-    time.sleep(45)
-    log = logging.getLogger("uvicorn.error")
-    for viewer, name in (({"name": "Manager", "role": "MANAGER"}, "Star Telecom"), ({"name": "Sailen Das", "role": "KAM"}, "Star Telecom"), ({"name": "Manager", "role": "MANAGER"}, "K M Enterprise (NHIN)")):
-        try:
-            r = person_review(role="RDS", name=name, user=viewer)
-            log.warning("RDSRV %s by %s ok sales=%s/%s counters=%s team=%s limited=%r actions=%s", name, viewer["name"], r["summary"]["sales"], r["summary"]["target"], len(r["counters"]), len(r["team"]), r["limited_to"], [a["title"][:40] for a in r["actions"]])
-        except Exception as exc:
-            log.warning("RDSRV %s by %s ERR %r", name, viewer["name"], exc)
-import threading as _thr_tmp
-_thr_tmp.Thread(target=_tmp_rdsrv, daemon=True).start()
