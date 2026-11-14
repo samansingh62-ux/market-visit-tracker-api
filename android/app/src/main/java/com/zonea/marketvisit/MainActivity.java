@@ -207,11 +207,66 @@ public class MainActivity extends Activity {
         a.runOnUiThread(() -> a.web.evaluateJavascript("window.onPushToken && window.onPushToken();", null));
     }
 
-    /** Small bridge the web app can call: window.AndroidApp.getPushToken(). */
+    /** Small bridge the web app can call: window.AndroidApp.getPushToken() / saveFile(...). */
     private class Bridge {
         @JavascriptInterface
         public String getPushToken() {
             return PushService.savedToken(MainActivity.this);
+        }
+
+        /**
+         * Saves a file the web app made (review image or PPT) into Downloads/Market Visit,
+         * then opens the share menu for it. Returns where it was saved, or "error: ..." on failure.
+         */
+        @JavascriptInterface
+        public String saveFile(String name, String mime, String base64, boolean share) {
+            try {
+                byte[] bytes = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+                String safe = name.replaceAll("[\\\\/:*?\"<>|]", "_");
+                Uri uri;
+                String where;
+                if (Build.VERSION.SDK_INT >= 29) {
+                    android.content.ContentValues v = new android.content.ContentValues();
+                    v.put(MediaStore.MediaColumns.DISPLAY_NAME, safe);
+                    v.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                    v.put(MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS + "/Market Visit");
+                    v.put(MediaStore.MediaColumns.IS_PENDING, 1);
+                    uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                    if (uri == null) return "error: could not create the file";
+                    try (java.io.OutputStream out = getContentResolver().openOutputStream(uri)) {
+                        out.write(bytes);
+                    }
+                    v.clear();
+                    v.put(MediaStore.MediaColumns.IS_PENDING, 0);
+                    getContentResolver().update(uri, v, null, null);
+                    where = "Downloads/Market Visit";
+                } else {
+                    File dir = new File(getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS), "Market Visit");
+                    if (!dir.exists() && !dir.mkdirs()) return "error: could not create the folder";
+                    File f = new File(dir, safe);
+                    try (java.io.FileOutputStream out = new java.io.FileOutputStream(f)) {
+                        out.write(bytes);
+                    }
+                    uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                    where = "Android/data/" + getPackageName() + "/files/Download/Market Visit";
+                }
+                if (share) {
+                    final Uri shareUri = uri;
+                    runOnUiThread(() -> {
+                        Intent send = new Intent(Intent.ACTION_SEND);
+                        send.setType(mime);
+                        send.putExtra(Intent.EXTRA_STREAM, shareUri);
+                        send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        try {
+                            startActivity(Intent.createChooser(send, "Share " + safe));
+                        } catch (ActivityNotFoundException ignored) {
+                        }
+                    });
+                }
+                return where;
+            } catch (Exception e) {
+                return "error: " + e.getMessage();
+            }
         }
     }
 

@@ -377,9 +377,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
   </div>
   <div class="scroll" style="padding-top:4px"><div id="rvCard"></div>
     <div id="rvBtns" class="hidden" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <button class="btn soft" id="rvImg" style="height:48px">Share image</button>
-      <button class="btn" id="rvPpt" style="height:48px">Download PPT</button>
-    </div></div>
+      <button class="btn soft" id="rvImg" style="height:48px">Save image</button>
+      <button class="btn" id="rvPpt" style="height:48px">Save PPT</button>
+    </div>
+    <div id="rvSaved" class="card hidden" style="margin-top:10px;padding:12px 14px;font-size:14px;line-height:1.45"></div></div>
 </section>
 
 <!-- ============ TL FTD ============ -->
@@ -1197,7 +1198,7 @@ let rvSeq = 0, rvData = null;
 function showReview(arg) {
   const [role, ...rest] = String(arg || '').split('/');
   const name = rest.join('/');
-  const box = $('rvCard'); const seq = ++rvSeq; rvData = null; $('rvBtns').classList.add('hidden');
+  const box = $('rvCard'); const seq = ++rvSeq; rvData = null; $('rvBtns').classList.add('hidden'); $('rvSaved').classList.add('hidden');
   if (!RV_ROLES.includes(role) || !name) { box.innerHTML = '<div class="err">Pick a TL, SS or KAM to review.</div>'; return; }
   box.innerHTML = '<div class="skeleton" style="height:220px"></div><div class="skeleton" style="height:360px;margin-top:12px"></div>';
   api(`/review?role=${role}&name=${encodeURIComponent(name)}`).then((d) => { if (seq === rvSeq) { rvData = d; renderReview(d); $('rvBtns').classList.remove('hidden'); } })
@@ -1248,10 +1249,7 @@ async function shareReview() {
     let blob;
     try { blob = await window.htmlToImage.toBlob(el, opt); } catch { blob = await window.htmlToImage.toBlob(el, { ...opt, skipFonts: true }); }
     if (!blob) throw new Error('Could not make the image.');
-    const fname = `${rvData.name} - ${rvData.role} review ${rvData.period.end}.png`;
-    const file = new File([blob], fname, { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: fname });
-    else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Image saved.'); }
+    await shareOrSave(blob, `${rvData.name} - ${rvData.role} review ${rvData.period.end}.png`, 'image/png');
   } catch (e) { if (e && e.name !== 'AbortError') toast(e.message || 'Could not make the image.', true); }
   b.disabled = false;
 }
@@ -1259,11 +1257,34 @@ $('rvShare').addEventListener('click', shareReview);
 function loadScript(src) {
   return new Promise((ok, bad) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = () => bad(new Error('Could not load. Check your connection.')); document.head.appendChild(sc); });
 }
+const APK_URL = 'https://github.com/samansingh62-ux/market-visit-tracker-api/releases/download/android-latest/MarketVisit.apk';
+function blobToBase64(blob) {
+  return new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = () => bad(new Error('Could not read the file.')); r.readAsDataURL(blob); });
+}
+function showSaved(where, fname) {
+  const box = $('rvSaved'); if (!box) return;
+  box.innerHTML = `<b>Saved</b> to ${esc(where)}<br><span class="note" style="font-size:12px">${esc(fname)}</span>`;
+  box.classList.remove('hidden');
+}
+// Save the file to the phone first (Downloads), then open the share menu.
 async function shareOrSave(blob, fname, mime) {
-  const file = new File([blob], fname, { type: mime });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: fname }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  const inApp = /MarketVisitApp\//.test(navigator.userAgent);
+  if (window.AndroidApp && typeof window.AndroidApp.saveFile === 'function') {
+    const where = window.AndroidApp.saveFile(fname, mime, await blobToBase64(blob), true);
+    if (String(where).startsWith('error')) throw new Error('Could not save: ' + String(where).slice(7));
+    showSaved(where, fname); toast('Saved to ' + where);
+    return;
+  }
+  if (inApp) {   // older app build: it cannot save files yet
+    $('rvSaved').innerHTML = `<b>Update the app to save files.</b> This version of the Market Visit app can't save images or PPTs. <a href="${APK_URL}" style="color:var(--brand);font-weight:700">Download the latest app</a>, install it over this one, then try again.`;
+    $('rvSaved').classList.remove('hidden');
+    return;
+  }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Saved to your downloads.');
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+  showSaved('your Downloads folder', fname); toast('Saved to Downloads');
+  const file = new File([blob], fname, { type: mime });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: fname }); } catch (e) { /* saved already; sharing is optional */ } }
 }
 async function downloadReviewPpt() {
   if (!rvData) return;
