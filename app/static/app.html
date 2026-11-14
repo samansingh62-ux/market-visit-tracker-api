@@ -2232,7 +2232,16 @@ function schemesHtml(row) {
   const card = (inner) => `<div class="card" style="display:flex;flex-direction:column;gap:10px">${inner}</div>`;
   const nextTxt = (n, open) => n && open ? `<span class="note" style="color:var(--brand-ink);font-weight:700">${n.units_more} more → ₹${fmt(n.rate)}/unit (${money(n.payout)})</span>` : '';
   const modelOpen = P.models && !P.models.closed;
-  const lineRow = (l) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(l.series)}</b><span class="num note">${fmt(l.units)} sold${l.slab ? ' · ' + esc(l.slab) + ' · ₹' + fmt(l.rate) + '/unit' : ' · below first slab'}</span>${nextTxt(l.next, modelOpen)}</div><b class="num">${money(l.payout)}</b></div>`;
+  const stockTxt = (l) => {
+    if (l.stock == null || !modelOpen) return '';
+    const a = l.if_all_sold || {};
+    const parts = [];
+    if (l.stock > 0) parts.push(`<span class="note" style="color:var(--good);font-weight:700">In stock ${fmt(l.stock)} → sell all: ${money(a.payout)}${a.extra > 0 ? ` (+${money(a.extra)})` : ''}${a.slab ? ' · ' + esc(a.slab) : ''}</span>`);
+    else parts.push(`<span class="note" style="color:var(--warn);font-weight:700">No stock here: order to earn more</span>`);
+    if (l.stock > 0 && l.next && l.next.stock_short > 0) parts.push(`<span class="note" style="color:var(--warn)">Next slab needs ${fmt(l.next.units_more)} more; stock is ${fmt(l.next.stock_short)} short</span>`);
+    return parts.join('');
+  };
+  const lineRow = (l) => `<div class="kv" style="align-items:flex-start"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><b>${esc(l.series)}</b><span class="num note">${fmt(l.units)} sold${l.slab ? ' · ' + esc(l.slab) + ' · ₹' + fmt(l.rate) + '/unit' : ' · below first slab'}</span>${nextTxt(l.next, modelOpen)}${stockTxt(l)}</div><b class="num">${money(l.payout)}</b></div>`;
 
   // Booster
   const b = S.booster || {};
@@ -2241,14 +2250,16 @@ function schemesHtml(row) {
 
   // Model schemes
   const group = (title, g, period, showUnsold) => {
-    const sold = (g.lines || []).filter((l) => l.units > 0);
-    const unsold = (g.lines || []).filter((l) => !l.units).map((l) => l.series);
+    const show = (l) => l.units > 0 || (modelOpen && l.stock > 0);
+    const sold = (g.lines || []).filter(show);
+    const unsold = (g.lines || []).filter((l) => !show(l)).map((l) => l.series);
     if (!sold.length && !showUnsold) return '';
-    return card(head(title, when(period, '1–15 Nov'), g.payout) +
+    const ex = modelOpen && g.stock_extra > 0 ? `<span class="note" style="color:var(--good);font-weight:700;margin-top:-4px">Selling the stock on hand adds ${money(g.stock_extra)}</span>` : '';
+    return card(head(title, when(period, '1–15 Nov'), g.payout) + ex +
       (sold.length ? `<div>${sold.map(lineRow).join('')}</div>` : '') +
-      (showUnsold && unsold.length ? `<span class="note">Not sold yet: ${unsold.map(esc).join(', ')}</span>` : ''));
+      (showUnsold && unsold.length ? `<span class="note">Not sold yet${modelOpen && sold.some((l) => l.stock != null) ? ', no stock' : ''}: ${unsold.map(esc).join(', ')}</span>` : ''));
   };
-  const modelsLeft = [S.clearance, S.additional].every((g) => !(g.lines || []).some((l) => l.units > 0));
+  const modelsLeft = [S.clearance, S.additional].every((g) => !(g.lines || []).some((l) => l.units > 0 || (modelOpen && l.stock > 0)));
 
   // Back support
   const m = S.back_support || {};
@@ -2268,7 +2279,8 @@ function schemesHtml(row) {
   const sh = S.shared;
   return (sh ? `<div class="alert info" style="font-size:13px;line-height:1.45">Schemes are worked out on the whole retailer: <b>${esc(sh.retailer_name || sh.retailer_code)}</b>, all ${sh.stores} stores together. Every store shows the same figures.</div>` : '') +
     card(`<span class="note" style="font-weight:700">November schemes · provisional</span><b class="num" style="font-size:30px;line-height:1">${money(S.total)}</b>
-      <span class="note">Booster + Focus + Clearance + Additional + Back Support. Paid only with 100% V-Work upload and 90% activation; pre-activation above 5% cuts 20%; MOP breach or infiltration voids it.</span>`) +
+      <span class="note">Booster + Focus + Clearance + Additional + Back Support. Paid only with 100% V-Work upload and 90% activation; pre-activation above 5% cuts 20%; MOP breach or infiltration voids it.</span>
+      ${modelOpen && S.stock_extra > 0 ? `<div class="alert info" style="font-size:13px;line-height:1.45;margin-top:2px"><span><b>+${money(S.stock_extra)} more</b> if the ${fmt(S.stock_units)} scheme-model units in stock here are sold by ${esc(String((P.models || {}).end || '').slice(8))} Nov. Model slabs count sales till then.</span></div>` : ''}`) +
     card(head('Booster', bSub, b.payout) + bBody) +
     group('Focus Model', S.focus || {}, P.models, true) +
     group('Clearance Model', S.clearance || {}, P.models, false) +

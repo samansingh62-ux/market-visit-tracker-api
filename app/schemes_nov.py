@@ -86,23 +86,40 @@ def _find(units, slabs):
     return None
 
 
-def _model_lines(models, table):
-    """Per-series payout plus what the next slab would pay."""
-    lines, total = [], 0
+def _pay(units, slabs):
+    i = _find(units, slabs)
+    rate = slabs[i][2] if i is not None else 0
+    return i, rate, units * rate
+
+
+def _model_lines(models, table, stock=None):
+    """Per-series payout, what the next slab would pay, and what selling the stock on hand would pay."""
+    lines, total, extra = [], 0, 0
     for key, (label, slabs) in table.items():
         units = int((models or {}).get(key) or 0)
-        i = _find(units, slabs)
-        rate = slabs[i][2] if i is not None else 0
-        payout = units * rate
+        i, rate, payout = _pay(units, slabs)
         nxt = None
         j = (i + 1) if i is not None else 0
         if j < len(slabs):
             lo, _hi, nrate = slabs[j]
             nxt = {"units_more": lo - units, "rate": nrate, "payout": lo * nrate}
         total += payout
-        lines.append({"series": label, "units": units, "slab": _slab_label(*slabs[i][:2]) if i is not None else None,
-                      "rate": rate, "payout": payout, "next": nxt})
-    return {"payout": total, "units": sum(x["units"] for x in lines), "lines": lines}
+        line = {"series": label, "units": units, "slab": _slab_label(*slabs[i][:2]) if i is not None else None,
+                "rate": rate, "payout": payout, "next": nxt}
+        if stock is not None:
+            st = int(stock.get(key) or 0)
+            ai, arate, apay = _pay(units + st, slabs)
+            line["stock"] = st
+            line["if_all_sold"] = {"units": units + st, "slab": _slab_label(*slabs[ai][:2]) if ai is not None else None,
+                                   "rate": arate, "payout": apay, "extra": apay - payout}
+            if nxt:
+                line["next"]["stock_short"] = max(nxt["units_more"] - st, 0)   # 0 = the stock on hand is enough
+            extra += apay - payout
+        lines.append(line)
+    out = {"payout": total, "units": sum(x["units"] for x in lines), "lines": lines}
+    if stock is not None:
+        out["stock_extra"] = extra
+    return out
 
 
 def _club_name(value):
@@ -204,10 +221,15 @@ def for_retailer(club, target_value, data, today):
     data = data or {}
     models = data.get("models") or {}
     b = booster(club, data.get("booster"))
-    f = _model_lines(models, FOCUS)
-    c = _model_lines(models, CLEARANCE)
-    a = _model_lines(models, ADDITIONAL)
+    stock = data.get("stock") if isinstance(data.get("stock"), dict) else None
+    f = _model_lines(models, FOCUS, stock)
+    c = _model_lines(models, CLEARANCE, stock)
+    a = _model_lines(models, ADDITIONAL, stock)
     bs = back_support(club, target_value, data.get("month"))
     total = sum(int(x or 0) for x in (b.get("payout"), f["payout"], c["payout"], a["payout"], bs.get("payable")))
-    return {"month": "2026-11", "periods": periods(today), "booster": b, "focus": f, "clearance": c,
-            "additional": a, "back_support": bs, "shopboy": shopboy(data.get("month")), "total": total}
+    out = {"month": "2026-11", "periods": periods(today), "booster": b, "focus": f, "clearance": c,
+           "additional": a, "back_support": bs, "shopboy": shopboy(data.get("month")), "total": total}
+    if stock is not None:
+        out["stock_extra"] = f["stock_extra"] + c["stock_extra"] + a["stock_extra"]
+        out["stock_units"] = sum(int(v or 0) for k, v in stock.items() if k in {**FOCUS, **CLEARANCE, **ADDITIONAL})
+    return out
