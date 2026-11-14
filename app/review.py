@@ -121,5 +121,5 @@ def _parents(perf, role):
     for r in rs:
         if r.get("town_name"):
             towns[r["town_name"]] = towns.get(r["town_name"], 0) + 1
-    return {"ss": common("ss") if role == "TL" else "", "kam": common("kam") if role in ("TL", "SS") else "",
+    return {"ss": common("ss") if role == "TL" else "", "kam": common("kam") if role in ("TL", "SS", "RDS") else "",
             "towns": [t for t, _ in sorted(towns.items(), key=lambda x: -x[1])[:3]]}

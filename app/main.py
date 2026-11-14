@@ -677,6 +677,8 @@ def me(user: dict = Depends(get_current_user)):
 
 
 def _scope(user: dict) -> dict:
+    if isinstance(user.get("_scope"), dict):   # internal: a review limited to the viewer's area
+        return dict(user["_scope"])
     role = user.get("role")
     name = canonical_name(user.get("name"))
 
@@ -948,7 +950,7 @@ def visit_report_view(date_from: Optional[str] = Query(default=None), date_to: O
 
 
 @app.get("/review")
-def person_review(role: str = Query(..., pattern="^(TL|SS|KAM)$"), name: str = Query(..., min_length=2, max_length=80),
+def person_review(role: str = Query(..., pattern="^(TL|SS|KAM|RDS)$"), name: str = Query(..., min_length=2, max_length=80),
                   user: dict = Depends(get_dashboard_user)):
     """One-page review of a TL, SS or KAM: KPIs, each counter, flags and an action plan."""
     name = canonical_name(name)
@@ -963,9 +965,15 @@ def person_review(role: str = Query(..., pattern="^(TL|SS|KAM)$"), name: str = Q
         raise HTTPException(status_code=403, detail="This person is outside your area.")
     if str(user.get("role") or "").upper() == "TL" and not (role == "TL" and name == canonical_name(user.get("name"))):
         raise HTTPException(status_code=403, detail="TLs can see their own review only.")
-    perf = performance_dashboard({"name": name, "role": role})
+    target_user = {"name": name, "role": role}
+    limited = False
+    if role == "RDS" and viewer and canonical_name(viewer.get("rds")) != name:
+        # An RDS spans several areas: a KAM / SS sees only the part of it in their own area.
+        target_user["_scope"] = {**viewer, "rds": name}
+        limited = True
+    perf = performance_dashboard(target_user)
     team = []
-    if role in ("SS", "KAM"):
+    if role in ("SS", "KAM", "RDS"):
         left = max(int(perf["period"].get("days_remaining") or 1), 1)
         for g in (perf.get("hierarchy") or {}).get("tl") or []:
             if g["name"] in review.PLACEHOLDERS or not g.get("target") and not g.get("sales"):
@@ -973,7 +981,9 @@ def person_review(role: str = Query(..., pattern="^(TL|SS|KAM)$"), name: str = Q
             team.append({"name": g["name"], "sales": g["sales"], "target": g["target"], "pct": g.get("achievement_pct"),
                          "ftd": g.get("ftd_sales"), "need": -(-max(g["target"] - g["sales"], 0) // left) if g["target"] else 0})
         team.sort(key=lambda x: (x["pct"] or 0))
-    return review.build(perf, role, name, team)
+    out = review.build(perf, role, name, team)
+    out["limited_to"] = ", ".join(f"{k.upper()} {v}" for k, v in viewer.items() if k != "rds") if limited else ""
+    return out
 
 
 _punched_cache = {}
@@ -2419,7 +2429,7 @@ def competition_trend(months: int = Query(default=3, ge=1, le=12), user: dict = 
 def performance_dashboard(user: dict = Depends(get_dashboard_user)):
     """Cached per user for a short time; the home screen, EOD remarks and
     reports all reuse it instead of each rebuilding it from V-Work."""
-    key = (str(user.get("role") or ""), str(user.get("name") or ""), date.today().isoformat())
+    key = (str(user.get("role") or ""), str(user.get("name") or ""), date.today().isoformat(), str(sorted((user.get("_scope") or {}).items())))
     now = time.monotonic()
     with _perf_cache_lock:
         hit = _perf_cache.get(key)

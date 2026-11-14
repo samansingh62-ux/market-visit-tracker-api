@@ -309,7 +309,7 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
 
     <a class="listCard hidden" href="#/team" id="reviewLink">
       <div class="rank" style="background:#EEF2FF;color:#2F6BFF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 13l3-3 2 2 4-4"/></svg></div>
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Review cards &amp; PPT</b><span class="note">Any TL, SS or KAM: share as image or download a PPT</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Review cards &amp; PPT</b><span class="note">Any TL, SS, KAM or RDS: save as image or PPT</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
 
     <a class="listCard hidden" href="#/ftd" id="ftdLink">
       <div class="rank" style="background:var(--brand-soft);color:var(--brand)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></div>
@@ -965,7 +965,7 @@ function showHome() {
   $('visitReportLink').classList.toggle('hidden', !canSeeVisitReport());
   $('punchedLink').classList.toggle('hidden', !canSeePunched());
   { const r = String(user.role || '').toUpperCase(); const rl = $('reviewLink');
-    rl.classList.toggle('hidden', !(view === 'zone' || ['ADMIN', 'CEO', 'MANAGER', 'VIEWER', 'KAM', 'SS', 'TL'].includes(r)));
+    rl.classList.toggle('hidden', !(view === 'zone' || ['ADMIN', 'CEO', 'MANAGER', 'VIEWER', 'KAM', 'SS', 'TL', 'RDS'].includes(r)));
     rl.href = view !== 'zone' && r === 'TL' ? rvHref('TL', user.name) : '#/team'; }
   $('ftdLink').classList.toggle('hidden', String(user.role || '').toUpperCase() === 'RDS' && view !== 'zone');
   loadVworkPending();
@@ -1191,7 +1191,7 @@ $('vrKam').addEventListener('change', () => { vr.kam = $('vrKam').value; renderV
 $('vrSearch').addEventListener('input', () => { vr.q = $('vrSearch').value; renderVisitReport(); });
 
 /* ---------------- PERSON REVIEW ---------------- */
-const RV_ROLES = ['TL', 'SS', 'KAM'];
+const RV_ROLES = ['TL', 'SS', 'KAM', 'RDS'];
 const rvHref = (role, name) => `#/review/${role}/${encodeURIComponent(name)}`;
 const RV_SKIP = ['VBM-Vacant', 'SS Direct (NPO)', 'Vacant-Zone A', 'Unassigned'];
 let rvSeq = 0, rvData = null;
@@ -1209,7 +1209,7 @@ function renderReview(d) {
   const col = (p) => p == null ? '#94A3B8' : p >= 100 ? '#16A34A' : p >= 50 ? '#F59E0B' : '#E11D48';
   const visit = (n) => n == null ? 'Never' : n === 0 ? 'Today' : n === 1 ? 'Yesterday' : n + 'd ago';
   const now = new Date(Date.now() + 5.5 * 3600e3);
-  const sub = [par.towns && par.towns.join(', '), par.ss && 'SS ' + par.ss, par.kam && 'KAM ' + par.kam, `${S.counters} counters`].filter(Boolean).join(' · ');
+  const sub = [d.limited_to && 'Only ' + d.limited_to + ' area', par.towns && par.towns.join(', '), par.ss && 'SS ' + par.ss, par.kam && 'KAM ' + par.kam, `${S.counters} counters`].filter(Boolean).join(' · ');
   const counterRow = (c) => {
     const dhot = (c.dos || 0) >= 45, vhot = c.days_since_visit == null || c.days_since_visit >= 20;
     return `<div class="tr"><div class="nm"><b>${esc(c.name)}</b>
@@ -2407,7 +2407,7 @@ function renderTeam() {
     const pct = g.target ? g.achievement_pct : null;
     const col = pct == null ? ['var(--bar)', 'var(--ink)'] : pct >= 90 ? ['var(--good-bar)', 'var(--good)'] : pct >= 70 ? ['var(--bar)', 'var(--brand-ink)'] : ['var(--warn-bar)', 'var(--warn)'];
     const r = user.role === 'KAM' ? rec(g.name) : null;
-    const rv = ['tl', 'ss'].includes(teamSeg) && !RV_SKIP.includes(g.name);
+    const rv = ['tl', 'ss', 'rds'].includes(teamSeg) && !RV_SKIP.includes(g.name);
     return `<div class="card row">
       <${rv ? `a href="${rvHref(teamSeg.toUpperCase(), g.name)}"` : 'div'} style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;color:inherit">
         <div class="between"><b class="ellipsis" style="font-size:15px">${esc(g.name)}${rv ? ' <span style="color:var(--brand);font-size:13px">Review ›</span>' : ''}</b><b class="num" style="font-size:15px;color:${col[1]}">${pct == null ? '—' : fmt1(pct) + '%'}</b></div>
