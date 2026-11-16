@@ -3350,3 +3350,28 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: club value snapshot ----
+def _tmp_clubvals():
+    import json as _j
+    time.sleep(50)
+    log = logging.getLogger("uvicorn.error")
+    try:
+        p = performance_dashboard({"name": "Manager", "role": "MANAGER"})
+        seen, rows = set(), []
+        for r in p["retailers"]:
+            sc = r.get("schemes") or {}
+            key = (sc.get("shared") or {}).get("retailer_code") or r["code"]
+            if key in seen or not sc:
+                continue
+            seen.add(key)
+            bs = sc.get("back_support") or {}
+            rows.append([key, bs.get("club_assigned") or "", round(bs.get("counted_value") or 0), round(bs.get("eligible_value") or 0), round(bs.get("target_value") or 0)])
+        log.warning("CLUBV P %s", _j.dumps({"period": p["period"], "n": len(rows)}))
+        for i in range(0, len(rows), 60):
+            log.warning("CLUBV R%02d %s", i // 60, _j.dumps(rows[i:i + 60]))
+    except Exception as exc:
+        log.warning("CLUBV ERR %r", exc)
+import threading as _thr_tmp
+_thr_tmp.Thread(target=_tmp_clubvals, daemon=True).start()
