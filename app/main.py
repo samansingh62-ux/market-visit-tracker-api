@@ -3342,3 +3342,27 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
+
+
+# ---- temporary: export check ----
+def _tmp_export():
+    time.sleep(50)
+    log = logging.getLogger("uvicorn.error")
+    for role, name in (("TL", "Monojit Rudra Paul"), ("KAM", "Sailen Das"), ("RDS", "Star Telecom")):
+        try:
+            t0 = time.time()
+            d = person_review(role=role, name=name, user={"name": "Manager", "role": "MANAGER"})
+            png = review_export.build_png(d); ppt = review_export.build_pptx(d)
+            log.warning("EXPCHK %s %s ok png=%sKB ppt=%sKB %.1fs", role, name, len(png) // 1024, len(ppt) // 1024, time.time() - t0)
+        except Exception as exc:
+            log.warning("EXPCHK %s %s ERR %r", role, name, exc)
+    try:
+        import anyio
+        r = anyio.run(whatsapp_mcp.get_tl_ftd)
+        log.warning("EXPCHK mcp tl_ftd ok tls=%s total=%s", len(r["tls"]), r["total_ftd"])
+        r = anyio.run(whatsapp_mcp.get_scheme_payout, "Afsana")
+        log.warning("EXPCHK mcp scheme ok %s", str(r)[:200])
+    except Exception as exc:
+        log.warning("EXPCHK mcp ERR %r", exc)
+import threading as _thr_tmp
+_thr_tmp.Thread(target=_tmp_export, daemon=True).start()
