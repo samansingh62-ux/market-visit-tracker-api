@@ -245,7 +245,7 @@ button{min-height:44px}
 .perfTable{width:100%;border-collapse:collapse}.perfTable th{background:#f3f1ec;color:#8a8880;font-size:10px;letter-spacing:.07em}.perfTable td{font-size:12px}
 .perfAch{min-width:120px}.perfBar{height:7px;background:#efede8;border-radius:99px;overflow:hidden;margin-top:4px}.perfBar i{height:100%;display:block;background:#2f7dd3;border-radius:99px}
 .perfStatus{display:inline-block;padding:4px 8px;border-radius:99px;font-size:10px;font-weight:800}.perfStatus.track{background:#e9f7ef;color:#247a50}.perfStatus.behind{background:#fff1db;color:#a15b00}.perfStatus.stock{background:#fff0f0;color:#b42318}.perfStatus.none{background:#f2f4f7;color:#667085}
-.perfHierarchyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.perfMiniTable{width:100%;border-collapse:collapse}.perfMiniTable td,.perfMiniTable th{padding:8px 6px;border-bottom:1px solid #eeeae3;font-size:11px}.perfMiniTable th{background:#f8f6f2;color:#89867f}
+.perfHierarchyGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.perfMiniTable{width:100%;border-collapse:collapse}.perfMiniTable td,.perfMiniTable th{padding:8px 6px;border-bottom:1px solid #eeeae3;font-size:11px}.perfMiniTable th{background:#f8f6f2;color:#89867f}
 .perfView.hidden{display:none!important}
 @media(max-width:1000px){.perfKpis{grid-template-columns:repeat(3,1fr)}.perfHierarchyGrid{grid-template-columns:1fr}}
 @media(max-width:700px){
@@ -500,11 +500,13 @@ button{min-height:44px}
     <button class="perfTab" data-perf-tab="retailers">Retailer Wise Status</button>
     <button class="perfTab" data-perf-tab="eod">EOD Remarks</button>
     <button class="perfTab" data-perf-tab="hierarchy">Hierarchy</button>
+    <button class="perfTab" data-perf-tab="sales">Sales calendar</button>
   </div>
   <div class="perfFilterBar">
     <label>Search Retailer<input id="perfSearch" placeholder="Retailer name"></label>
     <label>Status<select id="perfStatusFilter"><option value="">All</option><option>On Track</option><option>Behind</option><option>High Stock</option><option>Out of Stock</option><option>Stock Unmatched</option><option>No Sales</option></select></label>
-    <label id="perfHierarchyFilterWrap">Hierarchy<select id="perfHierarchyFilter"><option value="">All</option></select></label>
+    <label id="perfHierarchyFilterWrap">Level<select id="perfLevelFilter"><option value="">All</option><option value="kam">KAM</option><option value="ss">SS</option><option value="tl">TL</option><option value="rds">RDS</option></select></label>
+    <label id="perfNameWrap">Name<select id="perfHierarchyFilter" disabled><option value="">Pick a level first</option></select></label>
     <button id="perfReset" class="secondary" type="button">Reset</button>
   </div>
   <div class="perfKpis">
@@ -587,11 +589,14 @@ button{min-height:44px}
 
   <div id="perfHierarchyView" class="perfView hidden">
     <div class="perfHierarchyGrid">
+      <div class="perfPanel"><h3>KAM wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>KAM</th><th>Target</th><th>Sales</th><th>Ach%</th><th>Payout</th></tr></thead><tbody id="perfKAMRows"></tbody></table></div></div>
       <div class="perfPanel"><h3>TL wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>TL</th><th>Target</th><th>Sales</th><th>Ach%</th><th>Payout</th></tr></thead><tbody id="perfTLRows"></tbody></table></div></div>
       <div class="perfPanel"><h3>SS wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>SS</th><th>Target</th><th>Sales</th><th>Ach%</th><th>Payout</th></tr></thead><tbody id="perfSSRows"></tbody></table></div></div>
       <div class="perfPanel"><h3>RDS wise</h3><div class="wrap"><table class="perfMiniTable"><thead><tr><th>RDS</th><th>Target</th><th>Sales</th><th>Ach%</th><th>Payout</th></tr></thead><tbody id="perfRDSRows"></tbody></table></div></div>
     </div>
   </div>
+
+  <div id="perfSalesView" class="perfView hidden"></div>
 
   <div id="perfStockView" class="perfView hidden perfPanel">
     <h3>Stock & DOS</h3>
@@ -838,11 +843,11 @@ function filteredPerfRows(){
   let rows=[...(perfData.retailers||[])];
   let search=($('perfSearch').value||'').trim().toLowerCase();
   let status=$('perfStatusFilter').value;
-  let h=$('perfHierarchyFilter').value;
+  let h=$('perfHierarchyFilter').value, lvl=$('perfLevelFilter').value;
   if(search)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(search));
   if(status)rows=rows.filter(r=>r.status===status);
-  if(h)rows=rows.filter(r=>[r.tl,r.ss,r.rds].some(v=>String(v||'').split(' | ').includes(h))).map(r=>{
-    const stores=(perfData.store_sales||[]).filter(s=>s.retailer_code===r.code&&[s.tl,s.ss,s.rds].includes(h));
+  if(h&&lvl)rows=rows.filter(r=>String(r[lvl]||'').split(' | ').includes(h)||(r.assignments||[]).some(a=>a[lvl]===h)).map(r=>{
+    const stores=(perfData.store_sales||[]).filter(s=>s.retailer_code===r.code&&s[lvl]===h);
     const sales=stores.reduce((n,s)=>n+Number(s.sales||0),0);
     const salesValue=stores.reduce((n,s)=>n+Number(s.sales_value||0),0);
     const ftdSales=stores.reduce((n,s)=>n+Number(s.ftd_sales||0),0);
@@ -921,6 +926,7 @@ function renderPerfTables(){
   $('perfVisitRows').innerHTML=visitRows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.last_visit||'Never')}</td><td>${r.days_since_visit==null?'—':r.days_since_visit}</td><td>${r.visit_count}</td><td>${r.sales}</td><td><span class="perfStatus ${r.days_since_visit==null||r.days_since_visit>14?'behind':'track'}">${r.days_since_visit==null?'Never Visited':r.days_since_visit>14?'Overdue':'Covered'}</span></td></tr>`).join('');
 
   const renderHierarchy=(id,arr)=>{$(id).innerHTML=(arr||[]).map(x=>`<tr><td><b>${esc(x.name)}</b><div class="priorityReason">${x.retailers} retailers</div></td><td>${Math.round(Number(x.target||0))}</td><td>${Math.round(Number(x.sales||0))}</td><td>${Math.round(Number(x.achievement_pct||0))}%</td><td><b>${x.total_known_payout==null?'Pending allocation':inr(x.total_known_payout)}</b></td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'};
+  renderHierarchy('perfKAMRows',perfData.hierarchy?.kam);
   renderHierarchy('perfTLRows',perfData.hierarchy?.tl);
   renderHierarchy('perfSSRows',perfData.hierarchy?.ss);
   renderHierarchy('perfRDSRows',perfData.hierarchy?.rds);
@@ -1080,16 +1086,12 @@ async function performanceDashboard(){
   try{
     perfData=await api('/performance-dashboard');
     let role=perfData.user?.role||'';
-    let options=[];
-    if(['MANAGER','ADMIN','CEO','VIEWER'].includes(role)){
-      options=[
-        ...(perfData.hierarchy?.tl||[]).map(x=>x.name),
-        ...(perfData.hierarchy?.ss||[]).map(x=>x.name),
-        ...(perfData.hierarchy?.rds||[]).map(x=>x.name),
-      ];
-    }
-    $('perfHierarchyFilterWrap').style.display=['MANAGER','ADMIN','CEO','VIEWER'].includes(role)?'block':'none';
-    $('perfHierarchyFilter').innerHTML='<option value="">All</option>'+[...new Set(options)].sort().map(x=>`<option>${esc(x)}</option>`).join('');
+    const zone=['MANAGER','ADMIN','CEO','VIEWER'].includes(role);
+    const levels=zone?['kam','ss','tl','rds']:role==='KAM'?['ss','tl','rds']:role==='SS'?['tl']:[];
+    $('perfLevelFilter').innerHTML='<option value="">All</option>'+levels.map(k=>`<option value="${k}">${k.toUpperCase()}</option>`).join('');
+    $('perfHierarchyFilterWrap').style.display=levels.length?'block':'none';
+    $('perfNameWrap').style.display=levels.length?'block':'none';
+    fillPerfNames();
     renderPerfTables();
   }catch(e){
     $('perfRetailerRows').innerHTML='<tr><td colspan="23">Performance dashboard unavailable: '+esc(e.message)+'</td></tr>';
@@ -1831,10 +1833,13 @@ function setPerfTabLayout(tab){
   const isVisit=tab==='visits';
   const isEod=tab==='eod';
   const isSimple=isVisit||isEod;
+  const isSales=tab==='sales';
   const filter=$('performanceDashboard').querySelector('.perfFilterBar');
   const kpis=$('performanceDashboard').querySelector('.perfKpis');
   if(filter)filter.classList.toggle('hidden',isSimple);
-  if(kpis)kpis.classList.toggle('hidden',isSimple);
+  if(kpis){kpis.classList.toggle('hidden',isSimple||isSales);kpis.style.display=(isSimple||isSales)?'none':'';}
+  if($('perfSalesView'))$('perfSalesView').classList.toggle('hidden',!isSales);
+  if(isSales)showSalesCalendar();
 
   const mainKpis=document.querySelector('#dashboardHome > .kpiGrid');
   const mainPanels=document.querySelector('#dashboardHome > .panelGrid');
@@ -1872,8 +1877,9 @@ document.querySelectorAll('.perfTab').forEach(btn=>btn.onclick=()=>{
 });
 $('perfSearch').oninput=renderPerfTables;
 $('perfStatusFilter').onchange=renderPerfTables;
-$('perfHierarchyFilter').onchange=renderPerfTables;
-$('perfReset').onclick=()=>{$('perfSearch').value='';$('perfStatusFilter').value='';$('perfHierarchyFilter').value='';renderPerfTables()};
+$('perfHierarchyFilter').onchange=()=>{renderPerfTables();if(document.querySelector('.perfTab.active')?.dataset.perfTab==='sales')runSalesCalendar();};
+$('perfLevelFilter').onchange=()=>{fillPerfNames();renderPerfTables();if(document.querySelector('.perfTab.active')?.dataset.perfTab==='sales')runSalesCalendar();};
+$('perfReset').onclick=()=>{$('perfSearch').value='';$('perfStatusFilter').value='';$('perfLevelFilter').value='';fillPerfNames();renderPerfTables()};
 $('eodRetailer').onchange=syncEodRemark;
 $('eodSave').onclick=saveEodRemark;
 $('eodExportExcel').onclick=downloadEodRemarks;
@@ -1996,4 +2002,81 @@ $('visitPhotoModal').onclick=e=>{if(e.target===$('visitPhotoModal'))closeVisitPh
 setStatus(false,'Checking...');
 checkConnection();
 if(token&&user)showApp().catch(()=>logout());
+</script><script>
+/* Level -> name picker and the sales calendar (range-wise sales) */
+function fillPerfNames(){
+  const lvl=$('perfLevelFilter').value, sel=$('perfHierarchyFilter'), prev=sel.value;
+  if(!lvl||!perfData){sel.innerHTML='<option value="">Pick a level first</option>';sel.disabled=true;return;}
+  const skip=['Unassigned','VBM-Vacant','SS Direct (NPO)','Vacant-Zone A'];
+  const names=[...new Set((perfData.hierarchy?.[lvl]||[]).map(x=>x.name).filter(n=>n&&!skip.includes(n)))].sort();
+  sel.innerHTML=`<option value="">All ${lvl.toUpperCase()}s (${names.length})</option>`+names.map(n=>`<option ${n===prev?'selected':''}>${esc(n)}</option>`).join('');
+  sel.disabled=false;
+}
+const IST_TODAY=()=>new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
+const shiftDay=(d,n)=>new Date(new Date(d+'T00:00:00Z').getTime()+n*864e5).toISOString().slice(0,10);
+let salesCal={from:'',to:'',seq:0};
+function showSalesCalendar(){
+  const box=$('perfSalesView'); if(box.dataset.ready)return;
+  box.dataset.ready='1';
+  const t=IST_TODAY(); salesCal.from=salesCal.from||t.slice(0,8)+'01'; salesCal.to=salesCal.to||t;
+  box.innerHTML=`<div class="perfPanel" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div><h3 style="margin:0">Sales calendar</h3><div class="perfSub">Sell-out for any date range up to 62 days, from V-Work. Use Level and Name above to see one KAM, SS, TL or RDS.</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <label>From<input type="date" id="scFrom" min="2025-01-01"></label>
+        <label>To<input type="date" id="scTo" min="2025-01-01"></label>
+        <button id="scGo" class="primary" type="button">Show sales</button>
+      </div></div>
+    <div id="scQuick" style="display:flex;gap:8px;flex-wrap:wrap">${[['today','Today'],['yesterday','Yesterday'],['last7','Last 7 days'],['mtd','This month'],['lastmonth','Last month'],['lymtd','This month last year']].map(([k,l])=>`<button type="button" class="secondary" data-q="${k}">${l}</button>`).join('')}</div>
+    <div id="scResult"></div></div>`;
+  $('scFrom').value=salesCal.from;$('scTo').value=salesCal.to;$('scFrom').max=$('scTo').max=t;
+  $('scGo').onclick=()=>{salesCal.from=$('scFrom').value;salesCal.to=$('scTo').value;runSalesCalendar();};
+  $('scQuick').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{
+    const t=IST_TODAY(),q=b.dataset.q;let f=t,e=t;
+    if(q==='yesterday'){f=e=shiftDay(t,-1);}
+    else if(q==='last7'){f=shiftDay(t,-6);}
+    else if(q==='mtd'){f=t.slice(0,8)+'01';}
+    else if(q==='lastmonth'){const first=t.slice(0,8)+'01';e=shiftDay(first,-1);f=e.slice(0,8)+'01';}
+    else if(q==='lymtd'){const y=String(+t.slice(0,4)-1);f=y+t.slice(4,8)+'01';e=y+t.slice(4);}
+    $('scFrom').value=salesCal.from=f;$('scTo').value=salesCal.to=e;runSalesCalendar();
+  });
+  runSalesCalendar();
+}
+async function runSalesCalendar(){
+  if(!$('scResult'))return;
+  const f=salesCal.from,t=salesCal.to,box=$('scResult');
+  let err='';
+  if(!f||!t)err='Pick both dates.';else if(t<f)err='The To date is before the From date.';else if(t>IST_TODAY())err='The To date can’t be in the future.';
+  else if((new Date(t)-new Date(f))/864e5+1>62)err='Pick 62 days or fewer.';
+  if(err){box.innerHTML=`<div class="perfSub" style="color:#c0392b;font-weight:700">${esc(err)}</div>`;return;}
+  const lvl=$('perfLevelFilter').value,name=$('perfHierarchyFilter').value;
+  const qs=new URLSearchParams({from:f,to:t});if(lvl&&name)qs.set(lvl,name);
+  const seq=++salesCal.seq;const days=(new Date(t)-new Date(f))/864e5+1;
+  box.innerHTML=`<div class="perfSub">Loading ${esc(f)} to ${esc(t)}${lvl&&name?' for '+esc(name):''}… ${days>10?'Long ranges can take up to a minute the first time.':''}</div>`;
+  $('scGo').disabled=true;
+  try{const d=await api('/sales/by-date?'+qs);if(seq===salesCal.seq)renderSalesCalendar(d,lvl&&name?`${lvl.toUpperCase()} ${name}`:'');}
+  catch(e){if(seq===salesCal.seq)box.innerHTML=`<div class="perfSub" style="color:#c0392b;font-weight:700">${esc(e.message)}</div>`;}
+  finally{if(seq===salesCal.seq)$('scGo').disabled=false;}
+}
+function renderSalesCalendar(d,who){
+  const T=d.totals||{},P=d.period||{},daily=d.daily||[];
+  const n=v=>Math.round(Number(v||0)).toLocaleString('en-IN');
+  const peak=Math.max(1,...daily.map(x=>x.units));
+  const best=daily.reduce((a,x)=>x.units>(a?a.units:-1)?x:a,null);
+  const day=x=>new Date(x+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  const mini=(title,rows)=>rows&&rows.length?`<div class="perfPanel"><h3>${title}</h3><div class="wrap" style="max-height:340px;overflow:auto"><table class="perfMiniTable"><thead><tr><th>Name</th><th>Units</th><th>Value</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${n(r.units)}</td><td>${inr(r.value)}</td></tr>`).join('')}</tbody></table></div></div>`:'';
+  $('scResult').innerHTML=`
+    <div class="perfKpis" style="margin:0">
+      <div class="perfKpi"><span>Units</span><b>${n(T.units)}</b></div><div class="perfKpi"><span>Value</span><b>${inr(T.value)}</b></div>
+      <div class="perfKpi"><span>Per day</span><b>${n(T.per_day)}</b></div><div class="perfKpi"><span>ASP</span><b>${inr(T.asp)}</b></div>
+      <div class="perfKpi"><span>Counters sold</span><b>${n(T.counters_selling)}</b></div><div class="perfKpi"><span>Days</span><b>${n(P.days)}</b></div></div>
+    <div class="perfSub" style="margin-top:6px"><b>${esc(P.start)} to ${esc(P.end)}</b>${who?' · '+esc(who):''}${best?` · best day ${day(best.date)} (${n(best.units)})`:''}</div>
+    ${daily.length>1?`<div class="perfPanel" style="margin-top:10px"><h3>Day by day</h3><div style="display:flex;align-items:flex-end;gap:${daily.length>31?1:4}px;height:160px;padding-top:8px">${daily.map(x=>`<div title="${day(x.date)}: ${n(x.units)} units · ${inr(x.value)}" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%"><span style="font-size:10px;color:#71809a">${daily.length<=31?n(x.units):''}</span><div style="width:100%;height:${Math.max(2,Math.round(x.units/peak*130))}px;background:${x===best?'#2F6BFF':'#C9D6F5'};border-radius:3px 3px 0 0"></div></div>`).join('')}</div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#71809a;margin-top:4px"><span>${day(daily[0].date)}</span><span>${day(daily[daily.length-1].date)}</span></div></div>`:''}
+    <div class="perfHierarchyGrid" style="margin-top:12px">
+      ${mini('Models',(d.models||[]).map(m=>({name:m.model,units:m.units,value:m.value})))}
+      ${mini('KAM wise',d.kams)}${mini('SS wise',d.sss)}${mini('TL wise',d.tls)}${mini('RDS wise',d.rdss)}
+      ${(d.counters||[]).length?`<div class="perfPanel"><h3>Top counters</h3><div class="wrap" style="max-height:340px;overflow:auto"><table class="perfMiniTable"><thead><tr><th>Counter</th><th>TL</th><th>Units</th><th>Value</th></tr></thead><tbody>${d.counters.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.tl||'')}</td><td>${n(c.units)}</td><td>${inr(c.value)}</td></tr>`).join('')}</tbody></table></div></div>`:''}
+    </div>`;
+}
 </script><script src="/web-features.js"></script></body></html>

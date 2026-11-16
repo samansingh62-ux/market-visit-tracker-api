@@ -351,6 +351,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
         <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">From<input class="box" type="date" id="salesFrom" min="2025-01-01"></label>
         <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">To<input class="box" type="date" id="salesTo" min="2025-01-01"></label>
       </div>
+      <div id="salesWhoBox" class="hidden" style="display:grid;grid-template-columns:1fr 1.6fr;gap:10px">
+        <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">Level<select class="box" id="salesLevel"></select></label>
+        <label class="lbl" style="font-size:13px;color:var(--muted);font-weight:700">Name<select class="box" id="salesName" disabled><option value="">Everyone</option></select></label>
+      </div>
       <button class="btn" id="salesGo" style="height:50px">Show sales</button>
       <span class="note" id="salesScope"></span>
     </div>
@@ -1044,8 +1048,25 @@ function showSales() {
     $('salesFrom').value = def[0]; $('salesTo').value = def[1];
   }
   $('salesScope').textContent = 'Showing ' + (view === 'zone' ? 'all of Zone A' : ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) ? 'all of Zone A' : 'your area') + ' · up to 62 days at a time';
+  const zone = view === 'zone' || ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role);
+  const levels = zone ? ['kam', 'ss', 'tl', 'rds'] : user.role === 'KAM' ? ['ss', 'tl', 'rds'] : user.role === 'SS' ? ['tl'] : [];
+  $('salesWhoBox').classList.toggle('hidden', !levels.length);
+  if (levels.length && !$('salesLevel').options.length) {
+    $('salesLevel').innerHTML = '<option value="">Everyone</option>' + levels.map((k) => `<option value="${k}">${k.toUpperCase()}</option>`).join('');
+    whenLoaded(load('perf', '/performance-dashboard'), () => fillSalesNames(), () => {});
+  }
   runSales();
 }
+function fillSalesNames() {
+  const lvl = $('salesLevel').value, sel = $('salesName');
+  const h = ((cache.perf || {}).data || {}).hierarchy || {};
+  const skip = ['Unassigned', 'VBM-Vacant', 'SS Direct (NPO)', 'Vacant-Zone A'];
+  const names = lvl ? [...new Set((h[lvl] || []).map((x) => x.name).filter((n) => n && !skip.includes(n)))].sort() : [];
+  sel.innerHTML = `<option value="">${lvl ? 'All ' + lvl.toUpperCase() + 's (' + names.length + ')' : 'Everyone'}</option>` + names.map((n) => `<option>${esc(n)}</option>`).join('');
+  sel.disabled = !lvl;
+}
+$('salesLevel').addEventListener('change', () => { fillSalesNames(); runSales(); });
+$('salesName').addEventListener('change', () => runSales());
 $('salesQuick').addEventListener('click', (e) => {
   const b = e.target.closest('[data-q]'); if (!b) return;
   const r = salesQuick(b.dataset.q).map(isoDay);
@@ -1073,7 +1094,8 @@ async function runSales() {
   box.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>Loading ${days === 1 ? shortDay(from) : shortDay(from) + ' – ' + shortDay(to)}…</b><span class="note">${days > 10 ? 'A long range reads each day from V-Work and can take up to a minute the first time.' : 'Reading V-Work…'}</span><div class="skeleton" style="height:120px"></div></div>`;
   $('salesGo').disabled = true;
   try {
-    const d = await api(`/sales/by-date?from=${from}&to=${to}`);
+    const lvl = $('salesLevel').value, who = $('salesName').value;
+    const d = await api(`/sales/by-date?from=${from}&to=${to}` + (lvl && who ? `&${lvl}=${encodeURIComponent(who)}` : ''));
     if (seq === salesSeq) renderSales(d);
   } catch (e) {
     if (seq === salesSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="runSales()">Try again</button>`;
@@ -1094,11 +1116,15 @@ function renderSales(d) {
       <details><summary class="note" style="cursor:pointer">See each day</summary><div style="padding-top:4px">${daily.slice().reverse().map((x) => `<div class="kv"><span>${new Date(x.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</span><b class="num">${fmt(x.units)} <span class="note" style="font-weight:500">· ${money(x.value)}</span></b></div>`).join('')}</div></details>
     </div>` : '';
   const models = (d.models || []).slice(0, 10);
-  const team = ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) || view === 'zone' ? { title: 'By KAM', rows: d.kams || [] } : user.role === 'KAM' ? { title: 'By TL', rows: d.tls || [] } : null;
+  const f = d.filter || {};
+  const zoneU = ['CEO', 'ADMIN', 'VIEWER', 'MANAGER'].includes(user.role) || view === 'zone';
+  const teams = f.tl ? [] : f.ss ? [{ title: 'By TL', rows: d.tls || [] }] : f.kam ? [{ title: 'By SS', rows: d.sss || [] }, { title: 'By TL', rows: d.tls || [] }]
+    : f.rds ? [{ title: 'By TL', rows: d.tls || [] }] : zoneU ? [{ title: 'By KAM', rows: d.kams || [] }, { title: 'By SS', rows: d.sss || [] }, { title: 'By TL', rows: d.tls || [] }]
+    : user.role === 'KAM' ? [{ title: 'By SS', rows: d.sss || [] }, { title: 'By TL', rows: d.tls || [] }] : user.role === 'SS' ? [{ title: 'By TL', rows: d.tls || [] }] : [];
   const counters = (d.counters || []).slice(0, 30);
   $('salesResult').innerHTML = `
     <div class="hero" style="gap:12px">
-      <div class="lite" style="font-size:14px;font-weight:600">${esc(label)}</div>
+      <div class="lite" style="font-size:14px;font-weight:600">${esc(label)}${Object.keys(f).length ? ' · ' + esc(Object.entries(f).map(([k, v]) => k.toUpperCase() + ' ' + v).join(', ')) : ''}</div>
       <div style="display:flex;align-items:baseline;gap:8px"><div class="num" style="font-size:40px;font-weight:800;line-height:1">${fmt(t.units)}</div><div class="lite" style="font-size:15px;font-weight:600">units</div></div>
       <div class="grid3" style="gap:8px">
         <div class="heroTile"><span>Value</span><b class="num" style="font-size:16px">${money(t.value)}</b></div>
@@ -1108,7 +1134,7 @@ function renderSales(d) {
     </div>
     ${chart}
     <div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">Models</div>${models.map((m) => `<div class="kv"><span>${esc(m.model)}</span><b class="num">${fmt(m.units)}</b></div>`).join('') || '<div class="kv note">No sales in these dates.</div>'}</div>
-    ${team && team.rows.length ? `<div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">${team.title}</div>${team.rows.map((r) => `<div class="kv"><span>${esc(r.name)}</span><b class="num">${fmt(r.units)}</b></div>`).join('')}</div>` : ''}
+    ${teams.filter((tm) => tm.rows.length).map((tm) => `<div class="card" style="padding:6px 16px"><div class="kv" style="font-weight:800">${tm.title}</div>${tm.rows.map((r) => `<div class="kv"><span>${esc(r.name)}</span><b class="num">${fmt(r.units)}</b></div>`).join('')}</div>`).join('')}
     ${counters.length ? `<div class="sectionHead"><h2>Top counters</h2><span class="note">${fmt(t.counters_selling)} sold</span></div>
     <div style="display:flex;flex-direction:column;gap:8px">${counters.map((c, i) => `<a class="listCard" href="#/r/${encodeURIComponent(c.code)}"><div class="rank num">${i + 1}</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(c.name)}</b><span class="note ellipsis">${esc([c.tl, c.ss].filter(Boolean).join(' · '))}</span></div><b class="num" style="font-size:17px">${fmt(c.units)}</b></a>`).join('')}</div>` : ''}`;
 }
@@ -2405,7 +2431,7 @@ function renderTeam() {
     <div class="stat" style="align-items:center"><span>Achieved</span><b class="num" style="font-size:16px;color:var(--brand)">${fmt1(s.achievement_pct)}%</b></div>
     <div class="stat" style="align-items:flex-end"><span>Need / day</span><b class="num" style="font-size:16px;color:var(--warn)">${fmt(Math.ceil(s.required_per_day || 0))}</b></div>`;
   const own = { TL: 'tl', SS: 'ss', RDS: 'rds' }[user.role];
-  const segs = ['tl', 'ss', 'rds'].filter((k) => k !== own && (h[k] || []).filter((g) => g.name !== 'Unassigned').length);
+  const segs = ['kam', 'tl', 'ss', 'rds'].filter((k) => k !== own && !(k === 'kam' && user.role === 'KAM') && (h[k] || []).filter((g) => g.name !== 'Unassigned').length);
   if (!segs.length) { $('teamSeg').innerHTML = ''; $('teamList').innerHTML = '<div class="card note">No team breakdown for your role.</div>'; $('teamAll').innerHTML = RV_ROLES.includes(String(user.role || '').toUpperCase()) ? `<a class="btn soft" style="height:44px" href="${rvHref(String(user.role).toUpperCase(), user.name)}">My review card</a>` : ''; return; }
   if (!segs.includes(teamSeg)) teamSeg = segs[0];
   $('teamSeg').style.gridTemplateColumns = `repeat(${segs.length},minmax(0,1fr))`;
@@ -2419,7 +2445,7 @@ function renderTeam() {
     const pct = g.target ? g.achievement_pct : null;
     const col = pct == null ? ['var(--bar)', 'var(--ink)'] : pct >= 90 ? ['var(--good-bar)', 'var(--good)'] : pct >= 70 ? ['var(--bar)', 'var(--brand-ink)'] : ['var(--warn-bar)', 'var(--warn)'];
     const r = user.role === 'KAM' ? rec(g.name) : null;
-    const rv = ['tl', 'ss', 'rds'].includes(teamSeg) && !RV_SKIP.includes(g.name);
+    const rv = ['tl', 'ss', 'rds', 'kam'].includes(teamSeg) && !RV_SKIP.includes(g.name);
     return `<div class="card row">
       <${rv ? `a href="${rvHref(teamSeg.toUpperCase(), g.name)}"` : 'div'} style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;color:inherit">
         <div class="between"><b class="ellipsis" style="font-size:15px">${esc(g.name)}${rv ? ' <span style="color:var(--brand);font-size:13px">Review ›</span>' : ''}</b><b class="num" style="font-size:15px;color:${col[1]}">${pct == null ? '—' : fmt1(pct) + '%'}</b></div>

@@ -2255,14 +2255,20 @@ _range_lock = __import__("threading").Lock()
 def sales_by_date(
     start: str = Query(alias="from"),
     end: str = Query(alias="to"),
+    kam: Optional[str] = Query(default=None, max_length=80),
+    ss: Optional[str] = Query(default=None, max_length=80),
+    tl: Optional[str] = Query(default=None, max_length=80),
+    rds: Optional[str] = Query(default=None, max_length=80),
     user: dict = Depends(get_dashboard_user),
 ):
-    """Sell-out for a past date range in the user's area (or the zone view)."""
+    """Sell-out for a past date range in the user's area (or the zone view).
+    kam / ss / tl / rds narrow it to one person; they can never widen the user's own area."""
     try:
         d1, d2 = date.fromisoformat(start), date.fromisoformat(end)
     except ValueError:
         raise HTTPException(status_code=400, detail="Dates must be YYYY-MM-DD.")
-    scope = _scope(user)
+    narrow = {k: canonical_name(v) for k, v in (("kam", kam), ("ss", ss), ("tl", tl), ("rds", rds)) if v and v.strip()}
+    scope = {**narrow, **_scope(user)}   # the user's own scope always wins
     key = (tuple(sorted(scope.items())), d1.isoformat(), d2.isoformat())
     now = time.monotonic()
     with _range_lock:
@@ -2285,7 +2291,7 @@ def sales_by_date(
         raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Sales for these dates are unavailable: {exc}") from exc
-    result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}}
+    result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}, "filter": narrow}
     with _range_lock:
         _range_cache[key] = (time.monotonic(), result)
     return result
@@ -2768,8 +2774,8 @@ def _build_performance_dashboard(user: dict):
         if r.get("tl"):
             tl_parents.setdefault(canonical_name(r["tl"]), (r.get("kam") or "", r.get("ss") or ""))
     hierarchy = {}
-    for field in ("tl", "ss", "rds"):
-        explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper())
+    for field in ("tl", "ss", "rds", "kam"):
+        explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper()) if field != "kam" else {}
         groups = {}
         for store in store_sales:
             name = store.get(field) or "Unassigned"
