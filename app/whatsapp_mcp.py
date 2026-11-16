@@ -239,6 +239,122 @@ def send_tl_broadcast(request_id: RequestID, confirm_send: bool = False) -> dict
     return once(request_id, {'operation': 'tl_broadcast'}, action)
 
 
+# ---------------- Zone A data tools (read only, whole zone) ----------------
+ZONE = {'name': 'Manager', 'role': 'MANAGER', 'tl': None, 'ss': None, 'rds': None}
+data_read = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=False)
+Name = Annotated[str, Field(min_length=2, max_length=80)]
+
+
+def _main():
+    from . import main   # imported late: main imports this module
+    return main
+
+
+async def _run(fn, *args, **kwargs):
+    import anyio
+    try:
+        return await anyio.to_thread.run_sync(lambda: fn(*args, **kwargs))
+    except HTTPException as exc:
+        return {'error': exc.detail, 'status': exc.status_code}
+
+
+@mcp.tool(annotations=data_read)
+async def get_review(role: Annotated[str, Field(pattern=r'^(TL|SS|KAM|RDS)$')], name: Name) -> dict:
+    """Review of one TL, SS, KAM or RDS: month so far, today's sale, flags, TLs under them,
+    counters (up to 40, biggest first) and a 5-point action plan."""
+    m = _main()
+    d = await _run(m.person_review, role=role, name=name, user=ZONE)
+    if 'error' in d:
+        return d
+    d['counters_total'] = len(d['counters'])
+    d['counters'] = d['counters'][:40]
+    return d
+
+
+@mcp.tool(annotations=data_read)
+async def get_tl_ftd(kam: Name | None = None) -> dict:
+    """Today's sale (FTD) by TL against the units each needs per day to reach the month target."""
+    m = _main()
+    perf = await _run(m.performance_dashboard, ZONE)
+    left = max(int((perf.get('period') or {}).get('days_remaining') or 1), 1)
+    rows = []
+    for t in (perf.get('hierarchy') or {}).get('tl') or []:
+        if not t.get('name') or t['name'] in ('Unassigned',) or (kam and t.get('kam') != kam):
+            continue
+        before = int(t.get('sales') or 0) - int(t.get('ftd_sales') or 0)
+        need = -(-max(int(t.get('target') or 0) - before, 0) // left) if t.get('target') else None
+        rows.append({'tl': t['name'], 'kam': t.get('kam'), 'ss': t.get('ss'), 'ftd_units': t.get('ftd_sales'),
+                     'ftd_value': round(t.get('ftd_sales_value') or 0), 'need_today': need,
+                     'pct_of_need': round(t['ftd_sales'] * 100 / need, 1) if need else None,
+                     'counters_sold_today': t.get('ftd_counters'), 'counters': t.get('retailers'),
+                     'mtd': t.get('sales'), 'target': t.get('target')})
+    rows.sort(key=lambda r: -(r['ftd_units'] or 0))
+    return {'date': (perf.get('period') or {}).get('end'), 'days_left_incl_today': left,
+            'total_ftd': sum(r['ftd_units'] or 0 for r in rows), 'total_need': sum(r['need_today'] or 0 for r in rows), 'tls': rows}
+
+
+@mcp.tool(annotations=data_read)
+async def get_scheme_payout(retailer: Annotated[str, Field(min_length=3, max_length=120)]) -> dict:
+    """November scheme payout for one retailer (code or part of the name): booster, focus, clearance,
+    additional and back support, with stock on hand per series and the payout if it is all sold."""
+    m = _main()
+    perf = await _run(m.performance_dashboard, ZONE)
+    q = retailer.strip().lower()
+    hits = [r for r in perf.get('retailers') or [] if r.get('code', '').lower() == q] or \
+           [r for r in perf.get('retailers') or [] if q in str(r.get('name') or '').lower()]
+    if not hits:
+        return {'error': 'No retailer matches that code or name.'}
+    if len({(r.get('schemes') or {}).get('shared', {}).get('retailer_code') or r['code'] for r in hits}) > 1:
+        return {'matches': [{'code': r['code'], 'name': r['name'], 'tl': r.get('tl')} for r in hits[:15]],
+                'note': 'Several retailers match; ask again with the code.'}
+    r = hits[0]
+    return {'code': r['code'], 'name': r['name'], 'tl': r.get('tl'), 'club': r.get('club'), 'schemes': r.get('schemes')}
+
+
+@mcp.tool(annotations=data_read)
+async def get_focus_models(variant: Annotated[str, Field(max_length=80)] | None = None) -> dict:
+    """Focus-model target vs achievement for Zone A; with a variant, the counters not moving it,
+    counters with a target but no stock, and VBAs at zero."""
+    m = _main()
+    d = await _run(m.focus_models_view, variant, ZONE)
+    det = d.get('detail') if isinstance(d, dict) else None
+    if det:
+        for k in ('not_moving', 'no_stock_with_target', 'vbas_zero'):
+            det[k + '_total'] = len(det[k])
+            det[k] = det[k][:40]
+    return d
+
+
+@mcp.tool(annotations=data_read)
+async def get_punched_sales(kam: Name | None = None) -> dict:
+    """VBA / RVBA / FVBA punched sales against target and what TLs and SSs punched themselves,
+    from the latest uploaded tertiary dashboard."""
+    m = _main()
+    d = await _run(m.punched_sales, None, ZONE)
+    if 'error' in d or not d.get('as_of'):
+        return d
+    vb = [v for v in d['vbas'] if not kam or v.get('kam') == kam]
+    own = [o for o in d['own'] if not kam or o.get('kam') == kam]
+    return {'as_of': d['as_of'], 'totals': d['totals'], 'vbas_total': len(vb), 'vbas_zero_sale': sum(1 for v in vb if not v['units']),
+            'lowest_vbas': vb[:30], 'tl_ss_own': own[:40]}
+
+
+@mcp.tool(annotations=data_read)
+async def get_visit_report(date_from: Annotated[str, Field(pattern=r'^\d{4}-\d{2}-\d{2}$')] | None = None,
+                           date_to: Annotated[str, Field(pattern=r'^\d{4}-\d{2}-\d{2}$')] | None = None,
+                           kam: Name | None = None) -> dict:
+    """Outlets visited and remarks by TL, SS and KAM, and TL-wise outlets per day (default: this month)."""
+    m = _main()
+    d = await _run(m.visit_report_view, date_from, date_to, ZONE)
+    if 'error' in d:
+        return d
+    people = [p for p in d['people'] if not kam or p['kam'] == kam or p['name'] == kam]
+    for p in people:
+        p['recent_visits'] = p.pop('visits')[-10:]
+    return {'date_from': d['date_from'], 'date_to': d['date_to'], 'people': people,
+            'tl_daily': [t for t in d['tl_daily'] if not kam or t['kam'] == kam], 'dates': d['dates']}
+
+
 class BearerAuth:
     def __init__(self, app):
         self.app = app

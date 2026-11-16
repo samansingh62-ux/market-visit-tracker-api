@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Fil
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
-from . import crud, database, schemes_nov, focus_models, visit_report, punched, review
+from . import crud, database, schemes_nov, focus_models, visit_report, punched, review, review_export
 from .alignment import alignment, canonical_name
 from . import whatsapp_mcp
 from . import engage, engage_routes
@@ -366,6 +366,16 @@ def mobile_manifest():
 @app.get("/app/icon.svg", include_in_schema=False)
 def mobile_icon():
     return FileResponse(STATIC_DIR / "icon.svg", media_type="image/svg+xml")
+
+
+@app.get("/api-guide", include_in_schema=False)
+def api_guide():
+    return FileResponse(STATIC_DIR / "api-guide.html", media_type="text/html", headers=_APP_NO_CACHE)
+
+
+@app.get("/web-features.js", include_in_schema=False)
+def web_features_js():
+    return FileResponse(STATIC_DIR / "web-features.js", media_type="application/javascript", headers=_APP_NO_CACHE)
 
 
 @app.get("/app/pptxgen.js", include_in_schema=False)
@@ -984,6 +994,31 @@ def person_review(role: str = Query(..., pattern="^(TL|SS|KAM|RDS)$"), name: str
     out = review.build(perf, role, name, team)
     out["limited_to"] = ", ".join(f"{k.upper()} {v}" for k, v in viewer.items() if k != "rds") if limited else ""
     return out
+
+
+def _download(data: bytes, filename: str, media_type: str) -> Response:
+    from urllib.parse import quote
+    ascii_name = filename.encode("ascii", "ignore").decode() or "download"
+    return Response(content=data, media_type=media_type, headers={
+        "Content-Disposition": f"attachment; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(filename)}",
+        "Cache-Control": "no-store"})
+
+
+@app.get("/review/image")
+def person_review_image(role: str = Query(..., pattern="^(TL|SS|KAM|RDS)$"), name: str = Query(..., min_length=2, max_length=80),
+                        user: dict = Depends(get_dashboard_user)):
+    """The review card as a PNG (same access rules as /review)."""
+    d = person_review(role=role, name=name, user=user)
+    return _download(review_export.build_png(d), review_export.file_name(d, "png"), "image/png")
+
+
+@app.get("/review/ppt")
+def person_review_ppt(role: str = Query(..., pattern="^(TL|SS|KAM|RDS)$"), name: str = Query(..., min_length=2, max_length=80),
+                      user: dict = Depends(get_dashboard_user)):
+    """The review as a PowerPoint deck (same access rules as /review)."""
+    d = person_review(role=role, name=name, user=user)
+    return _download(review_export.build_pptx(d), review_export.file_name(d, "pptx"),
+                     "application/vnd.openxmlformats-officedocument.presentationml.presentation")
 
 
 _punched_cache = {}

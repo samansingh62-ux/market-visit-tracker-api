@@ -819,7 +819,7 @@ async function showApp(){if(!token||!user)return; setStatus(true,'Connected');$(
   load().catch(e=>{console.error(e);msg('authMsg','Dashboard refresh failed: '+e.message)});
   if(user.role==='ADMIN'){adminKey=PIN_ADMIN;loadAdminUsers().catch(()=>{})}
 }
-function logout(){closeHighDosWarning();token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
+function logout(){window.dispatchEvent(new Event('wf:logout'));closeHighDosWarning();token='';user=null;managerMode=false;adminKey='';sessionStorage.removeItem('mvt_token');sessionStorage.removeItem('mvt_user');if($('kamWhatsappNav'))$('kamWhatsappNav').classList.add('hidden');if($('kamWhatsappPanel'))$('kamWhatsappPanel').classList.add('hidden');if($('kamManagementNav'))$('kamManagementNav').classList.add('hidden');if($('kamManagementPanel'))$('kamManagementPanel').classList.add('hidden');$('managerNav').classList.add('hidden');$('managerPanel').classList.add('hidden');$('app').classList.add('hidden');$('authPanel').classList.remove('hidden');$('authPanel').classList.remove('hidden');setStatus(false,'Disconnected');msg('authMsg','Logged out.',true)}
 async function load(){await Promise.all([stats(),retailers(),visits(),coverage(),health(),priorities(),myTargetPerformance(),performanceDashboard(),performanceTrends()])}
 let perfData=null;
 
@@ -1996,4 +1996,4 @@ $('visitPhotoModal').onclick=e=>{if(e.target===$('visitPhotoModal'))closeVisitPh
 setStatus(false,'Checking...');
 checkConnection();
 if(token&&user)showApp().catch(()=>logout());
-</script></body></html>
+</script><script src="/web-features.js"></script></body></html>

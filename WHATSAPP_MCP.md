@@ -41,6 +41,12 @@ For a browser client, explicitly allow its Origin using
 The five tools are `get_whatsapp_status`, `list_templates`,
 `send_template_message`, `send_text_message`, and `send_tl_broadcast`.
 
+Read-only Zone A data tools (whole zone, no sending): `get_review` (TL / SS /
+KAM / RDS review with action plan), `get_tl_ftd` (today's sale by TL vs daily
+need), `get_scheme_payout` (one retailer's November schemes with stock on hand
+and payout if sold), `get_focus_models`, `get_punched_sales` and
+`get_visit_report`. A full feature guide is at `/api-guide`.
+
 1. Check status: Meta must authenticate, the phone-number ID must belong to the
    configured WABA, and template listing must succeed.
 2. List templates and select an approved name/language. This minimal sender

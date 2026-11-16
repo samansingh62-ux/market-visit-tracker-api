@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zone A API Guide</title>
+<style>
+:root{--bg:#F6F8FC;--card:#FFFFFF;--ink:#0B1B3F;--muted:#5B6B85;--line:#E2E8F0;--brand:#2F6BFF;--code:#0F1E44;--codeInk:#E6EDFF;--tag:#EEF2FF;--tagInk:#1E3A8A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#121B2E;--ink:#E8EEFB;--muted:#9AA8C2;--line:#24314D;--brand:#7FA6FF;--code:#050B18;--codeInk:#DCE6FF;--tag:#1B2A4D;--tagInk:#BFD0FF}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#121B2E;--ink:#E8EEFB;--muted:#9AA8C2;--line:#24314D;--brand:#7FA6FF;--code:#050B18;--codeInk:#DCE6FF;--tag:#1B2A4D;--tagInk:#BFD0FF}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:32px;margin:0 0 6px}h2{font-size:22px;margin:40px 0 12px;padding-top:8px}h3{font-size:16px;margin:0}
+p{margin:6px 0}.muted{color:var(--muted)}a{color:var(--brand)}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px}nav.toc a{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;text-decoration:none;font-weight:600;font-size:13px}
+.ep{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+.ep .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.m{font:700 12px/1 ui-monospace,Menlo,Consolas,monospace;padding:5px 8px;border-radius:6px;color:#fff;background:#16A34A}.m.post{background:#2F6BFF}
+code,.path{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px}.path{font-weight:700}
+.who{margin-left:auto;font-size:12px;font-weight:700;background:var(--tag);color:var(--tagInk);padding:4px 10px;border-radius:999px}
+pre{background:var(--code);color:var(--codeInk);border-radius:12px;padding:14px;overflow:auto;font-size:13px;line-height:1.5}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.params{margin-top:8px;font-size:14px}.params code{background:var(--tag);color:var(--tagInk);padding:1px 6px;border-radius:5px}
+@media(max-width:640px){.who{margin-left:0}h1{font-size:26px}}
+</style></head><body><div class="wrap">
+<h1>Zone A API Guide</h1>
+<p class="muted">Market Visit Tracker API · <code>https://market-visit-tracker-api.onrender.com</code>. Every feature in the app and the website runs on these endpoints. Interactive reference with every endpoint: <a href="/docs">/docs</a> · machine-readable spec: <a href="/openapi.json">/openapi.json</a>.</p>
+<nav class="toc"><a href="#auth">Sign in</a><a href="#access">Who sees what</a><a href="#perf">Performance</a><a href="#review">Review cards, image &amp; PPT</a><a href="#schemes">Schemes &amp; stock</a><a href="#focus">Focus models</a><a href="#punched">Punched sales</a><a href="#visits">Visits &amp; report</a><a href="#stock">Stock finder</a><a href="#retailer">Retailer 360</a><a href="#mcp">WhatsApp / Claude tools</a></nav>
+
+<h2 id="auth">Sign in</h2>
+<p>Log in with the same username and PIN as the app. Send the token as <code>Authorization: Bearer &lt;token&gt;</code> on every call. Managers can use <code>X-API-Key</code> instead. Zone heads with zone view add <code>X-View: zone</code> to read all of Zone A.</p>
+<pre>curl -X POST https://market-visit-tracker-api.onrender.com/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"YOUR_NAME","password":"YOUR_PIN"}'
+# → {"access_token":"…","user":{"name":"…","role":"TL"}}
+
+TOKEN=…   # keep it private: it works like your PIN
+curl -H "Authorization: Bearer $TOKEN" https://market-visit-tracker-api.onrender.com/performance-dashboard</pre>
+
+<h2 id="access">Who sees what</h2>
+<table><thead><tr><th>Login</th><th>Data returned</th></tr></thead><tbody>
+<tr><td>Admin, CEO, Manager, Zone A heads (zone view)</td><td>All of Zone A</td></tr>
+<tr><td>KAM</td><td>Their own area (all TLs, SSs and outlets in it)</td></tr>
+<tr><td>SS</td><td>Their TLs and all outlets (PO and NPO) under them</td></tr>
+<tr><td>TL</td><td>Their own PO outlets only</td></tr>
+<tr><td>RDS</td><td>Outlets billed through that RDS</td></tr>
+</tbody></table>
+<p class="muted">Scoping is done on the server. The same call returns different rows for different logins; there is no parameter to widen it.</p>
+
+<h2 id="perf">Performance</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/performance-dashboard</span><span class="who">All logins</span></div>
+<p>Month-to-date sales vs target for every outlet in your area, today’s sale (FTD), stock, days of stock, last visit, and scheme payout per outlet. Includes <code>hierarchy.tl</code>, <code>hierarchy.ss</code>, <code>hierarchy.rds</code> totals, which the TL-wise FTD page uses (<code>ftd_sales</code>, <code>ftd_counters</code>, <code>kam</code>, <code>ss</code> on each TL).</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/my-target-performance</span><span class="who">All logins</span></div><p>Your own target, achievement and per-day need.</p></div>
+
+<h2 id="review">Review cards, image &amp; PPT</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/review?role=TL&amp;name=Monojit Rudra Paul</span><span class="who">TL own · SS own TLs · KAM area · Admin all</span></div>
+<p>One-page review as JSON: summary (MTD, target, gap, need per day, FTD), flags, TLs under the person, every counter with stock, days of stock and last visit, and a 5-point action plan.</p>
+<p class="params"><code>role</code> TL, SS, KAM or RDS · <code>name</code> the person’s name as in the mapping. A KAM or SS opening an RDS sees only their part of it (<code>limited_to</code>).</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/review/image?role=…&amp;name=…</span><span class="who">Same as /review</span></div><p>The review card as a PNG file (1080 px wide), ready for WhatsApp.</p>
+<pre>curl -H "Authorization: Bearer $TOKEN" -OJ "https://market-visit-tracker-api.onrender.com/review/image?role=TL&amp;name=Monojit%20Rudra%20Paul"</pre></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/review/ppt?role=…&amp;name=…</span><span class="who">Same as /review</span></div><p>The review as a PowerPoint deck (.pptx): title, month so far, TL performance with chart, counters, stock and visits, action plan.</p></div>
+
+<h2 id="schemes">Schemes &amp; stock payout</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/performance-dashboard</span><span class="who">All logins</span></div>
+<p>Each outlet carries <code>schemes</code>: Booster, Focus, Clearance, Additional (per series: units sold, slab, rate, payout, next slab), Back Support margin and shop-boy slabs. While the model slabs are open, each series also has <code>stock</code> and <code>if_all_sold</code> (slab, payout and extra if all stock on hand sells), and the outlet has <code>stock_extra</code>. Chain retailers carry <code>shared</code> and are counted once.</p></div>
+
+<h2 id="focus">Focus models</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/focus-models</span><span class="who">All logins</span></div>
+<p>Target vs achievement for this month’s focus variants in your area. Add <code>?variant=…</code> for counters with stock but no sale, counters with a target but no stock, and VBAs at zero MTD and FTD.</p></div>
+
+<h2 id="punched">Punched sales</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/punched-sales</span><span class="who">Admin · KAM · SS · TL</span></div>
+<p>Sales punched by each VBA / RVBA / FVBA against their target, and units TLs and SSs punched under their own login. From the latest tertiary dashboard (date in <code>as_of</code>).</p></div>
+<div class="ep"><div class="top"><span class="m post">POST</span><span class="path">/admin/tertiary-dashboard</span><span class="who">Admin · CEO · Manager</span></div>
+<p>Upload the Tertiary Sales Dashboard .xlsx (multipart field <code>file</code>) to refresh punched sales. IMEIs are not stored.</p></div>
+
+<h2 id="visits">Visits &amp; visit report</h2>
+<div class="ep"><div class="top"><span class="m post">POST</span><span class="path">/visits</span><span class="who">Field logins</span></div><p>Log a market visit (retailer, feedback, follow-up, GPS, optional V-Work details). Photos: <code>POST /visits/{id}/photos</code>.</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/visits</span><span class="who">All logins</span></div><p>Visits in your area.</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/visit-report?date_from=2026-11-01&amp;date_to=2026-11-16</span><span class="who">Admin · Zone A heads · KAM</span></div>
+<p>Outlets each TL, SS and KAM visited, with remarks, and TL-wise outlets per day. Up to two months per call.</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/my-visits/vwork-pending</span><span class="who">Field logins</span></div><p>Your visits from the last 7 days not yet ticked as logged in V-Work. Tick one with <code>POST /visits/{id}/vwork-logged</code>.</p></div>
+
+<h2 id="stock">Stock finder</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/stock/finder?model=Y11 5G&amp;days=30</span><span class="who">TL · SS · KAM · zone</span></div>
+<p>Stock at each counter against what it sold in the last 15/30/45/60 days: not-moving and slow stock, colours, and counters selling the variant but low on stock. Leave out <code>model</code> for the summary by model.</p></div>
+
+<h2 id="retailer">Retailer 360</h2>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/retailers/{code}/360</span><span class="who">Outlets in your area</span></div><p>One outlet: sales trend, model mix, stock by model, visits, competition and schemes.</p></div>
+<div class="ep"><div class="top"><span class="m">GET</span><span class="path">/retailers/nearby?lat=…&amp;lng=…</span><span class="who">Field logins</span></div><p>Outlets near a GPS point, used when logging a visit.</p></div>
+
+<h2 id="mcp">WhatsApp / Claude tools</h2>
+<p>The same data is available as tools over MCP at <code>/mcp/</code> (Streamable HTTP, <code>Authorization: Bearer &lt;WHATSAPP_MCP_API_KEY&gt;</code>). Read tools return data for all of Zone A; send tools stay behind the WhatsApp delivery gates.</p>
+<table><thead><tr><th>Tool</th><th>What it returns</th></tr></thead><tbody>
+<tr><td><code>get_review</code></td><td>Review of a TL, SS, KAM or RDS (summary, flags, counters, action plan)</td></tr>
+<tr><td><code>get_tl_ftd</code></td><td>Today’s sale by TL against the daily need</td></tr>
+<tr><td><code>get_scheme_payout</code></td><td>Scheme payout for a retailer, with stock on hand and the payout if it is all sold</td></tr>
+<tr><td><code>get_focus_models</code></td><td>Focus-model target vs achievement; with a variant, counters not moving it and VBAs at zero</td></tr>
+<tr><td><code>get_punched_sales</code></td><td>VBA / FVBA punched sales and TL &amp; SS own punching</td></tr>
+<tr><td><code>get_visit_report</code></td><td>Outlets visited and remarks by person, and TL day by day</td></tr>
+<tr><td><code>get_whatsapp_status</code>, <code>list_templates</code>, <code>send_template_message</code>, <code>send_text_message</code>, <code>send_tl_broadcast</code></td><td>WhatsApp status and sending (gated; see WHATSAPP_MCP.md)</td></tr>
+</tbody></table>
+<p class="muted" style="margin-top:28px">Data comes from V-Work live sales and stock, the November mapping and target files, and the latest uploaded dashboards. Scheme figures are provisional.</p>
+</div></body></html>
