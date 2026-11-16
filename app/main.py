@@ -3350,20 +3350,3 @@ app.mount("/mcp", whatsapp_mcp.mcp_app)
 
 
 
-
-# ---- temporary: sales calendar check ----
-def _tmp_salescal():
-    time.sleep(70)
-    log = logging.getLogger("uvicorn.error")
-    z = {"name": "Manager", "role": "MANAGER"}
-    try:
-        p = performance_dashboard(z)
-        log.warning("SCCHK kam groups=%s", [(g["name"], g["sales"], g["target"]) for g in p["hierarchy"].get("kam", [])])
-        d = sales_by_date("2026-11-10", "2026-11-15", "Sailen Das", None, None, None, z)
-        log.warning("SCCHK range kam ok units=%s sss=%s tls=%s rdss=%s filter=%s", d["totals"]["units"], len(d.get("sss") or []), len(d.get("tls") or []), len(d.get("rdss") or []), d.get("filter"))
-        k = sales_by_date("2026-11-10", "2026-11-15", None, None, "Monojit Rudra Paul", None, {"name": "Prasanta Roy", "role": "KAM"})
-        log.warning("SCCHK outside area units=%s (expect 0)", k["totals"]["units"])
-    except Exception as exc:
-        log.warning("SCCHK ERR %r", exc)
-import threading as _thr_tmp
-_thr_tmp.Thread(target=_tmp_salescal, daemon=True).start()
