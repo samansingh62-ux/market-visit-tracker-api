@@ -2,7 +2,7 @@ from app.alignment import Alignment, alignment, canonical_name
 
 
 def test_master_is_unique_at_store_grain_and_retains_shared_retailers():
-    assert len(alignment.stores) == 730
+    assert len(alignment.stores) == 731
     assert len(alignment.retailers) == 589
     shared = [code for code in alignment.retailers if len({(r["kam"], r["ss"], r["tl"]) for r in alignment.assignments(code)}) > 1]
     assert len(shared) == 43

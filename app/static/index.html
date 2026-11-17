@@ -462,7 +462,7 @@ button{min-height:44px}
 <select id="adminStatus"><option value="">All status</option><option value="true">Active</option><option value="false">Inactive</option></select>
 <button id="adminRefresh" class="secondary">Refresh</button>
 <button id="createRdsPins" class="secondary">Create Missing RDS PINs &amp; Download</button>
-<button id="createAlignedTlPins" class="secondary">Create PINs: Ajoy, Manash, Biru &amp; Kamal</button>
+<button id="createAlignedTlPins" class="secondary">Create new TL PINs (incl. Longjam Rojit Singh)</button>
 </div>
 <div class="wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Hierarchy</th><th>Retailers</th><th>WhatsApp</th><th>Status</th><th>Last active</th><th>Action</th></tr></thead><tbody id="adminUsers"></tbody></table></div>
 <h3 style="margin:18px 0 8px">Recent sign-ins <span class="muted" style="font-weight:400;font-size:13px">· last 7 days</span></h3>
@@ -1505,7 +1505,7 @@ async function createAlignedTlPins(){
     const response=await fetch('/admin/users/tl/create-aligned-pins',{method:'POST',headers:adminHeaders()});
     if(!response.ok){const data=await response.json();throw Error(data.detail||'Unable to create PINs.')}
     const count=Number(response.headers.get('X-PINs-Created')||0);
-    if(!count)return msg('adminMsg','These four TL accounts already have PINs. Existing PINs were kept.',true);
+    if(!count)return msg('adminMsg','All new TL accounts already have PINs. Existing PINs were kept.',true);
     url=URL.createObjectURL(await response.blob());
     const link=document.createElement('a');link.href=url;link.download='new-aligned-tl-pins.csv';
     document.body.appendChild(link);link.click();link.remove();

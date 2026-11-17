@@ -2093,7 +2093,7 @@ def admin_create_missing_rds_pins():
 
 @app.post("/admin/users/tl/create-aligned-pins", dependencies=[Depends(require_admin_key)])
 def admin_create_aligned_tl_pins():
-    rows = crud.create_missing_rds_pins("TL", ("Ajoy Gogoi", "Manash Borah", "Biru Subba", "Kamal Rai"))
+    rows = crud.create_missing_rds_pins("TL", ("Ajoy Gogoi", "Manash Borah", "Biru Subba", "Kamal Rai", "Longjam Rojit Singh"))
     buffer = io.StringIO()
     writer = csv.writer(buffer)
     writer.writerow(["TL", "Username", "PIN"])
