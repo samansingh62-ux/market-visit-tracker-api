@@ -1794,8 +1794,37 @@ def _job_stock_sales(day: str) -> None:
             logging.getLogger("uvicorn.error").warning("stock/sales alert failed for %s: %s", u.get("name"), exc)
 
 
+def _short_counter(name) -> str:
+    return str(name or "").replace(" (Store)", "").replace(" (Retailer)", "").strip()
+
+
+def _job_not_uploaded(day: str) -> None:
+    """Midday: handsets V-Work counts as sold in the last 3 days at the user's counters that
+    nobody uploaded yet, so TLs get the VBAs to upload them while the sale is fresh."""
+    for u in engage.active_users(("TL", "SS", "RDS", "KAM", "CEO", "ADMIN", "VIEWER")):
+        try:
+            d = sales_not_uploaded(days=3, user=_as_token_user(u))
+            n = int((d.get("summary") or {}).get("units") or 0)
+            if not n:
+                continue
+            by_counter: dict = {}
+            for dd in d.get("dates") or []:
+                for r in dd.get("rows") or []:
+                    name = _short_counter(r.get("store_name") or r.get("retailer_name"))
+                    by_counter[name] = by_counter.get(name, 0) + int(r.get("units") or 0)
+            top = sorted(by_counter.items(), key=lambda kv: -kv[1])[:3]
+            names = ", ".join(f"{k} ({v})" for k, v in top)
+            more = " and more" if len(by_counter) > 3 else ""
+            engage.add_notification(
+                u["id"], "notup", f"{n} sold handset{'s' if n != 1 else ''} not uploaded in V-Work",
+                f"{names}{more}. Upload them so they count in system sales.", "#/notup", dedupe_key=f"notup:{day}")
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("not-uploaded alert failed for %s: %s", u.get("name"), exc)
+
+
 NOTIFICATION_JOBS = (
     ("stock_sales", "NOTIFY_STOCK_TIME", "10:00", _job_stock_sales),
+    ("notup", "NOTIFY_NOT_UPLOADED_TIME", "12:30", _job_not_uploaded),
     ("eod", "NOTIFY_EOD_TIME", "19:00", _job_eod_reminder),
     ("target", "NOTIFY_TARGET_TIME", "19:30", _job_target_update),
 )
@@ -2339,6 +2368,44 @@ def stock_finder(
     result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}}
     with _finder_lock:
         _finder_cache[key] = (time.monotonic(), result)
+    return result
+
+
+_notup_cache: dict = {}
+_notup_lock = __import__("threading").Lock()
+NOTUP_ROLES = {"TL", "SS", "RDS", "KAM", "CEO", "ADMIN", "VIEWER", "MANAGER"}
+
+
+@app.get("/sales/not-uploaded")
+def sales_not_uploaded(
+    days: int = Query(default=7, ge=1, le=31),
+    user: dict = Depends(get_dashboard_user),
+):
+    """Handsets V-Work counts as sold (Backstage sales) at the user's counters that nobody has
+    uploaded as a sale yet, day by day, so the team can upload them."""
+    if str(user.get("role") or "").upper() not in NOTUP_ROLES:
+        raise HTTPException(status_code=403, detail="This list is for TL, SS, RDS, KAM and zone roles.")
+    scope = _scope(user)
+    key = (tuple(sorted(scope.items())), days)
+    now = time.monotonic()
+    with _notup_lock:
+        hit = _notup_cache.get(key)
+        if hit and now - hit[0] < 300:
+            return hit[1]
+        for k in [k for k, v in _notup_cache.items() if now - v[0] >= 300]:
+            _notup_cache.pop(k, None)
+    headers = {"X-API-Key": VWORK_LIVE_API_KEY} if VWORK_LIVE_API_KEY else {}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(180.0, connect=10.0)) as client:
+            response = _vwork_request(client, "GET", f"{VWORK_LIVE_API_URL}/api/v1/sales/not-uploaded",
+                                      params={**scope, "days": days}, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"V-Work backstage sales are unavailable right now: {exc}") from exc
+    result = {**data, "user": {"name": user.get("name"), "role": user.get("role")}}
+    with _notup_lock:
+        _notup_cache[key] = (time.monotonic(), result)
     return result
 
 

@@ -303,6 +303,10 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <div class="rank" style="background:var(--warn-bg);color:var(--warn)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Stock finder</b><span class="note">Non-moving stock in your area, for sale returns</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
 
+    <a class="listCard hidden" href="#/notup" id="notupLink">
+      <div class="rank" style="background:var(--bad-bg);color:var(--bad)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v6M9.5 10.5L12 13l2.5-2.5"/><path d="M10.5 18h3"/></svg></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Not uploaded in V-Work</b><span class="note">Sold handsets (background sales) still to upload, day by day</span></div><span class="pill hidden num" id="notupCount" style="background:var(--bad-bg);color:var(--bad)"></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+
     <a class="listCard hidden" href="#/vreport" id="visitReportLink">
       <div class="rank" style="background:var(--brand-soft);color:var(--brand-ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></div>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b style="font-size:15px">Visit report</b><span class="note">Outlets visited and remarks by TL, SS and KAM</span></div><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
@@ -482,6 +486,22 @@ label.lbl small{font-size:13px;font-weight:500;color:var(--muted);margin-top:-4p
       <span class="note" id="sfScope"></span>
     </form>
     <div id="sfResult" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</section>
+
+<section id="s-notup" class="screen hidden" aria-label="Not uploaded in V-Work">
+  <div class="topbar">
+    <button class="iconBtn" data-back aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <h1 style="flex:1">Not uploaded in V-Work</h1>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="chipScroll" id="nuDays" role="group" aria-label="Period">
+      <button type="button" class="chip dark" data-d="1">Today</button>
+      <button type="button" class="chip dark" data-d="3">3 days</button>
+      <button type="button" class="chip dark" data-d="7">7 days</button>
+      <button type="button" class="chip dark" data-d="month">This month</button>
+    </div>
+    <div id="nuResult" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 </section>
 
@@ -813,7 +833,7 @@ function logout(message) {
 
 /* ---------------- router ---------------- */
 let afterRoute = null;
-const SCREENS = ['login', 'home', 'sales', 'vreport', 'punched', 'ftd', 'review', 'vwork', 'focus', 'stock', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
+const SCREENS = ['login', 'home', 'sales', 'vreport', 'punched', 'ftd', 'review', 'vwork', 'focus', 'stock', 'notup', 'visit', 'retailers', 'r360', 'team', 'eod', 'compete', 'centry', 'insights', 'notifications', 'chats', 'chat'];
 const NAV_SCREENS = { home: 'home', retailers: 'retailers', team: 'home', compete: 'compete', insights: 'home', chats: 'chats' };
 
 function route() {
@@ -836,7 +856,7 @@ function route() {
   window.scrollTo(0, 0);
   const arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (afterRoute) { const f = afterRoute; afterRoute = null; setTimeout(f, 0); }
-  ({ login: showLogin, home: showHome, sales: showSales, vreport: showVisitReport, punched: showPunched, ftd: showFtd, review: () => showReview(arg), vwork: () => showVwork(arg), focus: () => showFocus(arg), stock: () => showStock(arg), visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
+  ({ login: showLogin, home: showHome, sales: showSales, vreport: showVisitReport, punched: showPunched, ftd: showFtd, review: () => showReview(arg), vwork: () => showVwork(arg), focus: () => showFocus(arg), stock: () => showStock(arg), notup: showNotup, visit: () => showVisit(arg), retailers: showRetailers, r360: () => showR360(arg), team: showTeam, eod: showEod, compete: showCompete, centry: () => showCEntry(arg), insights: () => showInsights(arg), notifications: showNotifications, chats: showChats, chat: () => showChat(arg) })[name]();
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
@@ -966,6 +986,7 @@ function showHome() {
   renderViewSwitch();
   $('homeHello').textContent = 'Hi, ' + firstName(user.name);
   $('stockFinderLink').classList.toggle('hidden', !canFindStock());
+  $('notupLink').classList.toggle('hidden', !canSeeNotup()); if (canSeeNotup()) loadNotupCount();
   $('visitReportLink').classList.toggle('hidden', !canSeeVisitReport());
   $('punchedLink').classList.toggle('hidden', !canSeePunched());
   { const r = String(user.role || '').toUpperCase(); const rl = $('reviewLink');
@@ -1690,6 +1711,125 @@ async function runStock() {
   } catch (e) {
     if (seq === sfSeq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="runStock()">Try again</button>`;
   }
+}
+/* ---------------- not uploaded in V-Work (backstage sales, upload status No) ---------------- */
+const NOTUP_ROLES = ['TL', 'SS', 'RDS', 'KAM', 'CEO', 'ADMIN', 'VIEWER', 'MANAGER'];
+function canSeeNotup() { return view === 'zone' || NOTUP_ROLES.includes(String(user.role || '').toUpperCase()); }
+const nu = { seq: 0, data: null, tl: '' };
+function nuPeriod() { const d = store.get('mvt_nu_days'); return ['1', '3', '7', 'month'].includes(String(d)) ? String(d) : '3'; }
+function nuDays(p) { return p === 'month' ? new Date().getDate() : Number(p); }
+function nuModel(m) { return String(m || '').replace(/_EX\s*/, ' ').replace(/\(/, ' (').replace(/\s+/g, ' ').trim(); }
+function nuCounter(r) { return String(r.store_name || r.retailer_name || r.store_code || '').replace(/ \((Store|Retailer)\)$/, ''); }
+function nuTl(t, short) { t = String(t || ''); if (!t || /direct|vacant|no tl/i.test(t)) return t; return short ? firstName(t) : 'TL ' + t; }
+function nuDay(iso) { return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); }
+async function loadNotupCount() {
+  try {
+    const d = await api('/sales/not-uploaded?days=3');
+    const n = (d.summary || {}).units || 0, b = $('notupCount');
+    b.textContent = fmt(n); b.classList.toggle('hidden', !n);
+  } catch { /* the card still opens the full list */ }
+}
+function showNotup() {
+  if (!canSeeNotup()) { $('nuResult').innerHTML = '<div class="err">This list is for TL, SS, RDS, KAM and zone roles.</div>'; return; }
+  const p = nuPeriod();
+  document.querySelectorAll('#nuDays [data-d]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.d === p)));
+  runNotup();
+}
+$('nuDays').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  store.set('mvt_nu_days', b.dataset.d); nu.tl = ''; showNotup();
+});
+async function runNotup() {
+  const seq = ++nu.seq, box = $('nuResult'), days = nuDays(nuPeriod());
+  box.innerHTML = `<div class="card" style="display:flex;flex-direction:column;gap:8px"><b>Checking V-Work background sales…</b><span class="note">Reads V-Work’s backstage sales with upload status “No” for the last ${days} day${days > 1 ? 's' : ''}.</span></div><div class="skeleton" style="height:90px"></div><div class="skeleton" style="height:90px"></div>`;
+  try {
+    const d = await api('/sales/not-uploaded?days=' + days);
+    if (seq !== nu.seq) return;
+    nu.data = d; renderNotup();
+  } catch (e) {
+    if (seq === nu.seq) box.innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn soft" style="height:44px" onclick="runNotup()">Try again</button>`;
+  }
+}
+function nuRows() {
+  const d = nu.data || {}; const out = [];
+  (d.dates || []).forEach((day) => (day.rows || []).forEach((r) => { if (!nu.tl || (r.tl || 'No TL') === nu.tl) out.push(r); }));
+  return out;
+}
+function nuGroups(rows) {   // date -> counter -> handsets
+  const days = new Map();
+  rows.forEach((r) => {
+    if (!days.has(r.date)) days.set(r.date, new Map());
+    const k = r.store_code || r.retailer_code || nuCounter(r);
+    const m = days.get(r.date);
+    if (!m.has(k)) m.set(k, { r, items: [], units: 0 });
+    const g = m.get(k); g.items.push(r); g.units += r.units || 0;
+  });
+  return days;
+}
+function nuItemLines(g) {
+  return g.items.flatMap((x) => (x.imeis && x.imeis.length ? x.imeis.map((im) => `• ${nuModel(x.model)} · IMEI ${im}`) : [`• ${nuModel(x.model)}${x.units > 1 ? ' × ' + x.units : ''}`]));
+}
+function nuShareText(groups) {
+  const lines = ['Please upload these sales in V-Work today. V-Work shows them sold but not uploaded:'];
+  groups.forEach(({ date, g }) => {
+    lines.push('', `${nuDay(date)} · ${nuCounter(g.r)}${g.r.store_code ? ' (' + g.r.store_code + ')' : ''}${g.r.tl ? ' · ' + nuTl(g.r.tl) : ''}`);
+    lines.push(...nuItemLines(g));
+  });
+  return lines.join('\n');
+}
+async function nuShare(text) {
+  try {
+    if (navigator.share) { await navigator.share({ title: 'Not uploaded in V-Work', text }); return; }
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  } catch (e) { if (e && e.name !== 'AbortError') { try { await navigator.clipboard.writeText(text); toast('List copied'); } catch { toast('Couldn’t share the list', true); } } }
+}
+function renderNotup() {
+  const d = nu.data || {}, box = $('nuResult');
+  const rows = nuRows(), total = rows.reduce((a, r) => a + (r.units || 0), 0);
+  const counters = new Set(rows.map((r) => r.store_code || r.retailer_code)).size;
+  const tls = ((d.summary || {}).by_tl || []);
+  const asOf = d.as_of ? new Date(d.as_of).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '';
+  const head = `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:8px"><b class="num" style="font-size:34px;line-height:1;color:${total ? 'var(--bad)' : 'var(--good)'}">${fmt(total)}</b>
+        <span class="note" style="font-size:14px">sold handset${total === 1 ? '' : 's'} not uploaded${counters ? ` · ${fmt(counters)} counter${counters === 1 ? '' : 's'}` : ''}</span></div>
+      <span class="note" style="font-size:13px">V-Work’s background (backstage) sales count these handsets as sold, but no one has uploaded the sale. They stay out of system sales and your achievement until a VBA uploads them.${asOf ? ' Checked ' + esc(asOf) + '.' : ''}</span>
+      ${total ? '<button class="btn soft" style="height:44px;font-size:15px" id="nuShareAll">Share list on WhatsApp</button>' : ''}
+    </div>`;
+  const tlBox = tls.length > 1 ? `<div class="chipScroll" id="nuTls" role="group" aria-label="TL">
+      <button type="button" class="chip" data-tl="" aria-pressed="${!nu.tl}">All TLs</button>
+      ${tls.map((t) => `<button type="button" class="chip" data-tl="${esc(t.tl)}" aria-pressed="${nu.tl === t.tl}">${esc(nuTl(t.tl, true))} · ${fmt(t.units)}</button>`).join('')}
+    </div>` : '';
+  if (!total) {
+    box.innerHTML = head + tlBox + `<div class="card note">Nothing pending${nu.tl ? ' for ' + esc(nu.tl) : ''} in this period. Every handset V-Work counts as sold has been uploaded.</div>`;
+    bindNotup([]); return;
+  }
+  const days = nuGroups(rows), flat = [];
+  let html = head + tlBox;
+  [...days.keys()].sort().reverse().forEach((date) => {
+    const m = days.get(date); const n = [...m.values()].reduce((a, g) => a + g.units, 0);
+    html += `<div class="sectionHead"><h2 style="font-size:16px">${esc(nuDay(date))}</h2><span class="note num">${fmt(n)} handset${n === 1 ? '' : 's'}</span></div>`;
+    [...m.values()].sort((a, b) => b.units - a.units).forEach((g) => {
+      const i = flat.push({ date, g }) - 1;
+      html += `<div class="card" style="display:flex;flex-direction:column;gap:8px">
+        <div class="between"><b style="font-size:15px">${esc(nuCounter(g.r))}</b><span class="pill num" style="background:var(--bad-bg);color:var(--bad)">${fmt(g.units)}</span></div>
+        <span class="note" style="font-size:12px">${esc([g.r.store_code, nuTl(g.r.tl), g.r.rds].filter(Boolean).join(' · '))}</span>
+        <div style="display:flex;flex-direction:column;gap:6px">${g.items.map((x) => (x.imeis && x.imeis.length ? x.imeis.map((im) => `<div class="between" style="font-size:14px"><span>${esc(nuModel(x.model))}</span><button class="chip" style="height:32px;font-size:12px" data-copy="${esc(im)}">IMEI ${esc(im)}</button></div>`).join('')
+          : `<div class="between" style="font-size:14px"><span>${esc(nuModel(x.model))}</span><b class="num">${fmt(x.units)}</b></div>`)).join('')}</div>
+        <button class="btn soft" style="height:40px;font-size:14px" data-share="${i}">Ask to upload</button>
+      </div>`;
+    });
+  });
+  html += `<span class="note" style="font-size:12px;padding:0 4px">Source: ${esc(d.source || 'V-Work Store Sales, Backstage')}. A handset drops off this list once its sale is uploaded.</span>`;
+  box.innerHTML = html;
+  bindNotup(flat);
+}
+function bindNotup(flat) {
+  const all = $('nuShareAll');
+  if (all) all.onclick = () => { const groups = []; nuGroups(nuRows()).forEach((m, date) => m.forEach((g) => groups.push({ date, g }))); groups.sort((a, b) => (a.date < b.date ? 1 : -1)); nuShare(nuShareText(groups)); };
+  const tl = $('nuTls');
+  if (tl) tl.onclick = (e) => { const b = e.target.closest('[data-tl]'); if (!b) return; nu.tl = b.dataset.tl; renderNotup(); };
+  $('nuResult').querySelectorAll('[data-share]').forEach((b) => { b.onclick = () => nuShare(nuShareText([flat[Number(b.dataset.share)]])); });
+  $('nuResult').querySelectorAll('[data-copy]').forEach((b) => { b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.copy); toast('IMEI copied'); } catch { toast('Couldn’t copy', true); } }; });
 }
 function sfPill(status) {
   const c = status === 'Not moving' ? ['var(--bad-bg)', 'var(--bad)'] : status === 'Slow' ? ['var(--warn-bg)', 'var(--warn)'] : ['var(--good-bg)', 'var(--good)'];
@@ -3066,7 +3206,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 /* ---------------- NOTIFICATIONS ---------------- */
 const N_ICON = {
   target: ['🎯', 'var(--brand-soft)'], eod: ['📝', 'var(--warn-bg)'], stock: ['📦', 'var(--hi-bg)'],
-  sales: ['📉', 'var(--bad-bg)'], competition: ['⚔️', '#EEF1F6']
+  sales: ['📉', 'var(--bad-bg)'], competition: ['⚔️', '#EEF1F6'], notup: ['📲', 'var(--bad-bg)']
 };
 async function showNotifications() {
   $('notifList').innerHTML = '<div class="skeleton" style="height:76px"></div><div class="skeleton" style="height:76px"></div>';
