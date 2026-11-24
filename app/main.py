@@ -986,7 +986,7 @@ def person_review(role: str = Query(..., pattern="^(TL|SS|KAM|RDS)$"), name: str
     if role in ("SS", "KAM", "RDS"):
         left = max(int(perf["period"].get("days_remaining") or 1), 1)
         for g in (perf.get("hierarchy") or {}).get("tl") or []:
-            if g["name"] in review.PLACEHOLDERS or not g.get("target") and not g.get("sales"):
+            if g["name"] in review.PLACEHOLDERS or g.get("placeholder") or not g.get("target") and not g.get("sales"):
                 continue
             team.append({"name": g["name"], "sales": g["sales"], "target": g["target"], "pct": g.get("achievement_pct"),
                          "ftd": g.get("ftd_sales"), "need": -(-max(g["target"] - g["sales"], 0) // left) if g["target"] else 0})
@@ -2836,16 +2836,26 @@ def _build_performance_dashboard(user: dict):
     total_back_base = sum(int(x.get("back_support_base_margin") or 0) for x in retailer_rows)
     total_back_payable = sum(int(x.get("back_support_payable") or 0) for x in retailer_rows if x.get("back_support_payable") is not None)
 
+    # A TL card's KAM / SS come from that TL's own counters. Placeholder "TLs" such as
+    # "SS Direct (NPO)" are shared by several SSs, so each SS gets its own card.
+    def _tl_key(tl, ss):
+        tl = canonical_name(tl) if tl else tl
+        if tl and tl in review.PLACEHOLDERS and tl != "Unassigned" and ss:
+            return f"{tl} – {canonical_name(ss)}"
+        return tl
     tl_parents = {}
     for r in alignment.rows:
         if r.get("tl"):
-            tl_parents.setdefault(canonical_name(r["tl"]), (r.get("kam") or "", r.get("ss") or ""))
+            k = _tl_key(r["tl"], r.get("ss"))
+            kam_set, ss_set = tl_parents.setdefault(k, (set(), set()))
+            if r.get("kam"): kam_set.add(canonical_name(r["kam"]))
+            if r.get("ss"): ss_set.add(canonical_name(r["ss"]))
     hierarchy = {}
     for field in ("tl", "ss", "rds", "kam"):
         explicit_targets = crud.list_explicit_hierarchy_targets(month, field.upper()) if field != "kam" else {}
         groups = {}
         for store in store_sales:
-            name = store.get(field) or "Unassigned"
+            name = (_tl_key(store.get("tl"), store.get("ss")) if field == "tl" else store.get(field)) or "Unassigned"
             g = groups.setdefault(name, {
                 "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
                 "ftd_sales": 0, "ftd_sales_value": 0.0, "stock": 0,
@@ -2862,7 +2872,11 @@ def _build_performance_dashboard(user: dict):
                 g.setdefault("_ftd_codes", set()).add(store["retailer_code"])
         # Include assigned retailers even where there are no current sales.
         for item in retailer_rows:
-            names = {canonical_name(a.get(field)) for a in item.get("assignments", [])}
+            if field == "tl":
+                names = {_tl_key(a.get("tl"), a.get("ss")) for a in item.get("assignments", [])}
+                item["tl_keys"] = sorted(n for n in names if n)
+            else:
+                names = {canonical_name(a.get(field)) for a in item.get("assignments", [])}
             for name in names:
                 g = groups.setdefault(name, {
                     "name": name, "retailers": 0, "target": 0, "sales": 0, "sales_value": 0.0,
@@ -2885,7 +2899,11 @@ def _build_performance_dashboard(user: dict):
             g["retailers"] = len(g.pop("_codes"))
             g["ftd_counters"] = len(g.pop("_ftd_codes", ()))
             if field == "tl":
-                g["kam"], g["ss"] = tl_parents.get(g["name"], ("", ""))
+                kam_set, ss_set = tl_parents.get(g["name"], (set(), set()))
+                g["kam"], g["ss"] = " / ".join(sorted(kam_set)), " / ".join(sorted(ss_set))
+                base = g["name"].split(" – ")[0]
+                g["placeholder"] = base in review.PLACEHOLDERS
+                g["tl"] = base
             explicit = explicit_targets.get(g["name"])
             if explicit:
                 g["target"] = int(explicit.get("target_volume") or 0)

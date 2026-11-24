@@ -1481,18 +1481,18 @@ function renderFtd(d, at) {
       <div class="stat"><span>Need today</span><b class="num">${fmt(tot.n)}</b><span class="note" style="font-size:11px">${tot.n ? fmt1(tot.u * 100 / tot.n) + '% done' : ''}</span></div>
       <div class="stat"><span>TLs at zero</span><b class="num" style="color:${tot.z ? 'var(--bad)' : 'inherit'}">${fmt(tot.z)}</b><span class="note" style="font-size:11px">of ${base.length}</span></div></div></div>`;
   const ret = d.retailers || [];
-  const counters = (name) => ret.filter((r) => (r.assignments || []).some((a) => a.tl === name) || r.tl === name);
+  const counters = (name) => ret.filter((r) => (r.tl_keys || []).includes(name) || (r.assignments || []).some((a) => a.tl === name) || r.tl === name);
   $('ftdResult').innerHTML = `<span class="note">Need = units per day to reach the month target from where the TL started today · ${d.period.days_remaining} day${d.period.days_remaining > 1 ? 's' : ''} left incl. today</span>
     ${rows.map((t) => `<details class="card" style="padding:12px 14px" data-tl="${esc(t.name)}">
       <summary style="cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:6px">
         <div class="between" style="gap:10px;align-items:flex-start">
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(t.name)}</b>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><b class="ellipsis" style="font-size:15px">${esc(t.placeholder ? t.tl : t.name)}</b>
             <span class="note ellipsis" style="font-size:12px">${t.kam ? 'KAM ' + esc(t.kam) : ''}${t.ss ? ' · SS ' + esc(t.ss) : ''}</span>
             <span class="note" style="font-size:12px">${t.ftd_counters || 0} of ${t.retailers} counters sold today · MTD ${fmt(t.sales)}${t.target ? ' / ' + fmt(t.target) : ''}</span></div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;white-space:nowrap"><b class="num" style="font-size:20px;color:${t.ftd_sales ? 'var(--ink)' : 'var(--bad)'}">${fmt(t.ftd_sales)}<span class="note" style="font-size:13px"> / ${t.need == null ? '—' : fmt(t.need)}</span></b>
             <span class="note" style="font-size:11px">${t.pct == null ? 'no target' : `<b style="color:${tone(t.pct)}">${Math.round(t.pct)}%</b> of need`} · ${money(t.ftd_sales_value)}</span></div></div>
         ${t.need ? `<div style="height:6px;border-radius:3px;background:#E9EEF6;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, t.pct || 0)}%;background:${tone(t.pct)}"></i></div>` : ''}
-      </summary><div class="ftdCounters" style="margin-top:8px;border-top:1px solid var(--line)"></div>${RV_SKIP.includes(t.name) ? '' : `<a class="btn soft" style="height:40px;margin-top:8px;font-size:14px" href="${rvHref('TL', t.name)}">Full review card ›</a>`}</details>`).join('') || '<div class="card note">No TL matches.</div>'}`;
+      </summary><div class="ftdCounters" style="margin-top:8px;border-top:1px solid var(--line)"></div>${RV_SKIP.includes(t.name) || t.placeholder ? '' : `<a class="btn soft" style="height:40px;margin-top:8px;font-size:14px" href="${rvHref('TL', t.name)}">Full review card ›</a>`}</details>`).join('') || '<div class="card note">No TL matches.</div>'}`;
   $('ftdResult').querySelectorAll('details').forEach((el) => el.addEventListener('toggle', () => {
     if (!el.open) return;
     const list = counters(el.dataset.tl);
